@@ -13,7 +13,7 @@
     /* Language and Environment */
     "target": "es2016" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
     // "lib": [],                                        /* Specify a set of bundled library declaration files that describe the target runtime environment. */
-    "jsx": "preserve" /* Specify what JSX code is generated. */,
+    "jsx": "react-jsx" /* Specify what JSX code is generated. */,
     // "experimentalDecorators": true,                   /* Enable experimental support for TC39 stage 2 draft decorators. */
     // "emitDecoratorMetadata": true,                    /* Emit design-type metadata for decorated declarations in source files. */
     // "jsxFactory": "",                                 /* Specify the JSX factory function used when targeting React JSX emit, e.g. 'React.createElement' or 'h'. */
@@ -27,7 +27,7 @@
     /* Modules */
     "module": "ESNext" /* Specify what module code is generated. */,
     // "rootDir": "./",                                  /* Specify the root folder within your source files. */
-    // "moduleResolution": "node",                       /* Specify how TypeScript looks up a file from a given module specifier. */
+    "moduleResolution": "node" /* Specify how TypeScript looks up a file from a given module specifier. */,
     // "baseUrl": "./",                                  /* Specify the base directory to resolve non-relative module names. */
     // "paths": {},                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */
@@ -77,12 +77,12 @@
 
     /* Type Checking */
     "strict": true /* Enable all strict type-checking options. */,
-    "noImplicitAny": true /* Enable error reporting for expressions and declarations with an implied 'any' type. */,
+    // "noImplicitAny": true /* Enable error reporting for expressions and declarations with an implied 'any' type. */,
     "strictNullChecks": true /* When type checking, take into account 'null' and 'undefined'. */,
     // "strictFunctionTypes": true,                      /* When assigning functions, check to ensure parameters and the return values are subtype-compatible. */
     // "strictBindCallApply": true,                      /* Check that the arguments for 'bind', 'call', and 'apply' methods match the original function. */
     // "strictPropertyInitialization": true,             /* Check for class properties that are declared but not set in the constructor. */
-    "noImplicitThis": true /* Enable error reporting when 'this' is given the type 'any'. */,
+    // "noImplicitThis": true /* Enable error reporting when 'this' is given the type 'any'. */,
     // "useUnknownInCatchVariables": true,               /* Default catch clause variables as 'unknown' instead of 'any'. */
     // "alwaysStrict": true,                             /* Ensure 'use strict' is always emitted. */
     // "noUnusedLocals": true,                           /* Enable error reporting when local variables aren't read. */
