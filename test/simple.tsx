@@ -1,7 +1,7 @@
 import { useFunnel } from "../src/index.js";
 
 export function Simple() {
-  const Funnel = useFunnel({
+  const funnel = useFunnel({
     id: "simple-funnel",
     steps: ["이름_입력", "주민등록번호_입력", "휴대폰번호_입력"],
     initial: {
@@ -15,7 +15,7 @@ export function Simple() {
   });
 
   return (
-    <Funnel
+    <funnel.Render
       이름_입력={({ context, transition }) => (
         <button
           onClick={() =>

@@ -1,110 +1,143 @@
-import { z } from "zod";
-import { createUseFunnel } from "../src/index.js";
-
-// const useMyFunnel = createUseFunnel<{
-//   이름_입력: { 이름?: string };
-//   주민등록번호_입력: { 이름: string };
-//   휴대폰번호_입력: { 이름: string; 주민등록번호: string };
-// }>();
-
-const Context_Step1 = z.object({
-  이름: z.string().optional(),
-  주민등록번호: z.string().optional(),
-});
-
-const Context_Step2 = Context_Step1.required({
-  이름: true,
-});
-
-const Context_Step3 = Context_Step2.required({
-  주민등록번호: true,
-});
-
-const useMyFunnel = createUseFunnel({
-  이름_입력: Context_Step1.parse,
-  주민등록번호_입력: Context_Step2.parse,
-  휴대폰번호_입력: Context_Step3.parse,
-  약관동의: Context_Step3.parse,
-});
+import { useFunnel } from "../src/index.js";
 
 export function App() {
-  return useMyFunnel({
+  const funnel = useFunnel<{
+    이름_입력: { 이름?: string };
+    주민등록번호_입력: { 이름: string };
+    휴대폰번호_입력: { 이름: string; 주민등록번호: string };
+    약관동의: { 이름: string; 주민등록번호: string; 휴대폰번호: string };
+  }>({
+    id: "complex-funnel",
     initial: {
       step: "이름_입력",
       context: {},
     },
-    setup: {
-      이름_입력: (step) =>
-        step
-          .on("이름_입력_완료", (payload: { 이름: string }, { transition }) => {
+  });
+
+  switch (funnel.step) {
+    case "이름_입력": {
+      const 이름_입력_완료 = (payload: { 이름: string }) => {
+        return funnel.transition("주민등록번호_입력", {
+          이름: payload.이름,
+        });
+      };
+
+      return <button onClick={() => 이름_입력_완료({ 이름: "김토스" })} />;
+    }
+  }
+
+  return (
+    <funnel.Render
+      // 이름_입력={({ context, transition }) => {
+      // const 이름_입력_완료 = (payload: { 이름: string }) => {
+      //   return transition("주민등록번호_입력", {
+      //     이름: payload.이름,
+      //   });
+      // };
+
+      //   return (
+      //     <>
+      //       <p>이름: {context.이름}</p>
+      //       <button onClick={() => 이름_입력_완료({ 이름: "강민우" })} />
+      //     </>
+      //   );
+      // }}
+      이름_입력={funnel.withEvents({
+        events: {
+          이름_입력_완료: (payload: { 이름: string }, { transition }) => {
             return transition("주민등록번호_입력", {
               이름: payload.이름,
             });
-          })
-          .overlay(({ dispatch }) => {
-            return (
+          },
+          이름_입력_실패: (payload: { 이유: string }, { transition }) => {
+            throw {};
+          },
+        },
+        render({ context, dispatch }) {
+          return (
+            <button
+              onClick={() =>
+                dispatch({
+                  type: "이름_입력_완료",
+                  payload: {
+                    이름: "홍길동",
+                  },
+                })
+              }
+            />
+          );
+        },
+      })}
+      주민등록번호_입력={funnel.withEvents({
+        events: {
+          주민등록번호_입력_완료: (
+            payload: { value: string },
+            { transition }
+          ) => {
+            return transition("휴대폰번호_입력", {
+              주민등록번호: payload.value,
+            });
+          },
+          주민등록번호_입력_취소: (_, { transition }) => {
+            return transition("이름_입력");
+          },
+        },
+        render({ context, dispatch }) {
+          return (
+            <div>
+              <p>이름: {context.이름.toString()}</p>
               <button
                 onClick={() =>
                   dispatch({
-                    type: "이름_입력_완료",
+                    type: "주민등록번호_입력_완료",
                     payload: {
-                      이름: "홍길동",
+                      value: "123456-1234567",
                     },
                   })
                 }
-              />
-            );
-          }),
-      주민등록번호_입력: (step) =>
-        step
-          .on({
-            주민등록번호_입력_완료(payload: { value: string }, { transition }) {
-              return transition("휴대폰번호_입력", {
-                주민등록번호: payload.value,
-              });
-            },
-            주민등록번호_입력_취소(_, { transition }) {
-              return transition("이름_입력");
-            },
-          })
-          .render(({ context, dispatch }) => {
-            return (
-              <div>
-                <p>이름: {context.이름.toString()}</p>
-                <button
-                  onClick={() =>
-                    dispatch({
-                      type: "주민등록번호_입력_완료",
-                      payload: {
-                        value: "123456-1234567",
-                      },
-                    })
-                  }
-                >
-                  완료
-                </button>
-                <button
-                  onClick={() =>
-                    dispatch({
-                      type: "주민등록번호_입력_취소",
-                    })
-                  }
-                >
-                  취소
-                </button>
-              </div>
-            );
-          }),
-      휴대폰번호_입력: (step) =>
-        step.render(({ context, dispatch }) => {
+              >
+                완료
+              </button>
+              <button
+                onClick={() =>
+                  dispatch({
+                    type: "주민등록번호_입력_취소",
+                  })
+                }
+              >
+                취소
+              </button>
+            </div>
+          );
+        },
+      })}
+      휴대폰번호_입력={funnel.withEvents({
+        events: {
+          휴대폰번호_입력_완료: (
+            payload: { value: string },
+            { transition }
+          ) => {
+            return transition("약관동의", {
+              휴대폰번호: payload.value,
+            });
+          },
+          휴대폰번호_입력_취소: (_, { transition }) => {
+            return transition("주민등록번호_입력");
+          },
+        },
+        render({ context, dispatch }) {
           return (
             <div>
               <p>이름: {context.이름.toString()}</p>
               <p>주민등록번호: {context.주민등록번호.toString()}</p>
             </div>
           );
-        }),
-      약관동의: (step) => step.overlay(({ context, isOpen, close }) => null),
-    },
-  });
+        },
+      })}
+      약관동의={() => {
+        // TODO: overlay를 어떻게 구현할까?
+        return <div>약관동의</div>;
+      }}
+    />
+  );
 }
