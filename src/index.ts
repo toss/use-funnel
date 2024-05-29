@@ -1,1 +1,1 @@
-export { createUseFunnel } from "./useFunnel.js";
+export * from "./useFunnel.js";

@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 devDependencies:
+  '@tossteam/use-overlay':
+    specifier: ^17.453.7
+    version: 17.453.7(react@18.3.1)
   '@types/react':
     specifier: ^18.3.2
     version: 18.3.2
@@ -23,6 +26,9 @@ devDependencies:
   typescript:
     specifier: ^4.9.5
     version: 4.9.5
+  zod:
+    specifier: ^3.23.8
+    version: 3.23.8
 
 packages:
 
@@ -439,6 +445,18 @@ packages:
     requiresBuild: true
     dev: true
     optional: true
+
+  /@tossteam/use-overlay@17.453.7(react@18.3.1):
+    resolution: {integrity: sha512-jtm2YTCCGQmAeRwjced9nEC8CMDMBcMda6eJlmxlgtIfaMZACHD6U7uLqx6tqbJ9OtMc7qPl9OgQdFTWONfH2A==}
+    peerDependencies:
+      '@tossteam/use-back-event': '*'
+      react: ^18
+    peerDependenciesMeta:
+      '@tossteam/use-back-event':
+        optional: true
+    dependencies:
+      react: 18.3.1
+    dev: true
 
   /@types/estree@1.0.5:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
@@ -1231,4 +1249,8 @@ packages:
     resolution: {integrity: sha512-B3VqDZ+JAg1nZpaEmWtTXUlBneoGx6CPM9b0TENK6aoSu5t73dItudwdgmi6tHlIZZId4dZ9skcAQ2UbcyAeVA==}
     engines: {node: '>= 14'}
     hasBin: true
+    dev: true
+
+  /zod@3.23.8:
+    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
     dev: true

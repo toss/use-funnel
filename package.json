@@ -4,7 +4,8 @@
   "description": "",
   "type": "module",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,14 +14,17 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@tossteam/use-overlay": "^17.453.7",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tsup": "^8.0.2",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "zod": "^3.23.8"
   },
   "peerDependencies": {
+    "@tossteam/use-overlay": "^17",
     "react": "^18",
     "react-dom": "^18"
   }
