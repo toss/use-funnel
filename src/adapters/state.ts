@@ -1,0 +1,32 @@
+import { useMemo, useState } from "react";
+import { AnyState } from "../core.js";
+import { Adapter } from "./type.js";
+
+export const stateAdapter: Adapter = ({ initialState }) => {
+  const [history, setHistory] = useState<(typeof initialState)[]>([
+    initialState,
+  ]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  return useMemo(
+    () => ({
+      history,
+      currentIndex,
+      currentState: history[currentIndex] ?? null,
+      async push(state) {
+        setHistory((prev) => [...prev.slice(0, currentIndex + 1), state]);
+        setCurrentIndex((prev) => prev + 1);
+      },
+      async replace(state) {
+        setHistory((prev) => {
+          const newHistory = prev.slice(0, currentIndex + 1);
+          newHistory[currentIndex] = state;
+          return newHistory;
+        });
+      },
+      async go(index) {
+        setCurrentIndex((prev) => prev + index);
+      },
+    }),
+    [history, currentIndex]
+  );
+};

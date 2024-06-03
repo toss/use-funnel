@@ -8,18 +8,24 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test:unit": "vitest --root test/"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@testing-library/react": "^15.0.7",
+    "@testing-library/react-hooks": "^8.0.1",
+    "@testing-library/user-event": "^14.5.2",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.3.0",
+    "jsdom": "^24.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1",
     "tsup": "^8.0.2",
     "typescript": "^4.9.5",
+    "vitest": "^1.6.0",
     "zod": "^3.23.8"
   },
   "peerDependencies": {

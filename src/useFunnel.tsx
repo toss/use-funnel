@@ -1,65 +1,35 @@
-import React from "react";
+import { useCallback, useContext, useMemo, useRef, useState } from "react";
+import { FunnelAdapterContext } from "./adapters/provider.js";
+import { Adapter } from "./adapters/type.js";
+import { AnyStepContextMap, FunnelStep, State } from "./core.js";
+import { FunnelRender, FunnelRenderComponentProps } from "./FunnelRender.js";
+import {
+  makeUniqueId,
+  useFixedRef,
+  useStateStore,
+  useStateSubscriberStore,
+  useUpdatableRef,
+} from "./utils.js";
 
-import { CompareMergeContext } from "./typeUtil.js";
-
-type EventObject = { type: string };
-
-interface State<TName extends string | number | symbol, TContext = never> {
-  name: TName;
-  context: TContext;
+export interface UseFunnelOptions<TStepContextMap extends AnyStepContextMap> {
+  id: string;
+  contextGuard?: {
+    [TStepName in keyof TStepContextMap]: (
+      data: unknown
+    ) => TStepContextMap[TStepName];
+  };
+  steps?: (keyof TStepContextMap)[];
+  initial: {
+    [key in keyof TStepContextMap]: Omit<
+      State<key, TStepContextMap[key]>,
+      "id"
+    >;
+  }[keyof TStepContextMap];
+  adapter?: Adapter;
 }
 
-type TransitionFnArguments<
-  TName extends string,
-  TContext
-> = Partial<TContext> extends TContext
-  ? [target: TName, context?: TContext]
-  : [target: TName, context: TContext];
-
-type TransitionFn<
-  TState extends State<any, any>,
-  TNextState extends State<any, any>
-> = <TName extends TNextState["name"]>(
-  ...args: TransitionFnArguments<
-    TName,
-    CompareMergeContext<
-      TState["context"],
-      Extract<TNextState, { name: TName }>["context"]
-    >
-  >
-) => StepTransitionAction<TNextState>;
-
-type StepTransitionAction<TState extends State<any, any>> = {
-  type: "TRANSITION";
-  state: TState;
-};
-
-type RenderFunction<
-  TStepContextMap extends Record<string, any>,
-  TStepKey extends keyof TStepContextMap
-> = (_: {
-  context: TStepContextMap[TStepKey];
-  transition: TransitionFn<
-    State<TStepKey, TStepContextMap[TStepKey]>,
-    {
-      [NextStepKey in Exclude<keyof TStepContextMap, TStepKey>]: State<
-        NextStepKey,
-        TStepContextMap[NextStepKey]
-      >;
-    }[Exclude<keyof TStepContextMap, TStepKey>]
-  >;
-}) => React.ReactElement;
-
-type FunnelComponent<TStepContextMap extends Record<string, any>> =
-  React.ComponentType<{
-    [StepKey in keyof TStepContextMap]: RenderFunction<
-      TStepContextMap,
-      StepKey
-    >;
-  }>;
-
-export declare function useFunnel<
-  _TStepContextMap extends Record<string, any>,
+export function useFunnel<
+  _TStepContextMap extends AnyStepContextMap,
   TStepKeys extends keyof _TStepContextMap = keyof _TStepContextMap,
   TStepContext extends _TStepContextMap[TStepKeys] = _TStepContextMap[TStepKeys],
   TStepContextMap extends string extends keyof _TStepContextMap
@@ -67,75 +37,82 @@ export declare function useFunnel<
     : _TStepContextMap = string extends keyof _TStepContextMap
     ? Record<TStepKeys, TStepContext>
     : _TStepContextMap
->(_: {
-  id: string;
-  guard?:
-    | {
-        [TStepName in TStepKeys]: (data: unknown) => TStepContextMap[TStepName];
-      };
-  steps?: TStepKeys[];
-  initial: string extends keyof _TStepContextMap
-    ? {
-        step: TStepKeys;
-        context: TStepContext;
+>(options: UseFunnelOptions<TStepContextMap>) {
+  const optionsRef = useUpdatableRef(options);
+  const { adapter: _useAdapter, id } = options;
+
+  const useAdapterFromContext = useContext(FunnelAdapterContext);
+  const useAdapter = useFixedRef(_useAdapter ?? useAdapterFromContext).current;
+  if (useAdapter == null) {
+    throw new Error("Adapter is required");
+  }
+
+  const [initialState] = useState(() => ({
+    ...options.initial,
+    id: makeUniqueId(),
+  }));
+  const { currentIndex, currentState, replace, push, history } = useAdapter({
+    id,
+    initialState,
+  });
+
+  const currentStateRef = useUpdatableRef(currentState);
+
+  const transition = useCallback(
+    async <TName extends TStepKeys>(
+      stateName: TName,
+      assignContext: any,
+      isReplace = false
+    ) => {
+      const newContext = {
+        ...currentStateRef.current.context,
+        ...assignContext,
+      } as TStepContextMap[TName];
+      const nextState = {
+        id: makeUniqueId(),
+        step: stateName,
+        context: optionsRef.current.contextGuard?.[stateName]
+          ? optionsRef.current.contextGuard[stateName](newContext)
+          : newContext,
+      } as State<TName, TStepContextMap[TName]>;
+      if (isReplace) {
+        await replace(nextState);
+      } else {
+        await push(nextState);
       }
-    : {
-        [key in TStepKeys]: {
-          step: key;
-          context: TStepContextMap[key];
-        };
-      }[TStepKeys];
-}): {
-  Render: FunnelComponent<TStepContextMap>;
-  withEvents: <
-    TStepKey extends TStepKeys,
-    TEvents extends Record<
-      string,
-      (
-        payload: any,
-        options: {
-          context: TStepContextMap[TStepKey];
-          transition: TransitionFn<
-            State<TStepKey, TStepContextMap[TStepKey]>,
-            {
-              [NextStepKey in Exclude<TStepKeys, TStepKey>]: State<
-                NextStepKey,
-                TStepContextMap[NextStepKey]
-              >;
-            }[Exclude<TStepKeys, TStepKey>]
-          >;
-        }
-      ) => void
-    >
-  >(_: {
-    events: TEvents;
-    render: (_: {
-      context: TStepContextMap[TStepKey];
-      dispatch: (
-        payload: {
-          [key in keyof TEvents]: key extends string
-            ? Partial<Parameters<TEvents[key]>[0]> extends Parameters<
-                TEvents[key]
-              >[0]
-              ? { type: key; payload?: Parameters<TEvents[key]>[0] }
-              : { type: key; payload: Parameters<TEvents[key]>[0] }
-            : never;
-        }[keyof TEvents]
-      ) => void;
-    }) => React.ReactElement;
-  }) => RenderFunction<TStepContextMap, TStepKey>;
-} & {
-  [TStepKey in TStepKeys]: {
-    step: TStepKey;
-    context: TStepContextMap[TStepKey];
-    transition: TransitionFn<
-      State<TStepKey, TStepContextMap[TStepKey]>,
-      {
-        [NextStepKey in Exclude<TStepKeys, TStepKey>]: State<
-          NextStepKey,
-          TStepContextMap[NextStepKey]
-        >;
-      }[Exclude<TStepKeys, TStepKey>]
-    >;
+      return nextState;
+    },
+    [replace, push]
+  );
+
+  const step: {
+    [TStepKey in TStepKeys]: FunnelStep<TStepContextMap, TStepKey>;
+  }[TStepKeys] = useMemo(
+    () =>
+      ({
+        ...(currentState as any),
+        history: {
+          push: (name, context) =>
+            transition(name as unknown as TStepKeys, context),
+          replace: (name, context) =>
+            transition(name as unknown as TStepKeys, context, true),
+        },
+        beforeSteps: history.slice(0, currentIndex),
+      } as FunnelStep<TStepContextMap, TStepKeys>),
+    [currentState, transition, history, currentIndex]
+  );
+
+  const currentStepStoreRef = useStateSubscriberStore(step);
+
+  const Render = useMemo(() => {
+    return (props: FunnelRenderComponentProps<TStepContextMap>["steps"]) => {
+      const currentStep = useStateStore(currentStepStoreRef);
+      return <FunnelRender funnel={currentStep as any} steps={props} />;
+    };
+  }, [currentStepStoreRef]);
+
+  return {
+    ...step,
+    Render,
   };
-}[TStepKeys];
+}
