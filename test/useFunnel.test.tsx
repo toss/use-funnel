@@ -4,12 +4,7 @@ import { render, screen, cleanup } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { BrowserRouter, useNavigate } from "react-router-dom";
 
-import {
-  FunnelAdapterProvider,
-  FunnelRender,
-  useFunnel,
-  withEvents,
-} from "../src/index.js";
+import { FunnelAdapterProvider, useFunnel, withEvents } from "../src/index.js";
 import { stateAdapter } from "../src/adapters/state.js";
 import { ReactRouterV6Adapter } from "../src/adapters/reactRouter6.js";
 
@@ -153,44 +148,6 @@ describe("useFunnel()", () => {
     expect(screen.queryByText("vitest")).not.toBeNull();
   });
 
-  test("should work funnel.Render", async () => {
-    function FunnelRenderTest() {
-      const funnel = useFunnel<{
-        A: { id?: string };
-        B: { id: string };
-      }>({
-        id: "vitest",
-        initial: {
-          step: "A",
-          context: {},
-        },
-        adapter: stateAdapter,
-      });
-      return (
-        <FunnelRender
-          funnel={funnel}
-          steps={{
-            A: ({ history }) => (
-              <button onClick={() => history.push("B", { id: "vitest" })}>
-                Go B
-              </button>
-            ),
-            B: ({ context }) => <div>{context.id}</div>,
-          }}
-        />
-      );
-    }
-
-    render(<FunnelRenderTest />);
-
-    expect(screen.queryByText("Go B")).not.toBeNull();
-
-    const user = userEvent.setup();
-    await user.click(screen.getByText("Go B"));
-
-    expect(screen.queryByText("vitest")).not.toBeNull();
-  });
-
   test("should work funnel.withEvents", async () => {
     function FunnelWithEventsTest() {
       const funnel = useFunnel<{
@@ -209,7 +166,7 @@ describe("useFunnel()", () => {
           A={withEvents({
             events: {
               GoB: (payload: { id: string }, { history }) => {
-                return history.push("B", { id: payload.id });
+                history.push("B", { id: payload.id });
               },
             },
             render({ dispatch }) {
@@ -311,18 +268,15 @@ describe("useFunnel()", () => {
         adapter: stateAdapter,
       });
       return (
-        <FunnelRender
-          funnel={funnel}
-          steps={{
-            A: ({ history }) => (
-              <button onClick={() => history.push("B", { id: "vitest" })}>
-                Go B
-              </button>
-            ),
-            B: {
-              type: "overlay",
-              render: ({ context }) => <div>{context.id}</div>,
-            },
+        <funnel.Render
+          A={({ history }) => (
+            <button onClick={() => history.push("B", { id: "vitest" })}>
+              Go B
+            </button>
+          )}
+          B={{
+            type: "overlay",
+            render: ({ context }) => <div>{context.id}</div>,
           }}
         />
       );

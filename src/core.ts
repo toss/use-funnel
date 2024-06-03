@@ -2,24 +2,28 @@ import { TransitionFn } from "./transition.js";
 
 export type AnyContext = Record<string, any>;
 export type AnyStepContextMap = Record<string, AnyContext>;
-export type AnyState = State<any, AnyContext>;
+export type AnyState = FunnelState<any, AnyContext>;
 
-export interface State<
+export interface FunnelState<
   TName extends string | number | symbol,
   TContext = never
 > {
-  id: string;
   step: TName;
   context: TContext;
 }
+
+export type FunnelStateByContextMap<TStepContextMap extends AnyStepContextMap> =
+  {
+    [key in keyof TStepContextMap]: FunnelState<key, TStepContextMap[key]>;
+  }[keyof TStepContextMap];
 
 export type FunnelTransition<
   TStepContextMap extends AnyStepContextMap,
   TStepKey extends keyof TStepContextMap
 > = TransitionFn<
-  State<TStepKey, TStepContextMap[TStepKey]>,
+  FunnelState<TStepKey, TStepContextMap[TStepKey]>,
   {
-    [NextStepKey in Exclude<keyof TStepContextMap, TStepKey>]: State<
+    [NextStepKey in Exclude<keyof TStepContextMap, TStepKey>]: FunnelState<
       NextStepKey,
       TStepContextMap[NextStepKey]
     >;
@@ -38,12 +42,16 @@ export type FunnelStep<
   TStepContextMap extends AnyStepContextMap,
   TStepKey extends keyof TStepContextMap
 > = {
-  id: string;
   step: TStepKey;
   context: TStepContextMap[TStepKey];
   history: FunnelHistory<TStepContextMap, TStepKey>;
-  beforeSteps: State<
+  beforeSteps: FunnelState<
     keyof TStepContextMap,
     TStepContextMap[keyof TStepContextMap]
   >[];
 };
+
+export type FunnelStepByContextMap<TStepContextMap extends AnyStepContextMap> =
+  {
+    [key in keyof TStepContextMap]: FunnelStep<TStepContextMap, key>;
+  }[keyof TStepContextMap];

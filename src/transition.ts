@@ -1,4 +1,4 @@
-import { State } from "./core.js";
+import { FunnelState } from "./core.js";
 import { CompareMergeContext } from "./typeUtil.js";
 
 type TransitionFnArguments<
@@ -9,8 +9,8 @@ type TransitionFnArguments<
   : [target: TName, context: TContext];
 
 export type TransitionFn<
-  TState extends State<any, any>,
-  TNextState extends State<any, any>
+  TState extends FunnelState<any, any>,
+  TNextState extends FunnelState<any, any>
 > = <TName extends TNextState["step"]>(
   ...args: TransitionFnArguments<
     TName,

@@ -9,13 +9,11 @@ export const ReactRouterV6Adapter: Adapter = ({ id, initialState }) => {
 
   const currentStep = searchParams.get(`${id}.step`);
   const currentContext = location.state?.[`${id}.context`];
-  const currentId = location.state?.[`${id}.id`];
   const currentState = useMemo(() => {
-    return currentStep != null && currentContext != null && currentId != null
+    return currentStep != null && currentContext != null
       ? ({
           step: currentStep,
           context: currentContext,
-          id: currentId,
         } as typeof initialState)
       : initialState;
   }, [currentStep, currentContext, initialState]);
@@ -42,7 +40,6 @@ export const ReactRouterV6Adapter: Adapter = ({ id, initialState }) => {
             state: {
               ...location.state,
               [`${id}.context`]: state.context,
-              [`${id}.id`]: state.id,
               [`${id}.histories`]: [...(history ?? []), state],
             },
           }
@@ -59,7 +56,6 @@ export const ReactRouterV6Adapter: Adapter = ({ id, initialState }) => {
             state: {
               ...location.state,
               [`${id}.context`]: state.context,
-              [`${id}.id`]: state.id,
               [`${id}.histories}`]: [
                 ...(history ?? []).slice(0, currentIndex),
                 state,

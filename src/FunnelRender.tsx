@@ -1,5 +1,5 @@
-import { Fragment, useRef } from "react";
-import { AnyStepContextMap, FunnelStep, State } from "./core.js";
+import { Fragment } from "react";
+import { AnyStepContextMap, FunnelStep } from "./core.js";
 
 export type FunnelStepByContextMap<TStepContextMap extends AnyStepContextMap> =
   {
@@ -38,18 +38,15 @@ export function FunnelRender<TStepContextMap extends AnyStepContextMap>(
 ) {
   const { funnel, steps } = props;
   const render = steps[funnel.step];
-  let renderEntires: Array<
-    [string, keyof TStepContextMap, React.ReactElement]
-  > = [];
+  let renderEntires: Array<[keyof TStepContextMap, React.ReactElement]> = [];
 
   if (typeof render === "function") {
-    renderEntires.push([funnel.id, funnel.step, render(funnel)]);
+    renderEntires.push([funnel.step, render(funnel)]);
   } else {
     for (const step of funnel.beforeSteps.slice().reverse()) {
       const stepRender = steps[step.step];
       if (typeof stepRender === "function") {
         renderEntires.push([
-          step.id,
           step.step,
           stepRender({
             ...funnel,
@@ -59,7 +56,6 @@ export function FunnelRender<TStepContextMap extends AnyStepContextMap>(
         break;
       } else {
         renderEntires.push([
-          step.id,
           step.step,
           stepRender.render({
             ...funnel,
@@ -69,13 +65,13 @@ export function FunnelRender<TStepContextMap extends AnyStepContextMap>(
       }
     }
     renderEntires = renderEntires.slice().reverse();
-    renderEntires.push([funnel.id, funnel.step, render.render(funnel)]);
+    renderEntires.push([funnel.step, render.render(funnel)]);
   }
 
   return (
     <Fragment>
-      {renderEntires.map(([id, step, element]) => (
-        <Fragment key={id}>{element}</Fragment>
+      {renderEntires.map(([step, element]) => (
+        <Fragment key={step.toString()}>{element}</Fragment>
       ))}
     </Fragment>
   );

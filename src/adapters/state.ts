@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { AnyState } from "../core.js";
 import { Adapter } from "./type.js";
 
 export const stateAdapter: Adapter = ({ initialState }) => {
@@ -11,7 +10,7 @@ export const stateAdapter: Adapter = ({ initialState }) => {
     () => ({
       history,
       currentIndex,
-      currentState: history[currentIndex] ?? null,
+      currentState: history[currentIndex],
       async push(state) {
         setHistory((prev) => [...prev.slice(0, currentIndex + 1), state]);
         setCurrentIndex((prev) => prev + 1);

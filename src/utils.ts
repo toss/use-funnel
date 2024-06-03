@@ -61,7 +61,3 @@ export function useFixedRef<T>(value: T) {
   ref.current = value;
   return ref;
 }
-
-export function makeUniqueId() {
-  return Math.random().toString(36).slice(2);
-}
