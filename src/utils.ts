@@ -3,7 +3,7 @@ import {
   useEffect,
   useRef,
   useSyncExternalStore,
-} from "react";
+} from 'react';
 
 interface Store<T> {
   listeners: VoidFunction[];
@@ -56,7 +56,7 @@ export function useUpdatableRef<T>(value: T) {
 export function useFixedRef<T>(value: T) {
   const ref = useRef(value);
   if (ref.current !== value) {
-    throw new Error("Ref value cannot be changed");
+    throw new Error('Ref value cannot be changed');
   }
   ref.current = value;
   return ref;

@@ -1,6 +1,6 @@
-import { useMemo } from "react";
-import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
-import { Adapter } from "./type.js";
+import { useMemo } from 'react';
+import { useLocation, useSearchParams, useNavigate } from 'react-router-dom';
+import { Adapter } from './type.js';
 
 export const ReactRouterV6Adapter: Adapter = ({ id, initialState }) => {
   const location = useLocation();
@@ -29,7 +29,7 @@ export const ReactRouterV6Adapter: Adapter = ({ id, initialState }) => {
       history,
       currentIndex,
       currentState,
-      async push(state) {
+      push(state) {
         setSearchParams(
           (prev) => {
             prev.set(`${id}.step`, state.step);
@@ -45,7 +45,7 @@ export const ReactRouterV6Adapter: Adapter = ({ id, initialState }) => {
           }
         );
       },
-      async replace(state) {
+      replace(state) {
         setSearchParams(
           (prev) => {
             prev.set(`${id}.step`, state.step);
@@ -64,7 +64,7 @@ export const ReactRouterV6Adapter: Adapter = ({ id, initialState }) => {
           }
         );
       },
-      async go(index) {
+      go(index) {
         navigate(index);
       },
     }),

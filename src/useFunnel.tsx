@@ -1,20 +1,20 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 import {
   AnyStepContextMap,
   FunnelHistory,
   FunnelStepByContextMap,
   FunnelStateByContextMap,
-} from "./core.js";
-import { FunnelRender, FunnelRenderComponentProps } from "./FunnelRender.js";
+} from './core.js';
+import { FunnelRender, FunnelRenderComponentProps } from './FunnelRender.js';
 import {
   useFunnelAdapter,
   UseFunnelAdapterOptions,
-} from "./useFunnelAdapter.js";
+} from './useFunnelAdapter.js';
 import {
   useStateStore,
   useStateSubscriberStore,
   useUpdatableRef,
-} from "./utils.js";
+} from './utils.js';
 
 export interface UseFunnelOptions<TStepContextMap extends AnyStepContextMap>
   extends UseFunnelAdapterOptions<TStepContextMap> {
@@ -28,19 +28,20 @@ export interface UseFunnelOptions<TStepContextMap extends AnyStepContextMap>
 
 export type UseFunnelResults<TStepContextMap extends AnyStepContextMap> = {
   Render: (
-    props: FunnelRenderComponentProps<TStepContextMap>["steps"]
+    props: FunnelRenderComponentProps<TStepContextMap>['steps']
   ) => JSX.Element;
 } & FunnelStepByContextMap<TStepContextMap>;
 
 export function useFunnel<
   _TStepContextMap extends AnyStepContextMap,
   TStepKeys extends keyof _TStepContextMap = keyof _TStepContextMap,
-  TStepContext extends _TStepContextMap[TStepKeys] = _TStepContextMap[TStepKeys],
+  TStepContext extends
+    _TStepContextMap[TStepKeys] = _TStepContextMap[TStepKeys],
   TStepContextMap extends string extends keyof _TStepContextMap
     ? Record<TStepKeys, TStepContext>
     : _TStepContextMap = string extends keyof _TStepContextMap
     ? Record<TStepKeys, TStepContext>
-    : _TStepContextMap
+    : _TStepContextMap,
 >(
   options: UseFunnelOptions<TStepContextMap>
 ): UseFunnelResults<TStepContextMap> {
@@ -48,35 +49,40 @@ export function useFunnel<
   const adapter = useFunnelAdapter(options);
   const currentStateRef = useUpdatableRef(adapter.currentState);
 
-  const history: FunnelHistory<TStepContextMap, keyof TStepContextMap> =
-    useMemo(() => {
-      const transition = (step: keyof TStepContextMap, assignContext?: any) => {
-        const newContext = {
-          ...currentStateRef.current.context,
-          ...assignContext,
-        };
-        return {
-          step,
-          context: optionsRef.current.contextGuard?.[step]
-            ? optionsRef.current.contextGuard[step](newContext)
-            : newContext,
-        } as FunnelStateByContextMap<TStepContextMap>;
+  const history: FunnelHistory<
+    TStepContextMap,
+    keyof TStepContextMap & string
+  > = useMemo(() => {
+    const transition = (
+      step: keyof TStepContextMap,
+      assignContext?: object
+    ) => {
+      const newContext = {
+        ...currentStateRef.current.context,
+        ...assignContext,
       };
       return {
-        push: async (...args) => {
-          const [step, assignContext] = args;
-          const nextState = transition(step, assignContext);
-          await adapter.push(nextState);
-          return nextState as any;
-        },
-        replace: async (...args) => {
-          const [step, assignContext] = args;
-          const nextState = transition(step, assignContext);
-          await adapter.replace(nextState);
-          return nextState as any;
-        },
-      };
-    }, [adapter.replace, adapter.push, optionsRef]);
+        step,
+        context: optionsRef.current.contextGuard?.[step]
+          ? optionsRef.current.contextGuard[step](newContext)
+          : newContext,
+      } as FunnelStateByContextMap<TStepContextMap>;
+    };
+    return {
+      push: async (...args) => {
+        const [step, assignContext] = args;
+        const nextState = transition(step, assignContext);
+        await adapter.push(nextState);
+        return nextState as never;
+      },
+      replace: async (...args) => {
+        const [step, assignContext] = args;
+        const nextState = transition(step, assignContext);
+        await adapter.replace(nextState);
+        return nextState as never;
+      },
+    };
+  }, [adapter.replace, adapter.push, optionsRef]);
 
   const step = useMemo(
     () => ({
@@ -90,7 +96,7 @@ export function useFunnel<
   const currentStepStoreRef = useStateSubscriberStore(step);
 
   const Render = useMemo(() => {
-    return (props: FunnelRenderComponentProps<TStepContextMap>["steps"]) => {
+    return (props: FunnelRenderComponentProps<TStepContextMap>['steps']) => {
       const currentStep = useStateStore(currentStepStoreRef);
       return <FunnelRender funnel={currentStep} steps={props} />;
     };

@@ -9,11 +9,11 @@ export type RequiredCompareKeys<TBase, TResult> = {
         ? never
         : K
       : undefined extends TResult[K]
-      ? never
-      : K
+        ? never
+        : K
     : K extends keyof TBase
-    ? never
-    : never;
+      ? never
+      : never;
 }[keyof TBase | keyof TResult];
 
 /**
@@ -27,11 +27,11 @@ type OptionalCompareKeys<TBase, TResult> = {
         ? K
         : never
       : undefined extends TResult[K]
-      ? K
-      : never
+        ? K
+        : never
     : K extends keyof TBase
-    ? never
-    : never;
+      ? never
+      : never;
 }[keyof TBase | keyof TResult];
 
 /**
@@ -42,12 +42,12 @@ export type CompareMergeContext<TBase, TResult> = {
   [K in RequiredCompareKeys<TBase, TResult>]: K extends keyof TResult
     ? TResult[K]
     : K extends keyof TBase
-    ? TBase[K]
-    : never;
+      ? TBase[K]
+      : never;
 } & {
   [K in OptionalCompareKeys<TBase, TResult>]?: K extends keyof TBase
     ? TBase[K]
     : K extends keyof TResult
-    ? TResult[K]
-    : never;
+      ? TResult[K]
+      : never;
 };

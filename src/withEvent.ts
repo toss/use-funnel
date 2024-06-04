@@ -1,17 +1,17 @@
-import { AnyStepContextMap, FunnelStep } from "./core.js";
+import { AnyStepContextMap, FunnelStep } from './core.js';
 
 type RenderFunction<
-  TStepContextMap extends Record<string, any>,
-  TStepKey extends keyof TStepContextMap
+  TStepContextMap extends AnyStepContextMap,
+  TStepKey extends keyof TStepContextMap & string,
 > = (funnel: FunnelStep<TStepContextMap, TStepKey>) => React.ReactElement;
 
 type WithEventRenderFunction<
   TStepContextMap extends AnyStepContextMap,
-  TStepKey extends keyof TStepContextMap,
+  TStepKey extends keyof TStepContextMap & string,
   TEvents extends Record<
     string,
-    (payload: any, step: FunnelStep<TStepContextMap, TStepKey>) => void
-  >
+    (payload: never, step: FunnelStep<TStepContextMap, TStepKey>) => void
+  >,
 > = (_: {
   context: TStepContextMap[TStepKey];
   dispatch: (
@@ -29,11 +29,11 @@ type WithEventRenderFunction<
 
 export const withEvents: <
   TStepContextMap extends AnyStepContextMap,
-  TStepKey extends keyof TStepContextMap,
+  TStepKey extends keyof TStepContextMap & string,
   TEvents extends Record<
     string,
-    (payload: any, step: FunnelStep<TStepContextMap, TStepKey>) => void
-  >
+    (payload: never, step: FunnelStep<TStepContextMap, TStepKey>) => void
+  >,
 >(_: {
   events: TEvents;
   render: WithEventRenderFunction<TStepContextMap, TStepKey, TEvents>;
@@ -43,7 +43,7 @@ export const withEvents: <
       context: step.context,
       dispatch: (payload) => {
         if (payload.type in events) {
-          events[payload.type](payload.payload ?? {}, step);
+          events[payload.type](payload.payload ?? ({} as never), step);
         }
       },
     });

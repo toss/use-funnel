@@ -1,32 +1,35 @@
-import { Fragment } from "react";
-import { AnyStepContextMap, FunnelStep } from "./core.js";
+import { Fragment } from 'react';
+import { AnyStepContextMap, FunnelStep } from './core.js';
 
 export type FunnelStepByContextMap<TStepContextMap extends AnyStepContextMap> =
   {
-    [TStepKey in keyof TStepContextMap]: FunnelStep<TStepContextMap, TStepKey>;
-  }[keyof TStepContextMap];
+    [TStepKey in keyof TStepContextMap & string]: FunnelStep<
+      TStepContextMap,
+      TStepKey
+    >;
+  }[keyof TStepContextMap & string];
 
 export type FunnelRenderReady<TStepContextMap extends AnyStepContextMap> =
   FunnelStepByContextMap<TStepContextMap>;
 
 type RenderResult<
   TStepContextMap extends AnyStepContextMap,
-  TStepKey extends keyof TStepContextMap
+  TStepKey extends keyof TStepContextMap & string,
 > =
   | ((step: FunnelStep<TStepContextMap, TStepKey>) => React.ReactElement)
   | {
-      type: "overlay";
+      type: 'overlay';
       render: (
         step: FunnelStep<TStepContextMap, TStepKey>
       ) => React.ReactElement;
     };
 
 export interface FunnelRenderComponentProps<
-  TStepContextMap extends AnyStepContextMap
+  TStepContextMap extends AnyStepContextMap,
 > {
   funnel: FunnelRenderReady<TStepContextMap>;
   steps: {
-    [TStepKey in keyof TStepContextMap]: RenderResult<
+    [TStepKey in keyof TStepContextMap & string]: RenderResult<
       TStepContextMap,
       TStepKey
     >;
@@ -40,12 +43,12 @@ export function FunnelRender<TStepContextMap extends AnyStepContextMap>(
   const render = steps[funnel.step];
   let renderEntires: Array<[keyof TStepContextMap, React.ReactElement]> = [];
 
-  if (typeof render === "function") {
+  if (typeof render === 'function') {
     renderEntires.push([funnel.step, render(funnel)]);
   } else {
     for (const step of funnel.beforeSteps.slice().reverse()) {
       const stepRender = steps[step.step];
-      if (typeof stepRender === "function") {
+      if (typeof stepRender === 'function') {
         renderEntires.push([
           step.step,
           stepRender({

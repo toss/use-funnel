@@ -1,5 +1,5 @@
-import { createContext } from "react";
-import { Adapter } from "./type.js";
+import { createContext } from 'react';
+import { Adapter } from './type.js';
 
 export const FunnelAdapterContext = createContext<Adapter | null>(null);
 export function FunnelAdapterProvider({

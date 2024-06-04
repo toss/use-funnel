@@ -1,25 +1,25 @@
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test } from 'vitest';
 import {
   render,
   screen,
   cleanup,
   renderHook,
   act,
-} from "@testing-library/react";
-import { userEvent } from "@testing-library/user-event";
+} from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
 
-import { FunnelAdapterProvider, useFunnel, withEvents } from "../src/index.js";
-import { StateAdapter } from "../src/adapters/state.js";
-import { Adapter } from "src/adapters/type.js";
+import { FunnelAdapterProvider, useFunnel, withEvents } from '../src/index.js';
+import { StateAdapter } from '../src/adapters/state.js';
+import { Adapter } from '../src/adapters/type.js';
 
 function exhaustiveCheck(value: never): never {
   throw new Error(`Unhandled value: ${value}`);
 }
 
-describe("Test useFunnel()", () => {
+describe('Test useFunnel()', () => {
   afterEach(cleanup);
 
-  describe("Test useFunnel hook options", () => {
+  describe('Test useFunnel hook options', () => {
     function setup({
       adapter,
       wrapper,
@@ -33,9 +33,9 @@ describe("Test useFunnel()", () => {
             A: { id?: string };
             B: { id: string };
           }>({
-            id: "vitest",
+            id: 'vitest',
             initial: {
-              step: "A",
+              step: 'A',
               context: {},
             },
             adapter,
@@ -46,30 +46,30 @@ describe("Test useFunnel()", () => {
       );
     }
 
-    describe("Test useFunnel adapter option", () => {
-      describe("When adapter options is successfully passed", () => {
+    describe('Test useFunnel adapter option', () => {
+      describe('When adapter options is successfully passed', () => {
         let hook: ReturnType<typeof setup>;
 
         afterEach(() => {
-          expect(hook.result.current.step).toBe("A");
+          expect(hook.result.current.step).toBe('A');
           expect(hook.result.current.context).toEqual({});
           act(() => {
-            if (hook.result.current.step === "A") {
-              hook.result.current.history.push("B", { id: "1" });
+            if (hook.result.current.step === 'A') {
+              hook.result.current.history.push('B', { id: '1' });
             }
           });
-          expect(hook.result.current.step).toBe("B");
-          expect(hook.result.current.context).toEqual({ id: "1" });
+          expect(hook.result.current.step).toBe('B');
+          expect(hook.result.current.context).toEqual({ id: '1' });
         });
 
-        describe("When adapter is passed by useFunnel options", () => {
-          test("Should work", () => {
+        describe('When adapter is passed by useFunnel options', () => {
+          test('Should work', () => {
             hook = setup({ adapter: StateAdapter });
           });
         });
 
-        describe("When adapter is passed by FunnelAdapterProvider", () => {
-          test("Should work", () => {
+        describe('When adapter is passed by FunnelAdapterProvider', () => {
+          test('Should work', () => {
             hook = setup({
               wrapper: ({ children }) => (
                 <FunnelAdapterProvider adapter={StateAdapter}>
@@ -81,40 +81,40 @@ describe("Test useFunnel()", () => {
         });
       });
 
-      describe("When adapter options is not passed", () => {
-        test("should throw an error", () => {
+      describe('When adapter options is not passed', () => {
+        test('should throw an error', () => {
           expect(() => setup({ adapter: undefined })).toThrowError();
         });
       });
     });
   });
 
-  describe("Test useFunnel hook results", () => {
-    test("should work useFunnel with component render", async () => {
+  describe('Test useFunnel hook results', () => {
+    test('should work useFunnel with component render', async () => {
       function FunnelTest() {
         const funnel = useFunnel<{
           A: { id?: string };
           B: { id: string };
         }>({
-          id: "vitest",
+          id: 'vitest',
           initial: {
-            step: "A",
+            step: 'A',
             context: {},
           },
           adapter: StateAdapter,
         });
 
         switch (funnel.step) {
-          case "A": {
+          case 'A': {
             return (
               <button
-                onClick={() => funnel.history.push("B", { id: "vitest" })}
+                onClick={() => funnel.history.push('B', { id: 'vitest' })}
               >
                 Go B
               </button>
             );
           }
-          case "B": {
+          case 'B': {
             return <div>{funnel.context.id}</div>;
           }
           default: {
@@ -125,23 +125,23 @@ describe("Test useFunnel()", () => {
 
       render(<FunnelTest />);
 
-      expect(screen.queryByText("Go B")).not.toBeNull();
+      expect(screen.queryByText('Go B')).not.toBeNull();
 
       const user = userEvent.setup();
-      await user.click(screen.getByText("Go B"));
+      await user.click(screen.getByText('Go B'));
 
-      expect(screen.queryByText("vitest")).not.toBeNull();
+      expect(screen.queryByText('vitest')).not.toBeNull();
     });
 
-    test("should work funnel.Render", async () => {
+    test('should work funnel.Render', async () => {
       function FunnelRenderTest() {
         const funnel = useFunnel<{
           A: { id?: string };
           B: { id: string };
         }>({
-          id: "vitest",
+          id: 'vitest',
           initial: {
-            step: "A",
+            step: 'A',
             context: {},
           },
           adapter: StateAdapter,
@@ -149,7 +149,7 @@ describe("Test useFunnel()", () => {
         return (
           <funnel.Render
             A={({ history }) => (
-              <button onClick={() => history.push("B", { id: "vitest" })}>
+              <button onClick={() => history.push('B', { id: 'vitest' })}>
                 Go B
               </button>
             )}
@@ -160,23 +160,23 @@ describe("Test useFunnel()", () => {
 
       render(<FunnelRenderTest />);
 
-      expect(screen.queryByText("Go B")).not.toBeNull();
+      expect(screen.queryByText('Go B')).not.toBeNull();
 
       const user = userEvent.setup();
-      await user.click(screen.getByText("Go B"));
+      await user.click(screen.getByText('Go B'));
 
-      expect(screen.queryByText("vitest")).not.toBeNull();
+      expect(screen.queryByText('vitest')).not.toBeNull();
     });
 
-    test("should work funnel.withEvents", async () => {
+    test('should work funnel.withEvents', async () => {
       function FunnelWithEventsTest() {
         const funnel = useFunnel<{
           A: { id?: string };
           B: { id: string };
         }>({
-          id: "vitest",
+          id: 'vitest',
           initial: {
-            step: "A",
+            step: 'A',
             context: {},
           },
           adapter: StateAdapter,
@@ -186,14 +186,14 @@ describe("Test useFunnel()", () => {
             A={withEvents({
               events: {
                 GoB: (payload: { id: string }, { history }) => {
-                  history.push("B", { id: payload.id });
+                  history.push('B', { id: payload.id });
                 },
               },
               render({ dispatch }) {
                 return (
                   <button
                     onClick={() =>
-                      dispatch({ type: "GoB", payload: { id: "vitest" } })
+                      dispatch({ type: 'GoB', payload: { id: 'vitest' } })
                     }
                   >
                     Go B
@@ -208,23 +208,23 @@ describe("Test useFunnel()", () => {
 
       render(<FunnelWithEventsTest />);
 
-      expect(screen.queryByText("Go B")).not.toBeNull();
+      expect(screen.queryByText('Go B')).not.toBeNull();
 
       const user = userEvent.setup();
-      await user.click(screen.getByText("Go B"));
+      await user.click(screen.getByText('Go B'));
 
-      expect(screen.queryByText("vitest")).not.toBeNull();
+      expect(screen.queryByText('vitest')).not.toBeNull();
     });
 
-    test("should work FunnelRender overlay", async () => {
+    test('should work FunnelRender overlay', async () => {
       function FunnelRenderTest() {
         const funnel = useFunnel<{
           A: { id?: string };
           B: { id: string };
         }>({
-          id: "vitest",
+          id: 'vitest',
           initial: {
-            step: "A",
+            step: 'A',
             context: {},
           },
           adapter: StateAdapter,
@@ -232,12 +232,12 @@ describe("Test useFunnel()", () => {
         return (
           <funnel.Render
             A={({ history }) => (
-              <button onClick={() => history.push("B", { id: "vitest" })}>
+              <button onClick={() => history.push('B', { id: 'vitest' })}>
                 Go B
               </button>
             )}
             B={{
-              type: "overlay",
+              type: 'overlay',
               render: ({ context }) => <div>{context.id}</div>,
             }}
           />
@@ -246,13 +246,13 @@ describe("Test useFunnel()", () => {
 
       render(<FunnelRenderTest />);
 
-      expect(screen.queryByText("Go B")).not.toBeNull();
+      expect(screen.queryByText('Go B')).not.toBeNull();
 
       const user = userEvent.setup();
-      await user.click(screen.getByText("Go B"));
+      await user.click(screen.getByText('Go B'));
 
-      expect(screen.queryByText("Go B")).not.toBeNull();
-      expect(screen.queryByText("vitest")).not.toBeNull();
+      expect(screen.queryByText('Go B')).not.toBeNull();
+      expect(screen.queryByText('vitest')).not.toBeNull();
     });
   });
 });

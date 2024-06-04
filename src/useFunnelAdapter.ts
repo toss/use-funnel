@@ -1,11 +1,11 @@
-import { useContext, useState } from "react";
-import { FunnelAdapterContext } from "./adapters/provider.js";
-import { Adapter } from "./adapters/type.js";
-import { AnyStepContextMap, FunnelStateByContextMap } from "./core.js";
-import { useFixedRef } from "./utils.js";
+import { useContext, useState } from 'react';
+import { FunnelAdapterContext } from './adapters/provider.js';
+import { Adapter } from './adapters/type.js';
+import { AnyStepContextMap, FunnelStateByContextMap } from './core.js';
+import { useFixedRef } from './utils.js';
 
 export interface UseFunnelAdapterOptions<
-  TStepContextMap extends AnyStepContextMap
+  TStepContextMap extends AnyStepContextMap,
 > {
   id: string;
   initial: FunnelStateByContextMap<TStepContextMap>;
@@ -25,7 +25,7 @@ export function useFunnelAdapter<TStepContextMap extends AnyStepContextMap>(
   ).current;
   if (useAdapter == null) {
     throw new Error(
-      "Adapter is required. Please pass the adapter to the useFunnel or install FunnelAdapterProvider."
+      'Adapter is required. Please pass the adapter to the useFunnel or install FunnelAdapterProvider.'
     );
   }
   const [initialState] = useState<FunnelStateByContextMap<TStepContextMap>>(

@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { Adapter } from "./type.js";
+import { useMemo, useState } from 'react';
+import { Adapter } from './type.js';
 
 export const StateAdapter: Adapter = ({ initialState }) => {
   const [history, setHistory] = useState<(typeof initialState)[]>([
@@ -11,18 +11,18 @@ export const StateAdapter: Adapter = ({ initialState }) => {
       history,
       currentIndex,
       currentState: history[currentIndex],
-      async push(state) {
+      push(state) {
         setHistory((prev) => [...prev.slice(0, currentIndex + 1), state]);
         setCurrentIndex((prev) => prev + 1);
       },
-      async replace(state) {
+      replace(state) {
         setHistory((prev) => {
           const newHistory = prev.slice(0, currentIndex + 1);
           newHistory[currentIndex] = state;
           return newHistory;
         });
       },
-      async go(index) {
+      go(index) {
         setCurrentIndex((prev) => prev + index);
       },
     }),
