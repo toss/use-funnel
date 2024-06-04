@@ -38,18 +38,12 @@ export const withEvents: <
   events: TEvents;
   render: WithEventRenderFunction<TStepContextMap, TStepKey, TEvents>;
 }) => RenderFunction<TStepContextMap, TStepKey> = ({ events, render }) => {
-  return ({ context, step, history, id, beforeSteps }) => {
+  return (step) => {
     return render({
-      context,
+      context: step.context,
       dispatch: (payload) => {
         if (payload.type in events) {
-          events[payload.type](payload.payload ?? {}, {
-            context,
-            step,
-            history,
-            id,
-            beforeSteps,
-          });
+          events[payload.type](payload.payload ?? {}, step);
         }
       },
     });

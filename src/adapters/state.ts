@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Adapter } from "./type.js";
 
-export const stateAdapter: Adapter = ({ initialState }) => {
+export const StateAdapter: Adapter = ({ initialState }) => {
   const [history, setHistory] = useState<(typeof initialState)[]>([
     initialState,
   ]);
