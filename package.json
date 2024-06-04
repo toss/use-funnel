@@ -29,7 +29,8 @@
     "prettier": "prettier --write \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "build": "rimraf dist && concurrently \"pnpm:build:*\"",
     "build:dist": "tsup",
-    "build:types": "tsc -p tsconfig.build.json --emitDeclarationOnly"
+    "build:types": "tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
