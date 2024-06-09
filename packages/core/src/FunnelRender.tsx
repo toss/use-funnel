@@ -8,10 +8,10 @@ export type FunnelStepByContextMap<TStepContextMap extends AnyStepContextMap> = 
 export type FunnelRenderReady<TStepContextMap extends AnyStepContextMap> = FunnelStepByContextMap<TStepContextMap>;
 
 type RenderResult<TStepContextMap extends AnyStepContextMap, TStepKey extends keyof TStepContextMap & string> =
-  | ((step: FunnelStep<TStepContextMap, TStepKey>) => React.ReactElement)
+  | ((step: FunnelStep<TStepContextMap, TStepKey>) => React.ReactNode)
   | {
       type: 'overlay';
-      render: (step: FunnelStep<TStepContextMap, TStepKey>) => React.ReactElement;
+      render: (step: FunnelStep<TStepContextMap, TStepKey>) => React.ReactNode;
     };
 
 export interface FunnelRenderComponentProps<TStepContextMap extends AnyStepContextMap> {
@@ -26,7 +26,7 @@ export function FunnelRender<TStepContextMap extends AnyStepContextMap>(
 ) {
   const { funnel, steps } = props;
   const render = steps[funnel.step];
-  let renderEntires: Array<[keyof TStepContextMap, React.ReactElement]> = [];
+  let renderEntires: Array<[keyof TStepContextMap, React.ReactNode]> = [];
 
   if (typeof render === 'function') {
     renderEntires.push([funnel.step, render(funnel)]);

@@ -9,6 +9,10 @@ export interface FunnelState<TName extends string, TContext = never> {
 }
 
 export type AnyFunnelState = FunnelState<string, AnyContext>;
+export type GetFunnelStateByName<TFunnelState extends AnyFunnelState, TName extends TFunnelState['step']> = Extract<
+  TFunnelState,
+  { step: TName }
+>;
 
 type TransitionFnArguments<TName extends PropertyKey, TContext> =
   Partial<TContext> extends TContext ? [target: TName, context?: TContext] : [target: TName, context: TContext];
@@ -18,9 +22,9 @@ type TransitionFn<TState extends AnyFunnelState, TNextState extends AnyFunnelSta
 >(
   ...args: TransitionFnArguments<
     TName,
-    CompareMergeContext<TState['context'], Extract<TNextState, { step: TName }>['context']>
+    CompareMergeContext<TState['context'], GetFunnelStateByName<TNextState, TName>['context']>
   >
-) => Promise<TNextState>;
+) => Promise<GetFunnelStateByName<TNextState, TName>>;
 
 export type FunnelStateByContextMap<TStepContextMap extends AnyStepContextMap> = {
   [key in keyof TStepContextMap & string]: FunnelState<key, TStepContextMap[key]>;
@@ -32,11 +36,8 @@ export type FunnelTransition<
 > = TransitionFn<
   FunnelState<TStepKey, TStepContextMap[TStepKey]>,
   {
-    [NextStepKey in Exclude<keyof TStepContextMap, TStepKey> & string]: FunnelState<
-      NextStepKey,
-      TStepContextMap[NextStepKey]
-    >;
-  }[Exclude<keyof TStepContextMap, TStepKey> & string]
+    [NextStepKey in keyof TStepContextMap & string]: FunnelState<NextStepKey, TStepContextMap[NextStepKey]>;
+  }[keyof TStepContextMap & string]
 >;
 
 export interface FunnelHistory<
@@ -45,6 +46,11 @@ export interface FunnelHistory<
 > {
   push: FunnelTransition<TStepContextMap, TStepKey>;
   replace: FunnelTransition<TStepContextMap, TStepKey>;
+}
+
+interface GlobalFunnelHistory<TStepContextMap extends AnyStepContextMap> {
+  push: FunnelTransition<TStepContextMap, keyof TStepContextMap & string>;
+  replace: FunnelTransition<TStepContextMap, keyof TStepContextMap & string>;
 }
 
 export type FunnelStep<TStepContextMap extends AnyStepContextMap, TStepKey extends keyof TStepContextMap & string> = {
@@ -56,4 +62,6 @@ export type FunnelStep<TStepContextMap extends AnyStepContextMap, TStepKey exten
 
 export type FunnelStepByContextMap<TStepContextMap extends AnyStepContextMap> = {
   [key in keyof TStepContextMap & string]: FunnelStep<TStepContextMap, key>;
-}[keyof TStepContextMap & string];
+}[keyof TStepContextMap & string] & {
+  history: GlobalFunnelHistory<TStepContextMap>;
+};
