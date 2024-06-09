@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { FunnelRouter } from 'src/router.js';
+import { FunnelRouter } from '../src/router.js';
 
 export const MemoryRouter: FunnelRouter = ({ initialState }) => {
   const [history, setHistory] = useState<(typeof initialState)[]>([initialState]);
