@@ -1,77 +1,26 @@
 {
-  "name": "@tossteam/funnel",
-  "version": "0.0.0",
-  "description": "",
+  "name": "@tossteam/use-funnel",
   "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./adapters/state": {
-      "types": "./dist/adapters/state.d.ts",
-      "default": "./dist/adapters/state.js"
-    },
-    "./adapters/reactRouter6": {
-      "types": "./dist/adapters/reactRouter6.d.ts",
-      "default": "./dist/adapters/reactRouter6.js"
-    },
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "dist",
-    "index.d.ts"
-  ],
-  "scripts": {
-    "test": "vitest run",
-    "test:unit": "vitest --root test/",
-    "lint": "eslint",
-    "prettier": "prettier --write \"{src,test}/**/*.{js,jsx,ts,tsx}\"",
-    "build": "rimraf dist && concurrently \"pnpm:build:*\"",
-    "build:dist": "tsup",
-    "build:types": "tsc -p tsconfig.build.json --emitDeclarationOnly",
-    "prepare": "husky"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "private": true,
   "devDependencies": {
-    "@eslint/compat": "^1.0.3",
-    "@eslint/js": "^9.4.0",
-    "@testing-library/react": "^15.0.7",
-    "@testing-library/user-event": "^14.5.2",
-    "@types/react": "^18.3.2",
-    "@types/react-dom": "^18.3.0",
-    "@typescript-eslint/eslint-plugin": "^7.12.0",
-    "@typescript-eslint/parser": "^7.12.0",
-    "concurrently": "^8.2.2",
-    "eslint": "^9.4.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-react": "^7.34.2",
-    "eslint-plugin-react-hooks": "^4.6.2",
-    "globals": "^15.3.0",
+    "@typescript-eslint/eslint-plugin": "^6.1.0",
+    "@typescript-eslint/parser": "^6.1.0",
+    "eslint": "^8.45.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
     "husky": "^9.0.11",
-    "jsdom": "^24.1.0",
+    "hygen": "^6.2.11",
     "lint-staged": "^15.2.5",
-    "prettier": "^3.3.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.23.1",
-    "rimraf": "^5.0.7",
-    "tsup": "^8.0.2",
-    "typescript": "^4.9.5",
-    "typescript-eslint": "^7.12.0",
-    "vitest": "^1.6.0",
-    "zod": "^3.23.8"
+    "prettier": "^3.0.0",
+    "typescript": "^5.1.6"
   },
-  "peerDependencies": {
-    "react": ">=18",
-    "react-router-dom": ">=6"
-  },
-  "peerDependenciesMeta": {
-    "react-router-dom": {
-      "optional": true
-    }
+  "scripts": {
+    "add:router": "hygen packages router",
+    "prepare": "husky",
+    "prettier": "prettier --write \"packages/*/{src,test}/**/*.{js,jsx,ts,tsx}\""
   },
   "husky": {
     "hooks": {
@@ -79,14 +28,13 @@
     }
   },
   "lint-staged": {
-    "{src,test}/*.{js,jsx,ts,tsx,md}": [
+    "packages/*/{src,test}/*.{js,jsx,ts,tsx,md}": [
       "prettier --write",
       "git add"
     ],
-    "{src,test}/*.{js,ts,tsx}": [
+    "packages/*/{src,test}/*.{js,ts,tsx}": [
       "eslint --fix",
       "git add"
     ]
-  },
-  "sideEffects": false
+  }
 }

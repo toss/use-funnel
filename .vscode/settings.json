@@ -1,4 +1,20 @@
 {
+  "[javascript][javascriptreact][typescript][typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit"
+    }
+  },
+  "[json][jsonc][yaml][dockercompose]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "files.exclude": {
+    "**/node_modules/": true
+  },
+  "prettier.prettierPath": "node_modules/prettier/index.cjs",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
   "workbench.colorCustomizations": {
     "activityBar.background": "#3F2635",
     "titleBar.activeBackground": "#58354A",
