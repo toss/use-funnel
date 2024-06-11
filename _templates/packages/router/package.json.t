@@ -6,20 +6,19 @@ to: packages/<%= name %>/package.json
   "version": "0.0.0",
   "description": "",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./package.json": "./package.json"
+  "main": "./src/index.ts",
+  "publishConfig": {
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "module": "./dist/index.js",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./package.json": "./package.json"
+    }
   },
-  "files": [
-    "dist",
-    "index.d.ts"
-  ],
   "scripts": {
     "test": "vitest run",
     "test:unit": "vitest --root test/",
