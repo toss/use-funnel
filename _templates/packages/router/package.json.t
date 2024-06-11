@@ -6,6 +6,9 @@ to: packages/<%= name %>/package.json
   "version": "0.0.0",
   "description": "",
   "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
