@@ -7,8 +7,11 @@ export type FunnelStepByContextMap<TStepContextMap extends AnyStepContextMap> = 
 
 export type FunnelRenderReady<TStepContextMap extends AnyStepContextMap> = FunnelStepByContextMap<TStepContextMap>;
 
-type RenderResult<TStepContextMap extends AnyStepContextMap, TStepKey extends keyof TStepContextMap & string> =
-  | ((step: FunnelStep<TStepContextMap, TStepKey>) => React.ReactNode)
+export type RenderResult<TStepContextMap extends AnyStepContextMap, TStepKey extends keyof TStepContextMap & string> =
+  | {
+      type: 'render';
+      render: (step: FunnelStep<TStepContextMap, TStepKey>) => React.ReactNode;
+    }
   | {
       type: 'overlay';
       render: (step: FunnelStep<TStepContextMap, TStepKey>) => React.ReactNode;
@@ -17,7 +20,9 @@ type RenderResult<TStepContextMap extends AnyStepContextMap, TStepKey extends ke
 export interface FunnelRenderComponentProps<TStepContextMap extends AnyStepContextMap> {
   funnel: FunnelRenderReady<TStepContextMap>;
   steps: {
-    [TStepKey in keyof TStepContextMap & string]: RenderResult<TStepContextMap, TStepKey>;
+    [TStepKey in keyof TStepContextMap & string]:
+      | RenderResult<TStepContextMap, TStepKey>
+      | ((step: FunnelStep<TStepContextMap, TStepKey>) => React.ReactNode);
   };
 }
 
@@ -30,7 +35,9 @@ export function FunnelRender<TStepContextMap extends AnyStepContextMap>(
 
   if (typeof render === 'function') {
     renderEntires.push([funnel.step, render(funnel)]);
-  } else {
+  } else if (render.type === 'render') {
+    renderEntires.push([funnel.step, render.render(funnel)]);
+  } else if (render.type === 'overlay') {
     for (const step of funnel.beforeSteps.slice().reverse()) {
       const stepRender = steps[step.step];
       if (typeof stepRender === 'function') {

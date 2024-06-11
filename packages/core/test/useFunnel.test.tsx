@@ -1,7 +1,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { afterEach, describe, expect, test } from 'vitest';
-import { createUseFunnel, withEvents } from '../src/index.js';
+import { createUseFunnel } from '../src/index.js';
 import { MemoryRouter } from './memoryRouter.js';
 
 function exhaustiveCheck(value: never): never {
@@ -80,7 +80,7 @@ describe('Test useFunnel()', () => {
       expect(screen.queryByText('vitest')).not.toBeNull();
     });
 
-    test('should work funnel.withEvents', async () => {
+    test('should work funnel.Render.with', async () => {
       function FunnelWithEventsTest() {
         const funnel = useFunnel<{
           A: { id?: string };
@@ -94,7 +94,7 @@ describe('Test useFunnel()', () => {
         });
         return (
           <funnel.Render
-            A={withEvents({
+            A={funnel.Render.with({
               events: {
                 GoB: (payload: { id: string }, { history }) => {
                   history.push('B', { id: payload.id });
@@ -119,7 +119,7 @@ describe('Test useFunnel()', () => {
       expect(screen.queryByText('vitest')).not.toBeNull();
     });
 
-    test('should work FunnelRender overlay', async () => {
+    test('should work funnel.Render.overlay', async () => {
       function FunnelRenderTest() {
         const funnel = useFunnel<{
           A: { id?: string };
@@ -133,11 +133,22 @@ describe('Test useFunnel()', () => {
         });
         return (
           <funnel.Render
-            A={({ history }) => <button onClick={() => history.push('B', { id: 'vitest' })}>Go B</button>}
-            B={{
-              type: 'overlay',
-              render: ({ context }) => <div>{context.id}</div>,
-            }}
+            A={funnel.Render.with({
+              events: {
+                GoB: (payload: { id: string }, { history }) => {
+                  history.push('B', { id: payload.id });
+                },
+              },
+              render({ dispatch }) {
+                return <button onClick={() => dispatch({ type: 'GoB', payload: { id: 'vitest' } })}>Go B</button>;
+              },
+            })}
+            B={funnel.Render.with({
+              overlay: true,
+              render({ context }) {
+                return <div>{context.id}</div>;
+              },
+            })}
           />
         );
       }

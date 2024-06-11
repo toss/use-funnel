@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { AnyStepContextMap, FunnelHistory, FunnelStateByContextMap, FunnelStepByContextMap } from './core.js';
 import { FunnelRender, FunnelRenderComponentProps } from './FunnelRender.js';
+import { with$ } from './renderHelpers.js';
 import { FunnelRouter } from './router.js';
 import { useStateStore, useStateSubscriberStore, useUpdatableRef } from './utils.js';
 
@@ -14,7 +15,9 @@ export interface UseFunnelOptions<TStepContextMap extends AnyStepContextMap> {
 }
 
 export type UseFunnelResults<TStepContextMap extends AnyStepContextMap> = {
-  Render: (props: FunnelRenderComponentProps<TStepContextMap>['steps']) => JSX.Element;
+  Render: ((props: FunnelRenderComponentProps<TStepContextMap>['steps']) => JSX.Element) & {
+    with: typeof with$;
+  };
 } & FunnelStepByContextMap<TStepContextMap>;
 
 export interface UseFunnel {
@@ -87,10 +90,15 @@ export function createUseFunnel(useFunnelRouter: FunnelRouter): UseFunnel {
     const currentStepStoreRef = useStateSubscriberStore(step);
 
     const Render = useMemo(() => {
-      return (props: FunnelRenderComponentProps<TStepContextMap>['steps']) => {
-        const currentStep = useStateStore(currentStepStoreRef);
-        return <FunnelRender funnel={currentStep} steps={props} />;
-      };
+      return Object.assign(
+        (props: FunnelRenderComponentProps<TStepContextMap>['steps']) => {
+          const currentStep = useStateStore(currentStepStoreRef);
+          return <FunnelRender funnel={currentStep} steps={props} />;
+        },
+        {
+          with: with$,
+        },
+      );
     }, [currentStepStoreRef]);
 
     return {
