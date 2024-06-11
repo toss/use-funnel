@@ -19,6 +19,10 @@ to: packages/<%= name %>/package.json
       "./package.json": "./package.json"
     }
   },
+  "files": [
+    "dist",
+    "package.json"
+  ],
   "scripts": {
     "test": "vitest run",
     "test:unit": "vitest --root test/",
