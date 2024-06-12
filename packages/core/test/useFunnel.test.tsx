@@ -101,7 +101,7 @@ describe('Test useFunnel()', () => {
                 },
               },
               render({ dispatch }) {
-                return <button onClick={() => dispatch({ type: 'GoB', payload: { id: 'vitest' } })}>Go B</button>;
+                return <button onClick={() => dispatch('GoB', { id: 'vitest' })}>Go B</button>;
               },
             })}
             B={({ context }) => <div>{context.id}</div>}
@@ -140,7 +140,7 @@ describe('Test useFunnel()', () => {
                 },
               },
               render({ dispatch }) {
-                return <button onClick={() => dispatch({ type: 'GoB', payload: { id: 'vitest' } })}>Go B</button>;
+                return <button onClick={() => dispatch('GoB', { id: 'vitest' })}>Go B</button>;
               },
             })}
             B={funnel.Render.with({

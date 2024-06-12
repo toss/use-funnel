@@ -29,14 +29,14 @@ export class StepRenderHelper<
       : (state: {
           context: FunnelStep<TStepContextMap, TStepKey>['context'];
           dispatch: (
-            payload: {
+            ...payload: {
               [key in TEvent['type']]: Partial<Extract<TEvent, { type: key }>['payload']> extends Extract<
                 TEvent,
                 { type: key }
               >['payload']
-                ? { type: key; payload?: Extract<TEvent, { type: key }>['payload'] }
-                : { type: key; payload: Extract<TEvent, { type: key }>['payload'] };
-            }[TEvent['type']],
+                ? [type: key, payload?: Extract<TEvent, { type: key }>['payload']]
+                : [type: key, payload: Extract<TEvent, { type: key }>['payload']];
+            }[TEvent['type']]
           ) => void;
         }) => React.ReactNode,
   ): RenderResult<TStepContextMap, TStepKey> {
@@ -45,9 +45,9 @@ export class StepRenderHelper<
       render: (step: FunnelStep<TStepContextMap, TStepKey>) => {
         return callback({
           context: step.context,
-          dispatch: (payload) => {
-            if (payload.type in this.listeners) {
-              this.listeners[payload.type](payload.payload ?? ({} as never), step);
+          dispatch: (type, payload) => {
+            if (type in this.listeners) {
+              this.listeners[type](payload ?? ({} as never), step);
             }
           },
         });
@@ -72,13 +72,13 @@ interface StepRenderOptionWithEvents<
   render: (_: {
     context: FunnelStep<TStepContextMap, TStepKey>['context'];
     dispatch: (
-      payload: {
+      ...args: {
         [key in keyof TEvents]: key extends string
           ? Partial<Parameters<TEvents[key]>[0]> extends Parameters<TEvents[key]>[0]
-            ? { type: key; payload?: Parameters<TEvents[key]>[0] }
-            : { type: key; payload: Parameters<TEvents[key]>[0] }
+            ? [type: key, payload?: Parameters<TEvents[key]>[0]]
+            : [type: key, payload: Parameters<TEvents[key]>[0]]
           : never;
-      }[keyof TEvents],
+      }[keyof TEvents]
     ) => void;
   }) => React.ReactNode;
 }
