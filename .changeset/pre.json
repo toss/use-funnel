@@ -1,0 +1,10 @@
+{
+  "mode": "pre",
+  "tag": "alpha",
+  "initialVersions": {
+    "@use-funnel/browser": "0.0.0",
+    "@use-funnel/core": "0.0.0",
+    "@use-funnel/react-router-dom": "0.0.0"
+  },
+  "changesets": []
+}
