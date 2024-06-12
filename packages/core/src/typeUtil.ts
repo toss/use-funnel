@@ -54,3 +54,50 @@ export type CompareMergeContext<TBase, TResult> = Prettify<
         : never;
   }
 >;
+
+type PickRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+type TupleLastItem<T extends any[], TFallback = never> = T extends [...infer _, infer R] ? R : TFallback;
+
+type ContextRequiredExtendRule<TProperties extends string> =
+  | [step: string, required: TProperties]
+  | [step: string]
+  | { step: string; required?: TProperties };
+
+type GetContextRequiredExtendRuleStep<T extends ContextRequiredExtendRule<any>> = T extends { step: infer R }
+  ? R
+  : T extends [infer R]
+    ? R
+    : T extends [infer R, any]
+      ? R
+      : never;
+
+type GetContextRequiredExtendRuleRequired<T extends ContextRequiredExtendRule<any>> = T extends { required: infer R }
+  ? R
+  : T extends [any, infer R]
+    ? R
+    : never;
+
+export type ExtendedFunnelContext<
+  TInitialState,
+  TRuleTuples extends Array<ContextRequiredExtendRule<keyof TInitialState & string>>,
+  Var_ContextTuple extends any[] = [],
+  Var_Result = {},
+> = Var_ContextTuple['length'] extends TRuleTuples['length']
+  ? Prettify<Var_Result>
+  : ExtendedFunnelContext<
+      TInitialState,
+      TRuleTuples,
+      [
+        ...Var_ContextTuple,
+        PickRequired<
+          TupleLastItem<Var_ContextTuple, TInitialState>,
+          GetContextRequiredExtendRuleRequired<TRuleTuples[Var_ContextTuple['length']]>
+        >,
+      ],
+      Var_Result & {
+        [K in GetContextRequiredExtendRuleStep<TRuleTuples[Var_ContextTuple['length']]>]: PickRequired<
+          TupleLastItem<Var_ContextTuple, TInitialState>,
+          GetContextRequiredExtendRuleRequired<TRuleTuples[Var_ContextTuple['length']]>
+        >;
+      }
+    >;
