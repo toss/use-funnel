@@ -28,7 +28,8 @@ to: packages/<%= name %>/package.json
     "test:unit": "vitest --root test/",
     "build": "rimraf dist && concurrently \"pnpm:build:*\"",
     "build:dist": "tsup",
-    "build:types": "tsc -p tsconfig.build.json --emitDeclarationOnly"
+    "build:types": "tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "prepublish": "pnpm test && pnpm build",
   },
   "keywords": [],
   "author": "",
