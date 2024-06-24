@@ -1,17 +1,17 @@
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { AnyStepContextMap, FunnelHistory, FunnelStateByContextMap, FunnelStepByContextMap } from './core.js';
 import { FunnelRender, FunnelRenderComponentProps } from './FunnelRender.js';
 import { with$ } from './renderHelpers.js';
 import { FunnelRouter } from './router.js';
+import { FunnelStepOption } from './stepBuilder.js';
 import { useStateStore, useStateSubscriberStore, useUpdatableRef } from './utils.js';
 
 export interface UseFunnelOptions<TStepContextMap extends AnyStepContextMap> {
   id: string;
   initial: FunnelStateByContextMap<TStepContextMap>;
-  contextGuard?: {
-    [TStepName in keyof TStepContextMap]: (data: unknown) => TStepContextMap[TStepName];
+  steps?: {
+    [TStepName in keyof TStepContextMap]: FunnelStepOption<TStepContextMap[TStepName], any>;
   };
-  steps?: (keyof TStepContextMap)[];
 }
 
 export type UseFunnelResults<TStepContextMap extends AnyStepContextMap> = {
@@ -49,18 +49,38 @@ export function createUseFunnel(useFunnelRouter: FunnelRouter): UseFunnel {
     });
     const currentStateRef = useUpdatableRef(router.currentState);
 
+    const parseStepContext = useCallback(
+      <TStep extends keyof TStepContextMap>(step: TStep, context: unknown): TStepContextMap[TStep] | null => {
+        const stepOption = optionsRef.current.steps?.[step];
+        if (stepOption == null) {
+          return context as TStepContextMap[TStep];
+        }
+        // 1. check parse function
+        if (stepOption.parse != null) {
+          return stepOption.parse(context);
+        }
+        // 2. check guard function
+        if (stepOption.guard != null) {
+          return stepOption.guard(context) ? context : null;
+        }
+        return null;
+      },
+      [optionsRef],
+    );
+
     const history: FunnelHistory<TStepContextMap, keyof TStepContextMap & string> = useMemo(() => {
       const transition = (step: keyof TStepContextMap, assignContext?: object) => {
         const newContext = {
           ...currentStateRef.current.context,
           ...assignContext,
         };
-        return {
-          step,
-          context: optionsRef.current.contextGuard?.[step]
-            ? optionsRef.current.contextGuard[step](newContext)
-            : newContext,
-        } as FunnelStateByContextMap<TStepContextMap>;
+        const context = parseStepContext(step, newContext);
+        return context == null
+          ? optionsRef.current.initial
+          : ({
+              step,
+              context,
+            } as FunnelStateByContextMap<TStepContextMap>);
       };
       return {
         push: async (...args) => {
@@ -78,14 +98,19 @@ export function createUseFunnel(useFunnelRouter: FunnelRouter): UseFunnel {
       };
     }, [router.replace, router.push, optionsRef]);
 
-    const step = useMemo(
-      () => ({
-        ...router.currentState,
+    const step = useMemo(() => {
+      const validContext = parseStepContext(router.currentState.step, router.currentState.context);
+      return {
+        ...(validContext == null
+          ? optionsRef.current.initial
+          : {
+              step: router.currentState.step,
+              context: validContext,
+            }),
         history,
         beforeSteps: router.history.slice(0, router.currentIndex),
-      }),
-      [router.currentState, history, router.history, router.currentIndex],
-    );
+      };
+    }, [router.currentState, history, router.history, router.currentIndex]);
 
     const currentStepStoreRef = useStateSubscriberStore(step);
 
