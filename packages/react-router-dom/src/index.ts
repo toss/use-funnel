@@ -63,9 +63,6 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
           },
         );
       },
-      go(index) {
-        navigate(index);
-      },
     }),
     [currentState, history, currentIndex, setSearchParams, navigate, location.state],
   );

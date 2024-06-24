@@ -72,9 +72,6 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
         });
         setState(newHistoryState);
       },
-      go(index) {
-        window.history.go(index);
-      },
     }),
     [history, currentIndex, currentState],
   );

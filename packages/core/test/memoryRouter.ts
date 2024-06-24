@@ -20,9 +20,6 @@ export const MemoryRouter: FunnelRouter = ({ initialState }) => {
           return newHistory;
         });
       },
-      go(index) {
-        setCurrentIndex((prev) => prev + index);
-      },
     }),
     [history, currentIndex],
   );

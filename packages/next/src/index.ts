@@ -57,9 +57,6 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
           },
         );
       },
-      async go(index) {
-        window.history.go(index);
-      },
     }),
     [router, histories],
   );

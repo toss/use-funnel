@@ -11,7 +11,6 @@ export interface FunnelRouterResult<TState extends AnyFunnelState> {
   currentState: TState;
   push: (state: TState) => void | Promise<void>;
   replace: (state: TState) => void | Promise<void>;
-  go: (index: number) => void | Promise<void>;
 }
 
 export interface FunnelRouter {

@@ -18,9 +18,6 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
       replace(state) {
         throw new Error('Not implemented');
       },
-      go(index) {
-        throw new Error('Not implemented');
-      },
     }),
     [],
   );
