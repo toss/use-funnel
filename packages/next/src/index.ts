@@ -1,7 +1,7 @@
 import { createUseFunnel } from '@use-funnel/core';
-import { NextRouter, useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { useMemo } from 'react';
-import { removeKeys } from './util';
+import { makePath, removeKeys } from './util';
 
 export * from '@use-funnel/core';
 
@@ -69,18 +69,3 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
     [router, histories],
   );
 });
-
-const makePath = (router: NextRouter) => {
-  const { asPath, query: _query } = router;
-  const query = { ..._query };
-
-  const pathname = asPath.split('?')[0];
-
-  const pathVariables = [...router.pathname.matchAll(/\[(.+?)\]/g)].map((match) => match[1]);
-
-  pathVariables.forEach((variable) => {
-    delete query[variable];
-  });
-
-  return { pathname, query };
-};
