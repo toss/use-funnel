@@ -32,7 +32,15 @@ describe('Test useFunnel next router', () => {
 
       switch (funnel.step) {
         case 'A': {
-          return <button onClick={() => funnel.history.push('B', { id: 'vitest' })}>Go B</button>;
+          return (
+            <button
+              onClick={() => {
+                funnel.history.push('B', { id: 'vitest' });
+              }}
+            >
+              Go B
+            </button>
+          );
         }
         case 'B': {
           return <B context={funnel.context} />;
