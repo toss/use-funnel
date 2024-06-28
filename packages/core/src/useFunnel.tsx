@@ -84,15 +84,15 @@ export function createUseFunnel(useFunnelRouter: FunnelRouter): UseFunnel {
       };
       return {
         push: async (...args) => {
-          const [step, assignContext] = args;
+          const [step, assignContext, transitionOption] = args;
           const nextState = transition(step, assignContext);
-          await router.push(nextState);
+          await router.push(nextState, transitionOption);
           return nextState as never;
         },
         replace: async (...args) => {
-          const [step, assignContext] = args;
+          const [step, assignContext, transitionOption] = args;
           const nextState = transition(step, assignContext);
-          await router.replace(nextState);
+          await router.replace(nextState, transitionOption);
           return nextState as never;
         },
       };

@@ -5,12 +5,18 @@ export interface FunnelRouterOption<TState extends AnyFunnelState> {
   initialState: TState;
 }
 
+export interface FunnelRouterTransitionOption {
+  renderComponent?: {
+    overlay: boolean;
+  };
+}
+
 export interface FunnelRouterResult<TState extends AnyFunnelState> {
   history: TState[];
   currentIndex: number;
   currentState: TState;
-  push: (state: TState) => void | Promise<void>;
-  replace: (state: TState) => void | Promise<void>;
+  push: (state: TState, option?: FunnelRouterTransitionOption) => void | Promise<void>;
+  replace: (state: TState, option?: FunnelRouterTransitionOption) => void | Promise<void>;
 }
 
 export interface FunnelRouter {

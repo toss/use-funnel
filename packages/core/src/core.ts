@@ -1,3 +1,4 @@
+import { FunnelRouterTransitionOption } from './router.js';
 import { CompareMergeContext } from './typeUtil.js';
 
 export type AnyContext = Record<string, unknown>;
@@ -15,7 +16,9 @@ export type GetFunnelStateByName<TFunnelState extends AnyFunnelState, TName exte
 >;
 
 type TransitionFnArguments<TName extends PropertyKey, TContext> =
-  Partial<TContext> extends TContext ? [target: TName, context?: TContext] : [target: TName, context: TContext];
+  Partial<TContext> extends TContext
+    ? [target: TName, context?: TContext, option?: FunnelRouterTransitionOption]
+    : [target: TName, context: TContext, option?: FunnelRouterTransitionOption];
 
 type TransitionFn<TState extends AnyFunnelState, TNextState extends AnyFunnelState> = <
   TName extends TNextState['step'],

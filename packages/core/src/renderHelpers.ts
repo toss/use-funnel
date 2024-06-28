@@ -44,7 +44,7 @@ export class StepRenderHelper<
       type: this.overlay ? 'overlay' : 'render',
       render: (step: FunnelStep<TStepContextMap, TStepKey>) => {
         return callback({
-          context: step.context,
+          ...step,
           dispatch: (type, payload) => {
             if (type in this.listeners) {
               this.listeners[type](payload ?? ({} as never), step);
