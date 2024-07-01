@@ -7,11 +7,12 @@ import { useMemo } from 'react';
 export * from '@use-funnel/core';
 
 export const useFunnel = createUseFunnel(({ id, initialState }) => {
+  const history = useMemo(() => [], []);
+  const currentIndex = 0;
   return useMemo(
     () => ({
-      history: [],
-      currentIndex: 0,
-      currentState: initialState,
+      history,
+      currentIndex,
       push(state) {
         throw new Error('Not implemented');
       },
@@ -19,6 +20,6 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
         throw new Error('Not implemented');
       },
     }),
-    [],
+    [history, currentIndex],
   );
 });

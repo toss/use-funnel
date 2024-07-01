@@ -8,7 +8,9 @@ export * from '@use-funnel/core';
 export const useFunnel = createUseFunnel(({ id, initialState }) => {
   const router = useRouter();
 
-  const currentIndex = isNaN(Number(router.query?.[`${id}.index`])) ? 0 : Number(router.query?.[`${id}.index`]);
+  const _currentIndex = Number(router.query?.[`${id}.index`]);
+  const currentIndex = isNaN(_currentIndex) ? 0 : _currentIndex;
+
   const _histories = router.query?.[`${id}.histories`];
   const histories = useMemo<(typeof initialState)[]>(() => {
     try {
@@ -16,13 +18,12 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
     } catch {
       return [initialState];
     }
-  }, [currentIndex, _histories]);
+  }, [_histories]);
 
   return useMemo(
     () => ({
       history: histories,
       currentIndex,
-      currentState: histories[currentIndex],
       async push(state) {
         const { pathname, query } = makePath(router);
 
@@ -65,6 +66,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
           },
         );
       },
+      go: (index) => window.history.go(index),
     }),
     [router, histories],
   );

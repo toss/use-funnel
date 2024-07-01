@@ -23,7 +23,7 @@ describe('Test useFunnel browser router', () => {
         case 'B': {
           return (
             <div>
-              <button onClick={() => window.history.back()}>Go Back</button>
+              <button onClick={() => funnel.history.back()}>Go Back</button>
               <div>{funnel.context.id}</div>
             </div>
           );

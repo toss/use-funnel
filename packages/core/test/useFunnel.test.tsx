@@ -143,10 +143,14 @@ describe('Test useFunnel()', () => {
                 return <button onClick={() => dispatch('GoB', { id: 'vitest' })}>Go B</button>;
               },
             })}
-            B={funnel.Render.with({
-              overlay: true,
-              render({ context }) {
-                return <div>{context.id}</div>;
+            B={funnel.Render.overlay({
+              render({ context, close }) {
+                return (
+                  <div>
+                    <p>overlay: {context.id}</p>
+                    <button onClick={close}>Close Overlay</button>
+                  </div>
+                );
               },
             })}
           />
@@ -161,7 +165,13 @@ describe('Test useFunnel()', () => {
       await user.click(screen.getByText('Go B'));
 
       expect(screen.queryByText('Go B')).not.toBeNull();
-      expect(screen.queryByText('vitest')).not.toBeNull();
+      expect(screen.queryByText('overlay: vitest')).not.toBeNull();
+
+      // close overlay
+      await user.click(screen.getByText('Close Overlay'));
+
+      expect(screen.queryByText('Go B')).not.toBeNull();
+      expect(screen.queryByText('overlay: vitest')).toBeNull();
     });
   });
 });

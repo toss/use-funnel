@@ -49,6 +49,8 @@ export interface FunnelHistory<
 > {
   push: FunnelTransition<TStepContextMap, TStepKey>;
   replace: FunnelTransition<TStepContextMap, TStepKey>;
+  go: (index: number) => void | Promise<void>;
+  back: () => void | Promise<void>;
 }
 
 interface GlobalFunnelHistory<TStepContextMap extends AnyStepContextMap> {

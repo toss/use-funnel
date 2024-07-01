@@ -1,7 +1,35 @@
 import { AnyStepContextMap, FunnelStep } from './core';
-import { RenderResult } from './FunnelRender';
+import { FunnelRenderOverlayHandler, RenderResult } from './FunnelRender';
 
 type EventObject = { type: string; payload: never };
+type OverlayRenderArgument<TOverlayEnable extends boolean> = TOverlayEnable extends true
+  ? FunnelRenderOverlayHandler
+  : {};
+
+type FunnelRenderCallback<
+  TStepContextMap extends AnyStepContextMap,
+  TStepKey extends keyof TStepContextMap & string,
+  TEnableOverlay extends boolean,
+> = (state: FunnelStep<TStepContextMap, TStepKey> & OverlayRenderArgument<TEnableOverlay>) => React.ReactNode;
+
+type FunnelEventRenderCallback<
+  TStepContextMap extends AnyStepContextMap,
+  TStepKey extends keyof TStepContextMap & string,
+  TOverlayEnable extends boolean,
+  TEvents extends Record<string, (payload: never, step: FunnelStep<TStepContextMap, TStepKey>) => void>,
+> = (
+  state: Omit<FunnelStep<TStepContextMap, TStepKey>, 'history'> & {
+    dispatch: (
+      ...args: {
+        [key in keyof TEvents]: key extends string
+          ? Partial<Parameters<TEvents[key]>[0]> extends Parameters<TEvents[key]>[0]
+            ? [type: key, payload?: Parameters<TEvents[key]>[0]]
+            : [type: key, payload: Parameters<TEvents[key]>[0]]
+          : never;
+      }[keyof TEvents]
+    ) => void;
+  } & OverlayRenderArgument<TOverlayEnable>,
+) => React.ReactNode;
 
 export class StepRenderHelper<
   TStepContextMap extends AnyStepContextMap,
@@ -25,86 +53,117 @@ export class StepRenderHelper<
 
   render(
     callback: TEvent extends never
-      ? (state: FunnelStep<TStepContextMap, TStepKey>) => React.ReactNode
-      : (state: {
-          context: FunnelStep<TStepContextMap, TStepKey>['context'];
-          dispatch: (
-            ...payload: {
-              [key in TEvent['type']]: Partial<Extract<TEvent, { type: key }>['payload']> extends Extract<
-                TEvent,
-                { type: key }
-              >['payload']
-                ? [type: key, payload?: Extract<TEvent, { type: key }>['payload']]
-                : [type: key, payload: Extract<TEvent, { type: key }>['payload']];
-            }[TEvent['type']]
-          ) => void;
-        }) => React.ReactNode,
+      ? FunnelRenderCallback<TStepContextMap, TStepKey, true>
+      : FunnelEventRenderCallback<
+          TStepContextMap,
+          TStepKey,
+          true,
+          {
+            [key in TEvent['type']]: (
+              payload: Extract<TEvent, { type: key }>['payload'],
+              state: FunnelStep<TStepContextMap, TStepKey>,
+            ) => void;
+          }
+        >,
   ): RenderResult<TStepContextMap, TStepKey> {
     return {
       type: this.overlay ? 'overlay' : 'render',
       render: (step: FunnelStep<TStepContextMap, TStepKey>) => {
         return callback({
           ...step,
+          // event dispatch
           dispatch: (type, payload) => {
             if (type in this.listeners) {
               this.listeners[type](payload ?? ({} as never), step);
             }
           },
+          // close overlay action
+          close: () => step.history.back(),
         });
       },
     };
   }
 }
 
-interface StepRenderOption<TStepContextMap extends AnyStepContextMap, TStepKey extends keyof TStepContextMap & string> {
-  overlay?: boolean;
-  events?: never;
-  render: (state: FunnelStep<TStepContextMap, TStepKey>) => React.ReactNode;
-}
-
-interface StepRenderOptionWithEvents<
+// with event render
+export function renderWith<
   TStepContextMap extends AnyStepContextMap,
   TStepKey extends keyof TStepContextMap & string,
+  TOverlayEnable extends boolean,
   TEvents extends Record<string, (payload: never, step: FunnelStep<TStepContextMap, TStepKey>) => void>,
-> {
-  overlay?: boolean;
+>(option: {
+  overlay?: TOverlayEnable;
   events: TEvents;
-  render: (_: {
-    context: FunnelStep<TStepContextMap, TStepKey>['context'];
-    dispatch: (
-      ...args: {
-        [key in keyof TEvents]: key extends string
-          ? Partial<Parameters<TEvents[key]>[0]> extends Parameters<TEvents[key]>[0]
-            ? [type: key, payload?: Parameters<TEvents[key]>[0]]
-            : [type: key, payload: Parameters<TEvents[key]>[0]]
-          : never;
-      }[keyof TEvents]
-    ) => void;
-  }) => React.ReactNode;
-}
+  render: FunnelEventRenderCallback<TStepContextMap, TStepKey, TOverlayEnable, TEvents>;
+}): RenderResult<TStepContextMap, TStepKey>;
 
-export function with$<TStepContextMap extends AnyStepContextMap, TStepKey extends keyof TStepContextMap & string>(
-  option: StepRenderOption<TStepContextMap, TStepKey>,
-): RenderResult<TStepContextMap, TStepKey>;
-export function with$<
+// without event render
+export function renderWith<
   TStepContextMap extends AnyStepContextMap,
   TStepKey extends keyof TStepContextMap & string,
-  TEvents extends Record<string, (payload: never, step: FunnelStep<TStepContextMap, TStepKey>) => void>,
->(options: StepRenderOptionWithEvents<TStepContextMap, TStepKey, TEvents>): RenderResult<TStepContextMap, TStepKey>;
+  TOverlayEnable extends boolean,
+>(option: {
+  overlay?: TOverlayEnable;
+  events?: never;
+  render: FunnelRenderCallback<TStepContextMap, TStepKey, TOverlayEnable>;
+}): RenderResult<TStepContextMap, TStepKey>;
 
-export function with$<TStepContextMap extends AnyStepContextMap, TStepKey extends keyof TStepContextMap & string>(
-  options: StepRenderOption<TStepContextMap, TStepKey> | StepRenderOptionWithEvents<TStepContextMap, TStepKey, any>,
-): RenderResult<TStepContextMap, TStepKey> {
+export function renderWith<
+  TStepContextMap extends AnyStepContextMap,
+  TStepKey extends keyof TStepContextMap & string,
+  TOverlayEnable extends boolean,
+  TEvents extends Record<string, (payload: never, step: FunnelStep<TStepContextMap, TStepKey>) => void>,
+>(option: {
+  overlay?: TOverlayEnable;
+  events?: TEvents;
+  render: TEvents extends never
+    ? FunnelRenderCallback<TStepContextMap, TStepKey, TOverlayEnable>
+    : FunnelEventRenderCallback<TStepContextMap, TStepKey, TOverlayEnable, TEvents>;
+}) {
   const step = new StepRenderHelper<TStepContextMap, TStepKey>();
-  const events: StepRenderOptionWithEvents<TStepContextMap, TStepKey, any>['events'] | undefined = (options as any)
-    .events;
+  const events = option.events;
   if (events != null) {
     for (const [name, listener] of Object.entries(events)) {
       step.on(name, listener as any);
     }
   }
-  if (options.overlay != null) {
-    step.setOverlay(options.overlay);
+  if (option.overlay != null) {
+    step.setOverlay(option.overlay);
   }
-  return step.render(options.render as never);
+  return step.render(option.render as never);
+}
+
+// with event render
+export function overlayRenderWith<
+  TStepContextMap extends AnyStepContextMap,
+  TStepKey extends keyof TStepContextMap & string,
+  TEvents extends Record<string, (payload: never, step: FunnelStep<TStepContextMap, TStepKey>) => void>,
+>(option: {
+  events: TEvents;
+  render: FunnelEventRenderCallback<TStepContextMap, TStepKey, true, TEvents>;
+}): RenderResult<TStepContextMap, TStepKey>;
+
+// without event render
+export function overlayRenderWith<
+  TStepContextMap extends AnyStepContextMap,
+  TStepKey extends keyof TStepContextMap & string,
+>(option: {
+  events?: never;
+  render: FunnelRenderCallback<TStepContextMap, TStepKey, true>;
+}): RenderResult<TStepContextMap, TStepKey>;
+
+export function overlayRenderWith<
+  TStepContextMap extends AnyStepContextMap,
+  TStepKey extends keyof TStepContextMap & string,
+  TEvents extends Record<string, (payload: never, step: FunnelStep<TStepContextMap, TStepKey>) => void>,
+>(option: {
+  events?: any;
+  render: TEvents extends never
+    ? FunnelRenderCallback<TStepContextMap, TStepKey, true>
+    : FunnelEventRenderCallback<TStepContextMap, TStepKey, true, TEvents>;
+}) {
+  return renderWith({
+    ...option,
+    overlay: true,
+  } as never);
 }

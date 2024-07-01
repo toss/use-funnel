@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { AnyStepContextMap, FunnelHistory, FunnelStateByContextMap, FunnelStepByContextMap } from './core.js';
 import { FunnelRender, FunnelRenderComponentProps } from './FunnelRender.js';
-import { with$ } from './renderHelpers.js';
+import { overlayRenderWith, renderWith } from './renderHelpers.js';
 import { FunnelRouter } from './router.js';
 import { FunnelStepOption } from './stepBuilder.js';
 import { useStateStore, useStateSubscriberStore, useUpdatableRef } from './utils.js';
@@ -16,7 +16,8 @@ export interface UseFunnelOptions<TStepContextMap extends AnyStepContextMap> {
 
 export type UseFunnelResults<TStepContextMap extends AnyStepContextMap> = {
   Render: ((props: FunnelRenderComponentProps<TStepContextMap>['steps']) => JSX.Element) & {
-    with: typeof with$;
+    with: typeof renderWith;
+    overlay: typeof overlayRenderWith;
   };
 } & FunnelStepByContextMap<TStepContextMap>;
 
@@ -47,7 +48,8 @@ export function createUseFunnel(useFunnelRouter: FunnelRouter): UseFunnel {
       id: options.id,
       initialState: options.initial,
     });
-    const currentStateRef = useUpdatableRef(router.currentState);
+    const currentState = router.history[router.currentIndex];
+    const currentStateRef = useUpdatableRef(currentState);
 
     const parseStepContext = useCallback(
       <TStep extends keyof TStepContextMap>(step: TStep, context: unknown): TStepContextMap[TStep] | null => {
@@ -95,22 +97,24 @@ export function createUseFunnel(useFunnelRouter: FunnelRouter): UseFunnel {
           await router.replace(nextState, transitionOption);
           return nextState as never;
         },
+        go: router.go,
+        back: () => router.go(-1),
       };
-    }, [router.replace, router.push, optionsRef]);
+    }, [router.replace, router.push, router.go, optionsRef]);
 
     const step = useMemo(() => {
-      const validContext = parseStepContext(router.currentState.step, router.currentState.context);
+      const validContext = parseStepContext(currentState.step, currentState.context);
       return {
         ...(validContext == null
           ? optionsRef.current.initial
           : {
-              step: router.currentState.step,
+              step: currentState.step,
               context: validContext,
             }),
         history,
         beforeSteps: router.history.slice(0, router.currentIndex),
       };
-    }, [router.currentState, history, router.history, router.currentIndex]);
+    }, [currentState, history, router.history, router.currentIndex]);
 
     const currentStepStoreRef = useStateSubscriberStore(step);
 
@@ -121,7 +125,8 @@ export function createUseFunnel(useFunnelRouter: FunnelRouter): UseFunnel {
           return <FunnelRender funnel={currentStep} steps={props} />;
         },
         {
-          with: with$,
+          with: renderWith,
+          overlay: overlayRenderWith,
         },
       );
     }, [currentStepStoreRef]);

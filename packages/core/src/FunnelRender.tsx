@@ -8,6 +8,10 @@ export type FunnelStepByContextMap<TStepContextMap extends AnyStepContextMap> = 
 
 export type FunnelRenderReady<TStepContextMap extends AnyStepContextMap> = FunnelStepByContextMap<TStepContextMap>;
 
+export type FunnelRenderOverlayHandler = {
+  close: () => void;
+};
+
 export type RenderResult<TStepContextMap extends AnyStepContextMap, TStepKey extends keyof TStepContextMap & string> =
   | {
       type: 'render';
@@ -15,7 +19,7 @@ export type RenderResult<TStepContextMap extends AnyStepContextMap, TStepKey ext
     }
   | {
       type: 'overlay';
-      render: (step: FunnelStep<TStepContextMap, TStepKey>) => React.ReactNode;
+      render: (step: FunnelStep<TStepContextMap, TStepKey> & FunnelRenderOverlayHandler) => React.ReactNode;
     };
 
 export interface FunnelRenderComponentProps<TStepContextMap extends AnyStepContextMap> {
@@ -26,6 +30,17 @@ export interface FunnelRenderComponentProps<TStepContextMap extends AnyStepConte
       | ((step: FunnelStep<TStepContextMap, TStepKey>) => React.ReactNode);
   };
 }
+
+function neverUseHistory(): never {
+  throw new Error('Cannot use history in overlay render before steps.');
+}
+
+const overlayBeforeHistory: FunnelHistory<any, any> = {
+  push: neverUseHistory,
+  replace: neverUseHistory,
+  go: neverUseHistory,
+  back: neverUseHistory,
+};
 
 export function FunnelRender<TStepContextMap extends AnyStepContextMap>(
   props: FunnelRenderComponentProps<TStepContextMap>,
@@ -63,12 +78,14 @@ export function FunnelRender<TStepContextMap extends AnyStepContextMap>(
   } else if (render.type === 'overlay') {
     for (const step of funnelRenderStep.beforeSteps.slice().reverse()) {
       const stepRender = steps[step.step];
+      // NOTE: cannot use history in overlay render before steps
       if (typeof stepRender === 'function') {
         renderEntires.push([
           step.step,
           stepRender({
             ...funnelRenderStep,
             ...step,
+            history: overlayBeforeHistory,
           }),
         ]);
         break;
@@ -78,12 +95,20 @@ export function FunnelRender<TStepContextMap extends AnyStepContextMap>(
           stepRender.render({
             ...funnelRenderStep,
             ...step,
+            history: overlayBeforeHistory,
+            close: neverUseHistory,
           }),
         ]);
       }
     }
     renderEntires = renderEntires.slice().reverse();
-    renderEntires.push([funnelRenderStep.step, render.render(funnelRenderStep)]);
+    renderEntires.push([
+      funnelRenderStep.step,
+      render.render({
+        ...funnelRenderStep,
+        close: funnelRenderHistory.back,
+      }),
+    ]);
   }
 
   return (

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { BrowserRouter, useNavigate } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { describe, expect, test } from 'vitest';
 import { useFunnel } from '../src/index.js';
 
@@ -17,7 +17,6 @@ describe('Test useFunnel ReactRouter6 router', () => {
           context: {},
         },
       });
-      const navigate = useNavigate();
 
       switch (funnel.step) {
         case 'A': {
@@ -26,7 +25,7 @@ describe('Test useFunnel ReactRouter6 router', () => {
         case 'B': {
           return (
             <div>
-              <button onClick={() => navigate(-1)}>Go Back</button>
+              <button onClick={() => funnel.history.back()}>Go Back</button>
               <div>{funnel.context.id}</div>
             </div>
           );

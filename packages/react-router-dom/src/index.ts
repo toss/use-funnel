@@ -20,17 +20,21 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
       : initialState;
   }, [currentStep, currentContext, initialState]);
 
-  const history: (typeof initialState)[] = useMemo(
-    () => location.state?.[`${id}.histories`] ?? [currentState],
-    [location.state, currentState],
-  );
+  const history: (typeof initialState)[] = useMemo(() => {
+    const histories = location.state?.[`${id}.histories`];
+    if (Array.isArray(histories) && histories.length > 0) {
+      return histories;
+    } else {
+      return [currentState];
+    }
+  }, [location.state, currentState]);
+
   const currentIndex = history.length - 1;
 
   return useMemo(
     () => ({
       history,
       currentIndex,
-      currentState,
       push(state) {
         setSearchParams(
           (prev) => {
@@ -62,6 +66,9 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
             },
           },
         );
+      },
+      go: (index) => {
+        navigate(index);
       },
     }),
     [currentState, history, currentIndex, setSearchParams, navigate, location.state],
