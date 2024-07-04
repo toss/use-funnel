@@ -2,19 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, test } from 'vitest';
 
-import { useRouter } from 'next/router.js';
 import { useFunnel } from '../src/index.js';
-
-const B = ({ context }: { context: { id: string } }) => {
-  const router = useRouter();
-
-  return (
-    <div>
-      <button onClick={() => router.back()}>Go Back</button>
-      <div>{context.id}</div>
-    </div>
-  );
-};
 
 describe('Test useFunnel next router', () => {
   test('should work', async () => {
@@ -43,7 +31,11 @@ describe('Test useFunnel next router', () => {
           );
         }
         case 'B': {
-          return <B context={funnel.context} />;
+          return (
+            <div>
+              <div>{funnel.context.id}</div>
+            </div>
+          );
         }
         default: {
           throw new Error('Invalid step');

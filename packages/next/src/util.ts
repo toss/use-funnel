@@ -1,9 +1,20 @@
 import { NextRouter } from 'next/router';
 
-export const removeKeys = (_value: Record<string, any>, keys: string[]) => {
+export const removeKeys = (_value: Record<string, any>, conditions: (string | ((key: string) => boolean))[]) => {
   const value = { ..._value };
+  const valueKeys = Object.keys(value);
 
-  keys.forEach((key) => delete value[key]);
+  conditions.forEach((condition) => {
+    if (typeof condition === 'string') {
+      delete value[condition];
+    } else {
+      valueKeys.forEach((key) => {
+        if (condition(key)) {
+          delete value[key];
+        }
+      });
+    }
+  });
 
   return value;
 };

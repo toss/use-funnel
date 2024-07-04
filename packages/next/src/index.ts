@@ -5,13 +5,17 @@ import { makePath, removeKeys } from './util';
 
 export * from '@use-funnel/core';
 
+const QS_KEY = 'funnel.';
+
+const checkHasQSKey = (key: string) => key.startsWith(QS_KEY);
+
 export const useFunnel = createUseFunnel(({ id, initialState }) => {
   const router = useRouter();
 
-  const _currentIndex = Number(router.query?.[`${id}.index`]);
+  const _currentIndex = Number(router.query?.[`${QS_KEY}${id}.index`]);
   const currentIndex = isNaN(_currentIndex) ? 0 : _currentIndex;
 
-  const _histories = router.query?.[`${id}.histories`];
+  const _histories = router.query?.[`${QS_KEY}${id}.histories`];
   const histories = useMemo<(typeof initialState)[]>(() => {
     try {
       return _histories == null ? [initialState] : JSON.parse(_histories as string);
@@ -32,13 +36,13 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
             pathname,
             query: {
               ...query,
-              [`${id}.histories`]: JSON.stringify([...histories, state]),
-              [`${id}.index`]: currentIndex + 1,
+              [`${QS_KEY}${id}.histories`]: JSON.stringify([...histories, state]),
+              [`${QS_KEY}${id}.index`]: currentIndex + 1,
             },
           },
           {
             pathname,
-            query: { ...removeKeys(query, [`${id}.histories`]), [`${id}.index`]: currentIndex + 1 },
+            query: { ...removeKeys(query, [checkHasQSKey]), [`${QS_KEY}${id}.index`]: currentIndex + 1 },
           },
           {
             shallow: true,
@@ -53,13 +57,13 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
             pathname,
             query: {
               ...query,
-              [`${id}.histories`]: JSON.stringify([...(histories ?? []).slice(0, currentIndex), state]),
-              [`${id}.index`]: currentIndex + 1,
+              [`${QS_KEY}${id}.histories`]: JSON.stringify([...(histories ?? []).slice(0, currentIndex), state]),
+              [`${QS_KEY}${id}.index`]: currentIndex + 1,
             },
           },
           {
             pathname,
-            query: { ...removeKeys(query, [`${id}.histories`]), [`${id}.index`]: currentIndex + 1 },
+            query: { ...removeKeys(query, [checkHasQSKey]), [`${QS_KEY}${id}.index`]: currentIndex + 1 },
           },
           {
             shallow: true,

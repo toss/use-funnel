@@ -3,10 +3,12 @@ import { makePath, removeKeys } from '../src/util';
 
 describe('Test removeKeys', () => {
   test('should work', async () => {
-    const value = { a: 1, b: 2, c: 3, d: [4, 5, 6] };
+    const value = { a: 1, b: 2, c: 3, d: [4, 5, 6], abc: 123 };
 
-    expect(removeKeys(value, ['b', 'd'])).toEqual({ a: 1, c: 3 });
-    expect(value).toEqual({ a: 1, b: 2, c: 3, d: [4, 5, 6] });
+    expect(removeKeys(value, ['b', 'd'])).toEqual({ a: 1, c: 3, abc: 123 });
+    expect(value).toEqual({ a: 1, b: 2, c: 3, d: [4, 5, 6], abc: 123 });
+
+    expect(removeKeys(value, ['b', (key: string) => key.startsWith('a')])).toEqual({ c: 3, d: [4, 5, 6] });
   });
 });
 
