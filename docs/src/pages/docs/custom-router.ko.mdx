@@ -1,0 +1,51 @@
+# 직접 router 만드는 방법
+
+`@use-funnel`은 안정적인 뒤로가기 앞으로 가기를 위해 각 퍼널 단계에 대한 상태 스냅샷을 배열로 저장합니다.
+
+```jsx
+export const useFunnel = createUseFunnel(({ id, initialState }) => {
+  
+  /** ... */
+  
+  return useMemo(
+    () => ({
+      history,
+      currentIndex,
+      push(state) {
+        /** ... */
+      },
+      replace(state) {
+        /** ... */
+      },
+      go(delta) {
+        /** ... */
+      }
+    }),
+    [],
+  );
+});
+
+```
+
+- id : 각 퍼널을 구분하는 고유한 id
+- initialState : 퍼널의 초기 상태
+
+### return 값
+
+- history : 퍼널 진입 후 쌓인 라우팅 내역을 가진 배열
+    
+    ```tsx
+    type State = {
+      step: string; // 현재 진핸중인 퍼널 단계
+      context: any; // 현재 퍼널 상태
+    };
+    
+    type history = State[];
+    ```
+    
+- currentIndex : history 배열 중 현재 진행중인 퍼널 단계의 index
+- currentState : history[currentIndex] → 없애자!
+- push : 현재 history에서 새로운 history를 추가하며 다음 퍼널로 이동하는 동작 구현
+- replace : 현재 history를 덮어쓰고 다음 퍼널로 이동하는 경우 동작 구현
+- back :
+    - overlay의 close 동작과 일치함

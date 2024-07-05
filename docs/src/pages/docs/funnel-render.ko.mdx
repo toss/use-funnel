@@ -1,0 +1,85 @@
+import { Callout } from 'nextra/components'
+
+`useFunnel()` 에서 반환되는 `<Render />` 컴포넌트를 통해 각 단계의 렌더링을 정의할 수 있습니다. 또한 이벤트를 정의하거나 오버레이 기능 등을 사용할 수 있습니다.
+
+```tsx /Render/
+const funnel = useFunnel(/* ... */);
+return (
+  <funnel.Render
+    이메일입력={({ history }) => (
+      <이메일입력 onNext={(email) => history.push('비밀번호입력', { email })} />
+    )}
+    비밀번호입력={({ context, history }) => (
+      <비밀번호입력
+        email={context.email}
+        onNext={(password) => history.push('그외정보입력', { password })}
+      />
+    )}
+    그외정보입력={() => <그외정보입력 />}
+  />
+)
+```
+
+각 단계에 해당하는 렌더링 함수를 `<Render />` 컴포넌트의 props로 넘겨줍니다. 해당 렌더링 함수의 인자로 `funnel` 객체가 들어가며, 해당 단계에 맞는 `context`, `history` 에 접근할 수 있습니다.
+
+## 전환 이벤트 정의하기
+
+현재 단계에서 여러 개의 경로가 필요할 때 이벤트를 정의해서 사용하는 것을 고려해볼 수 있습니다.
+    
+```tsx /events/
+<funnel.Render
+  이메일입력={funnel.Render.with({
+    events: {
+      이메일입력완료: (email: string, { history }) => history.push('비빌번호입력', { email }),
+      이메일입력실패: (error: string, { history }) => history.push('에러페이지', { error })
+    },
+    render({ dispatch }) {
+      return (
+        <이메일입력
+          onNext={(email) => dispatch('이메일입력완료', email)}
+          onError={(error) => dispatch('이메일입력실패', error)}
+        />
+      )
+    }
+  })}
+/>
+```
+
+이벤트를 정의할 경우, 렌더링 함수에서 `history` 를 사용하지 못하며, 대신에 `events` 객체를 통해 정의한 이벤트를 `dispatch()` 함수를 통해 호출할 수 있습니다.
+
+<Callout>
+  현재 단계에서 발생할 수 있는 경로들을 한번에 정의할 수 있어, 응집력 있는 코드를 기대할 수 있습니다.
+</Callout>
+
+## Overlay
+
+현재 단계에서 이전 단계를 유지한채 모달, 바텀시트와 같은 UI를 표현하고자 할 때 사용할 수 있습니다.
+        
+```tsx /overlay/
+<funnel.Render
+  이메일입력={({ history }) => (
+    <이메일입력
+      onNext={(email) => history.push('약관동의', { email })}
+    />
+  )}
+  약관동의={funnel.Render.overlay({
+    render({ history }) {
+      return <약관동의 onAgree={() => history.push('비밀번호입력')} />
+    }
+  })}
+/>
+```
+        
+이 경우 `<약관동의/>` 컴포넌트가 렌더링 될 때, `<이메일입력/>` 컴포넌트 아래에 위치하게 됩니다.
+
+<Callout type="warning">
+주의할점: overlay가 라우터의 뒤로가기를 통해 닫힌게 아닌 다른 인터렉션으로 닫힌 경우, 명시적으로 render 함수 인자의 `close()` 를 실행해줘야합니다. `close()` 를 실행하게 될 경우, 히스토리에서 이전 단계로 이동하게 됩니다.
+</Callout>
+            
+```tsx /close/
+funnel.Render.overlay({
+  render({ history, close }) {
+    return <약관동의 onAgree={() => history.push('비밀번호입력')} onClose={() => close()} />
+  }
+})
+```

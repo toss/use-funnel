@@ -1,0 +1,45 @@
+# 소개글
+
+- 퍼널이란?
+    - UI 패턴의 일종, 같은 관심사를 가지는 여러개의 화면들로 구성된 상태 머신? 화면들의 흐름?
+    - 예시 필요
+    - 모바일에서 화면이 복잡해지는 것을 방지하기 위해 한 화면에서 하나만 입력받는 경우가 있음
+        - 예시 이미지(주담대 퍼널 등)
+    - 사용자가 하나의 동작을 위한 입력값을 여러 화면에 걸쳐서 수행하도록 하는 UI 패턴
+
+## 왜 만들었나요?
+
+```tsx
+type Funnel =
+  | { step: "A"; context: { a: string; b?: string; c?: string; } }
+  | { step: "B"; context: { a: string; b: string; c?: string; } }
+  | { step: "C"; context: { a: string; b: string; c: string; } };
+
+const [funnel, setFunnel] = useState({ step: "A", context: { a: "a" } });
+```
+
+단계 별로 상태가 확장되는 개발할 때, 위와 같은 union type을 정의해서 사용할 수 있습니다. 하지만 다음과 같은 문제점이 있습니다.
+
+- 뒤로가기, 앞으로가기와 같은 히스토리 조작을 따로 구현해야 합니다.
+- 단계를 전환할 때 현재 단계와 비교해서 필수적으로 요구되는 상태만을 추릴 수 없습니다.
+    - 예를 들어, 위에 A 단계와 B 단계의 타입 집합에서 프로퍼티 b만 필수지만, 일반적으로 구현할 경우 a도 필수로 요구됩니다.
+    ```tsx
+    // A에서 B로 전환할 때 b만 필수로 요구되어야 하는데, a도 필수로 요구됩니다.
+    setFunnel({ step: "B", context: { b: "new b" } }) // compile error
+    setFunnel({ step: "B", context: { a: funnel.context.a, b: "new b" } }) // no compile error
+    ```
+
+`@use-funnel`은 이러한 문제점을 해결하기 위해 만들어졌습니다.
+
+
+## 용어설명
+
+step이란?
+
+- 퍼널 마다의
+
+context란?
+
+- 상태
+
+history란?

@@ -1,0 +1,271 @@
+import { Tabs } from 'nextra/components'
+
+# 단계별 상태 작성 방법들
+
+`@use-funnel` 에서 단계 해당 단계에서 필요한 상태의 타입을 지정해야합니다. 이 문서를 통해 다양한 방법으로 단계별 상태를 정의하는 방법을 알아보겠습니다.
+
+## 제네릭으로 정의하기
+
+```tsx /funnel/
+// 1. 아무것도 입력 안됨
+type 이메일입력 = { email?: string; password?: string; other?: unknown }
+// 2. 이메일은 입력됨
+type 비밀번호입력 = { email: string; password?: string; other?: unknown }
+// 3. 이메일과 비밀번호 입력됨
+type 그외정보입력 = { email: string; password: string; other?: unknown }
+
+function MyFunnelApp() {
+  const funnel = useFunnel<{
+    이메일입력: 이메일입력;
+    비밀번호입력: 비밀번호입력;
+    그외정보입력: 그외정보입력;
+  }>({
+    id: "how-to-define-step-contexts",
+    initial: {
+      step: "이메일입력",
+      context: {}
+    }
+  });
+
+  funnel.step === '이메일입력' && typeof funnel.context.email // "string" | "undefined"
+  funnel.step === '비밀번호입력' && typeof funnel.context.email // "string"
+
+  funnel.step === '비밀번호입력' && typeof funnel.context.password // "string" | "undefined"
+  funnel.step === '그외정보입력' && typeof funnel.context.password // "string"
+  // ...
+}
+```
+
+각 단계별로 필요한 상태의 타입을 제네릭으로 정의하고, 단계의 이름을 키로, 상태의 타입을 값으로 하는 객체 타입을 `useFunnel()` 의 제네릭으로 넘겨줍니다.
+
+### `CreateFunnelStepType<>` 사용하기 
+
+```tsx /funnel/
+import { CreateFunnelStepType, useFunnel } from "@use-funnel/next";
+
+type FormState = {
+  email?: string;
+  password?: string;
+  other?: unknown;
+}
+
+function MyFunnelApp() {
+  const funnel = useFunnel<CreateFunnelStepType<FormState, [
+    ['이메일입력'],
+    ['비밀번호입력', 'email'],
+    ['그외정보입력', 'password']
+  ]>>({
+    id: "create-funnel-step-type",
+    initial: {
+      step: "이메일입력",
+      context: {}
+    }
+  });
+
+  funnel.step === '이메일입력' && typeof funnel.context.email // "string" | "undefined"
+  funnel.step === '비밀번호입력' && typeof funnel.context.email // "string"
+
+  funnel.step === '비밀번호입력' && typeof funnel.context.password // "string" | "undefined"
+  funnel.step === '그외정보입력' && typeof funnel.context.password // "string"
+  // ...
+}
+```
+
+`CreateFunnelStepType` 타입을 통해 제네릭으로 초기 상태에서 다음 단계로 나아 갈 때 마다 필수적으로 요구되는 상태의 키를 뽑아서 정의할 수 있습니다.
+
+```ts
+type CreateFunnelStepType<Context, Array<[string, string?]>> = Record<string, Context>;
+```
+
+제네릭으로 첫번째 타입으로 초기 상태의 타입을, 두번째 타입으로 단계 튜플 배열을 넘겨줍니다. 단계 튜플의 첫번째 인자는 단계의 이름, 두번째 인자는 해당 단계에서 필수적으로 요구되는 상태의 키를 선택적으로 넘겨줍니다.
+
+## steps 객체 정의하기
+
+```tsx
+interface FunnelStepOption<TContext> {
+  guard?: (data: unknown) => data is TContext;
+  parse?: (data: unknown) => TContext;
+}
+```
+
+`useFunnel()` 의 `steps` 옵션을 통해 스탭을 정의하고, `guard()` 혹은 `parse()` 를 각 단계 별로 정의합니다.
+
+```tsx
+type FormState = {
+  email?: string;
+  password?: string;
+  other?: unknown;
+}
+
+function 이메일입력_guard (data: unknown): data is FormState {
+  return true;
+}
+
+function 비밀번호입력_parse (data: unknown): FormState & { password: string } {
+  if (!(data != null && typeof data === 'object' && 'password' in data)) {
+    throw new Error('비밀번호입력 데이터가 아닙니다.');
+  }
+  return data;
+}
+
+function 그외정보입력_guard (data: unknown): data is FormState & { password: string; other: unknown } {
+  return 비밀번호입력_guard(data) && 'other' in data;
+}
+
+function MyFunnelApp() {
+  const funnel = useFunnel({
+    id: "step-by-step",
+    steps: {
+      이메일입력: { guard: 이메일입력_guard },
+      비밀번호입력: { parse: 비밀번호입력_parse },
+      그외정보입력: { guard: 그외정보입력_guard },
+    }
+  })
+
+  funnel.step === '이메일입력' && typeof funnel.context.email // "string" | "undefined"
+  funnel.step === '비밀번호입력' && typeof funnel.context.email // "string"
+
+  funnel.step === '비밀번호입력' && typeof funnel.context.password // "string" | "undefined"
+  funnel.step === '그외정보입력' && typeof funnel.context.password // "string"
+  // ...
+}
+```
+
+- `guard()` 를 사용하면 해당 단계로 진입 했을 때 상태가 유효하지 않을 경우, `initial` 에서 정의한 단계와 상태로 대체합니다.
+- `parse()` 를 사용하면 해당 단계로 진입 했을 때 상태가 유효하지 않을 경우, 에러를 발생시킵니다.
+
+### `createFunnelSteps()` 사용하기
+
+```tsx
+declare function createFunnelSteps<FormState>(): {
+  extends: (name: string | string[], options?: { requiredKeys: string | string[] }) => this;
+  build: () => Record<string, FunnelStepOption>;
+}
+```
+
+간단하게 다음 단계로 넘어갈 때 optional에서 required로 변경되는 단계 스탭을 만들 수 있습니다.
+
+```tsx /funnel/
+import { createFunnelSteps, useFunnel } from "@use-funnel/next";
+
+type FormState = {
+  email?: string;
+  password?: string;
+  other?: unknown;
+}
+
+const steps = createFunnelSteps<FormState>()
+   .extends('이메일입력')
+   .extends('비밀번호입력', { requiredKeys: 'email' })
+   .extends('그외정보입력', { requiredKeys: 'password' })
+   .build();
+
+function MyFunnelApp() {
+  const funnel = useFunnel({
+    id: "create-funnel-steps",
+    steps: steps,
+    initial: {
+      step: "이메일입력",
+      context: {}
+    }
+  });
+
+  funnel.step === '이메일입력' && typeof funnel.context.email // "string" | "undefined"
+  funnel.step === '비밀번호입력' && typeof funnel.context.email // "string"
+
+  funnel.step === '비밀번호입력' && typeof funnel.context.password // "string" | "undefined"
+  funnel.step === '그외정보입력' && typeof funnel.context.password // "string"
+  // ...
+}
+```
+
+
+
+## Runtime validator package 사용하기
+
+<Tabs items={['zod', 'superstruct']}>
+<Tabs.Tab>
+```tsx /funnel/
+import { z } from 'zod';
+
+const 이메일입력_Schema = z.object({
+  email: z.string(),
+  password: z.string(),
+  other: z.unknown()
+}).partial();
+
+const 비밀번호입력_Schema = 이메일입력_Schema.required({ email: true });
+const 그외정보입력_Schema = 비밀번호입력_Schema.required({ password: true });
+
+function MyFunnelApp() {
+  const funnel = useFunnel({
+    id: "zod-example",
+    steps: {
+      이메일입력: { parse: 이메일입력_Schema.parse },
+      비밀번호입력: { parse: 비밀번호입력_Schema.parse },
+      그외정보입력: { parse: 그외정보입력_Schema.parse },
+    },
+    initial: {
+      step: "이메일입력",
+      context: {}
+    }
+  });
+
+  funnel.step === '이메일입력' && typeof funnel.context.email // "string" | "undefined"
+  funnel.step === '비밀번호입력' && typeof funnel.context.email // "string"
+
+  funnel.step === '비밀번호입력' && typeof funnel.context.password // "string" | "undefined"
+  funnel.step === '그외정보입력' && typeof funnel.context.password // "string"
+  // ...
+}
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```tsx /funnel/
+import { partial, object, string, unknown, assign, omit, pick, create } from 'superstruct';
+
+const schema = object({
+  email: string(),
+  password: string(),
+  other: unknown()
+})
+
+const 이메일입력_Schema = partial(
+  schema
+);
+
+const 비밀번호입력_Schema = assign(
+  omit(이메일입력_Schema, ['email']),
+  pick(schema, ['email'])
+);
+
+const 그외정보입력_Schema = assign(
+  omit(비밀번호입력_Schema, ['password']),
+  pick(schema, ['password'])
+);
+
+function MyFunnelApp() {
+  const funnel = useFunnel({
+    id: "superstruct-example",
+    steps: {
+      이메일입력: { parse: (data) => create(data, 이메일입력_Schema) },
+      비밀번호입력: { parse: (data) => create(data, 비밀번호입력_Schema) },
+      그외정보입력: { parse: (data) => create(data, 그외정보입력_Schema) },
+    },
+    initial: {
+      step: "이메일입력",
+      context: {}
+    }
+  });
+
+  funnel.step === '이메일입력' && typeof funnel.context.email // "string" | "undefined"
+  funnel.step === '비밀번호입력' && typeof funnel.context.email // "string"
+
+  funnel.step === '비밀번호입력' && typeof funnel.context.password // "string" | "undefined"
+  funnel.step === '그외정보입력' && typeof funnel.context.password // "string"
+  // ...
+}
+```
+</Tabs.Tab>
+</Tabs>
+

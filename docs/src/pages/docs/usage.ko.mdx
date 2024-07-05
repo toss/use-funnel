@@ -1,0 +1,86 @@
+import { Steps, Callout } from 'nextra/components'
+
+# 사용방법
+
+<Steps>
+### 먼저 각 단계별로 필요한 상태를 정의합니다.
+    
+    ```tsx
+    // 회원가입 스탭 정의하기
+    
+    // 1. 아무것도 입력 안됨
+    type 이메일입력 = { email?: string; password?: string; other?: unknown }
+    // 2. 이메일은 입력됨
+    type 비밀번호입력 = { email: string; password?: string; other?: unknown }
+    // 3. 이메일과 비밀번호 입력됨
+    type 그외정보입력 = { email: string; password: string; other?: unknown }
+    ```
+    
+### 단계별 상태 타입을 `useFunnel()` 의 제네릭으로 지정합니다.
+    
+해당 컴포넌트에 진입했을때 사용할 단계 이름과 초기 context를 `initial`에 지정해줍니다. 
+
+```tsx /funnel/
+import { useFunnel } from "@use-funnel/next";
+
+function MyFunnelApp() {
+  const funnel = useFunnel<{
+    이메일입력: 이메일입력;
+    비밀번호입력: 비밀번호입력;
+    그외정보입력: 그외정보입력;
+  }>({
+    id: "my-funnel-app",
+    initial: {
+      step: "이메일입력",
+      context: {}
+    }
+  });
+  // ...
+}
+```
+
+<Callout type="info">`id` 는 [한 컴포넌트에 여러 퍼널](/docs/sub-funnel)이 있을 때, 유니크하게 구분할 수 있는 값입니다.</Callout>
+<Callout>이 방법 이외의 단계별 상태 정의는 [Context 작성 가이드](/docs/context-guide)를 참고해주세요.</Callout>
+    
+### `useFunnel()`에서 반환된 `step` 에 따라 `context`, `history` 를 사용합니다.
+
+```tsx /funnel/
+switch (funnel.step) {
+  case '이메일입력':
+    return <이메일입력 onNext={(email) => funnel.history.push('비밀번호입력', { email })} />;
+  case '비밀번호입력':
+    return (
+      <비밀번호입력
+        email={funnel.context.email}
+        onNext={(password) => funnel.history.push('그외정보입력', { password })}
+      />
+    );
+  case '그외정보입력':
+    return <그외정보입력 />;
+}
+```
+
+- `funnel.context` 를 통해 현재 단계의 상태를 가져올 수 있습니다. `funnel.step` 값에 따라 `funnel.context` 의 타입이 단계 별로 정의한 타입으로 추론됩니다.
+- `funnel.history.push()` 를 통해 다음 단계로 넘어갈 수 있습니다. 첫번째 인자로 단계의 이름을, 두번째 인자로 해당 단계로 진입하기 위해 필요한 상태를 받습니다.
+- `funnel.history.replace()` 는 `funnel.history.push()` 와 기본적인 동작은 같지만, 히스토리를 쌓지 않고 현재 step을 덮어씌웁니다.
+
+    
+혹은 `useFunnel()` 에서 반환되는 Render 컴포넌트를 사용할 수 있습니다. 해당 컴포넌트의 자세한 사용방법은 [여기](/docs/funnel-render)를 참고해주세요.
+
+```tsx /funnel/
+return (
+  <funnel.Render
+    이메일입력={({ history }) => (
+      <이메일입력 onNext={(email) => history.push('비밀번호입력', { email })} />
+    )}
+    비밀번호입력={({ context, history }) => (
+      <비밀번호입력
+        email={context.email}
+        onNext={(password) => history.push('그외정보입력', { password })}
+      />
+    )}
+    그외정보입력={() => <그외정보입력 />}
+  />
+)
+```
+</Steps>

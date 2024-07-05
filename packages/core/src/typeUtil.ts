@@ -77,14 +77,14 @@ type GetContextRequiredExtendRuleRequired<T extends ContextRequiredExtendRule<an
     ? R
     : never;
 
-export type ExtendedFunnelContext<
+export type CreateFunnelStepType<
   TInitialState,
   TRuleTuples extends Array<ContextRequiredExtendRule<keyof TInitialState & string>>,
   Var_ContextTuple extends any[] = [],
   Var_Result = {},
 > = Var_ContextTuple['length'] extends TRuleTuples['length']
   ? Prettify<Var_Result>
-  : ExtendedFunnelContext<
+  : CreateFunnelStepType<
       TInitialState,
       TRuleTuples,
       [
