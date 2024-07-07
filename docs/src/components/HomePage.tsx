@@ -16,7 +16,7 @@ export const HomePage = ({
   return (
     <div className="pb-20">
       <div className="flex flex-col items-center justify-center gap-8 pt-11 text-center">
-        <Image src="/logo.png" alt="Suspensive with star" width={200} height={200} />
+        <Image src="/logo.png" alt="Suspensive with star" width={200} height={200} className="-mb-4" />
         <div className="flex flex-col items-center gap-4">
           <div className="relative text-5xl font-bold">
             <span>{title}</span>

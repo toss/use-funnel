@@ -14,10 +14,5 @@
   },
   "prettier.prettierPath": "node_modules/prettier/index.cjs",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "typescript.tsdk": "node_modules/typescript/lib",
-  "workbench.colorCustomizations": {
-    "activityBar.background": "#3F2635",
-    "titleBar.activeBackground": "#58354A",
-    "titleBar.activeForeground": "#FCFAFB"
-  }
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
