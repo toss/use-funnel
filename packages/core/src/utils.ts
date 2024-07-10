@@ -1,4 +1,5 @@
-import { MutableRefObject, useEffect, useRef, useSyncExternalStore } from 'react';
+import { MutableRefObject, useEffect, useRef } from 'react';
+import { useSyncExternalStore } from 'use-sync-external-store/shim';
 
 interface Store<T> {
   listeners: VoidFunction[];

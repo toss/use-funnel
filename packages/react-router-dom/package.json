@@ -51,7 +51,7 @@
     "vitest": "^1.6.0"
   },
   "peerDependencies": {
-    "react": ">=18",
+    "react": "^17 || ^18",
     "react-router-dom": ">=6"
   },
   "sideEffects": false
