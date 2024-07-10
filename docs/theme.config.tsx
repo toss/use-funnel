@@ -8,7 +8,7 @@ const config: DocsThemeConfig = {
       <div className="flex items-center gap-2">
         <Image src="/logo.png" width={25} height={25} alt="@use-funnel logo" />
         <div className="relative">
-          <strong>use-funnel</strong>
+          <strong>@use-funnel</strong>
         </div>
       </div>
     );
@@ -16,15 +16,15 @@ const config: DocsThemeConfig = {
   head: function Head() {
     const { title, frontMatter } = useConfig();
     const { asPath, defaultLocale, locale } = useRouter();
-    const url = 'https://suspensive.org' + (defaultLocale === locale ? asPath : `/${locale}${asPath}`);
+    const url = 'https://use-funnel.slash.page' + (defaultLocale === locale ? asPath : `/${locale}${asPath}`);
 
     return (
       <>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta property="og:title" content={title || 'Suspensive'} />
+        <meta property="og:title" content={title || '@use-funnel'} />
         <meta property="og:url" content={url} />
-        <meta property="og:description" content={frontMatter.description || 'Packages to use React Suspense easily'} />
-        <meta property="og:image" content="/banner.png" />
+        <meta property="og:description" content={frontMatter.description || '@use-funnel'} />
+        <meta property="og:image" content="/logo.png" />
         <link rel="icon" href="/favicon.ico" type="image/ico" />
       </>
     );
@@ -61,7 +61,7 @@ const config: DocsThemeConfig = {
     toggleButton: true,
   },
   i18n: [
-    { locale: 'en', text: 'English' },
+    // { locale: 'en', text: 'English' },
     { locale: 'ko', text: '한국어' },
   ],
   search: {
