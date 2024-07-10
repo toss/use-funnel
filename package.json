@@ -14,7 +14,6 @@
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "husky": "^9.0.11",
     "hygen": "^6.2.11",
-    "lerna": "^8.1.3",
     "lint-staged": "^15.2.5",
     "prettier": "^3.0.0",
     "typescript": "^5.1.6"
@@ -38,6 +37,5 @@
       "eslint --fix",
       "git add"
     ]
-  },
-  "dependencies": {}
+  }
 }
