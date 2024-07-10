@@ -1,5 +1,4 @@
-import { MutableRefObject, useEffect, useRef } from 'react';
-import { useSyncExternalStore } from 'use-sync-external-store/shim';
+import { MutableRefObject, useEffect, useRef, useState } from 'react';
 
 interface Store<T> {
   listeners: VoidFunction[];
@@ -37,10 +36,15 @@ export function useStateSubscriberStore<T>(state: T) {
 }
 
 export function useStateStore<T>(subscriberRef: MutableRefObject<Store<T>>) {
-  return useSyncExternalStore(
-    subscriberRef.current.subscribe.bind(subscriberRef.current),
-    subscriberRef.current.getSnapshot,
-  );
+  const [state, setState] = useState(() => subscriberRef.current.getSnapshot());
+
+  useEffect(() => {
+    return subscriberRef.current.subscribe(() => {
+      setState(subscriberRef.current.getSnapshot());
+    });
+  }, [subscriberRef]);
+
+  return state;
 }
 
 export function useUpdatableRef<T>(value: T) {

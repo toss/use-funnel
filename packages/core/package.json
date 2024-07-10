@@ -36,7 +36,6 @@
     "@testing-library/user-event": "^14.5.2",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.3.0",
-    "@types/use-sync-external-store": "^0.0.6",
     "concurrently": "^8.2.2",
     "globals": "^15.3.0",
     "jsdom": "^24.1.0",
@@ -51,8 +50,5 @@
   "peerDependencies": {
     "react": "^17 || ^18"
   },
-  "sideEffects": false,
-  "dependencies": {
-    "use-sync-external-store": "^1.2.2"
-  }
+  "sideEffects": false
 }
