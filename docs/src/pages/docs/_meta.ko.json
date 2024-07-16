@@ -1,18 +1,17 @@
 {
   "introdution": "소개",
-  "why": "왜 사용하나요?",
   "install": "설치하기",
   "usage": "사용방법",
   "--- API Reference": {
     "type": "separator",
     "title": "API 문서"
   },
-  "context-guide": "단계별 상태 작성 가이드",
   "funnel-render": "<funnel.Render />",
   "--- Advanced": {
     "type": "separator",
     "title": "고급"
   },
+  "context-guide": "상태 정의 가이드",
   "sub-funnel": "퍼널 안에 퍼널 만들기",
   "custom-router": "라우터 직접 만들기"
 }

@@ -16,6 +16,7 @@
     "nextra-theme-docs": "^2.13.4",
     "react": "^18",
     "react-dom": "^18",
+    "react-tooltip": "^5.27.1",
     "remark-sandpack": "^0.0.3"
   },
   "devDependencies": {
