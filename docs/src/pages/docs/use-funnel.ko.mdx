@@ -1,0 +1,130 @@
+import { UseFunnelCodeBlock, Keyword } from '@/components'
+import { Callout } from 'nextra/components'
+
+# `useFunnel()`
+
+<UseFunnelCodeBlock>
+```tsx
+import { useFunnel, UseFunnelOptions, UseFunnelResults } from "@use-funnel/next";
+
+type T = {
+  helloStep: { message: string; };
+  worldStep: { message: string; message2: string }
+}
+
+const funnel: UseFunnelResults<T> = useFunnel<T>({
+  id: "use-funnel-api-reference",
+  steps: {},
+  context: {
+    step: "helloStep",
+    context: {
+      message: 'Hello'
+    }
+  },
+} satisfies UseFunnelOptions<T>);
+```
+</UseFunnelCodeBlock>
+
+패키지에서 제공하는 `useFunnel()` 함수의 스펙의 인자 타입인 `UseFunnelOptions<T>` 와 반환 타입인 `UseFunnelResults<T>` 을 알아볼게요.
+
+<Callout>
+제네릭 인자 `T`는 각 <Keyword keyword="step"/> 의 <Keyword keyword="context"/> 를 정의한 객체 타입을 의미해요.
+</Callout>
+
+## `UseFunnelOptions<T>`
+
+`UseFunnelOptions` 는 `useFunnel()` 함수의 인자로, 퍼널을 설정하는 옵션을 정의합니다. 퍼널의 식별자, 초기 상태, 그리고 각 단계의 옵션을 설정하는 속성들로 구성되어 있어요.
+
+### `id`
+
+<small className="text-red-600">required</small> <small>string</small>
+
+퍼널의 고유 식별자입니다. 이 식별자는 퍼널 인스턴스를 식별하는 데 사용되며, 동일한 식별자를 가진 퍼널은 동일한 상태와 설정을 공유합니다.
+
+### `initial`
+
+<small className="text-red-600">required</small> <small>`{ step: keyof T; context: T[keyof T] }`</small>
+
+퍼널의 초기 상태를 정의합니다. `step` 에 정의한 `T` 객체의 키가 들어가고, `context` 에 해당 키의 값이 들어가요.
+
+### `steps`
+
+<small className="text-gray-400">optional</small> <small>`{ [key in keyof T]: FunnelStepOption<T[key]> }`</small>
+
+```ts
+interface FunnelStepOption<TContext> {
+  guard?: (data: unknown) => data is TContext;
+  parse?: (data: unknown) => TContext;
+}
+```
+
+각 단계의 옵션을 정의합니다. `T` 객체의 키를 키로, `FunnelStepOption` 객체를 값으로 하는 객체 타입을 받아요. `guard` 혹은 `parse` 로 각각 <Keyword keyword="step"/> 의 <Keyword keyword="context"/> 를 검증하고, 파싱하는 함수를 정의할 수 있어요. 자세한 내용은 [여기](/docs/context-guide#steps-객체-정의하기)를 참고해주세요.
+
+## `UseFunnelResults<T>`
+
+`UseFunnelResults` 는 `useFunnel()` 함수의 반환값으로, 퍼널의 상태와 히스토리 조작, `<Render />` 컴포넌트 등을 포함하고 있어요.
+
+### `step`
+
+<small>`keyof T`</small>
+
+현재 퍼널의 <Keyword keyword="step"/> 을 나타내는 속성입니다. `T` 객체의 키 중 하나가 들어가요.
+
+### `context`
+
+<small>`T[keyof T]`</small>
+
+현재 퍼널의 <Keyword keyword="context"/> 를 나타내는 속성입니다. 현재 `step` 에 따라 `T` 객체의 값이 들어가요.
+
+### `history`
+
+<small>`FunnelHistory<T>`</small>
+
+```ts
+interface FunnelHistory<T> {
+  push: <TStep extends keyof T>(step: TStep, context: T[TStep]) => Promise<void> | void;
+  replace: <TStep extends keyof T>(step: TStep, context: T[TStep]) => Promise<void> | void;
+  go: (index: number) => void | Promise<void>;
+  back: () => void | Promise<void>;
+}
+```
+
+퍼널의 이동을 조작하는 객체에요. 해당 객체에는 다음과 같은 메소드를 제공해요.
+
+* `push` 는 새로운 <Keyword keyword="step"/> 으로 이동하며, 이전 <Keyword keyword="step"/> 의 히스토리를 남겨요.
+* `replace` 는 새로운 <Keyword keyword="step"/> 으로 이동하며, 이전 <Keyword keyword="step"/> 의 히스토리를 남기지 않아요.
+* `go` 는 현재 인덱스 기준으로 지정해서 이동합니다. 예로, `-1` 을 넘기면 이전 <Keyword keyword="step"/> 으로 이동해요.
+* `back` 은 이전 <Keyword keyword="step"/> 으로 이동해요.
+
+<UseFunnelCodeBlock>
+```tsx
+import { useFunnel } from "@use-funnel/next";
+
+type T = {
+  helloStep: { message: string; };
+  worldStep: { message: string; message2: string }
+}
+
+const funnel = useFunnel<T>({
+  id: "use-funnel-history-example",
+  steps: {},
+  context: {
+    step: "helloStep",
+    context: {
+      message: 'Hello'
+    }
+  },
+});
+
+if (funnel.step === 'helloStep') {
+  // `message` 속성은 이미 정의되어 있어서, `message2` 속성만 필수로 넘겨주면 된다!
+  funnel.history.push('worldStep', { message2: 'World' });
+}
+```
+</UseFunnelCodeBlock>
+
+또한 `push` 와 `replace` 에 넘겨주는 <Keyword keyword="context"/> 객체는 현재 <Keyword keyword="step"/> 의 <Keyword keyword="context"/> 와 비교해서 이동에 필수적인 속성을 바로 알 수 있어요. 자세한 내용은 [여기](/docs/introdution#강력한-타입-지원)를 참고해주세요.
+
+### `<Render />`
+
+자세한 내용은 [\<funnel.Render />](/docs/funnel-render) 을 참고해주세요.
