@@ -1,5 +1,5 @@
 {
-  "name": "@tossteam/use-funnel",
+  "name": "use-funnel",
   "type": "module",
   "private": true,
   "devDependencies": {
@@ -21,7 +21,10 @@
   "scripts": {
     "add:router": "hygen packages router",
     "prepare": "husky",
-    "prettier": "prettier --write \"packages/*/{src,test}/**/*.{js,jsx,ts,tsx}\""
+    "prettier": "prettier --write \"packages/*/{src,test}/**/*.{js,jsx,ts,tsx}\"",
+    "changeset": "changeset",
+    "changeset:publish": "pnpm prepack && changeset publish",
+    "changeset:version": "changeset version && pnpm i --lockfile-only"
   },
   "husky": {
     "hooks": {
