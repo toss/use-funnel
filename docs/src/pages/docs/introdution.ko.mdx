@@ -2,24 +2,7 @@ import { Keyword, KeywordDescription } from '@/components';
 
 # 소개글
 
-```mermaid
-%%{init: { 'logLevel': 'debug', 'theme': 'base', 'gitGraph': {'showBranches': true, 'showCommitLabel':true,'mainBranchName': '대출퍼널'}} }%%
-      gitGraph
-        commit id:"이름입력"
-        commit id:"직업선택"
-        branch "사업자퍼널"
-        commit id:"사업자등록일입력"
-        commit id:"주민등록번호입력"
-        branch "본인인증퍼널"
-        commit id:"토스인증"
-        commit type: HIGHLIGHT id:"인증실패"
-        commit id:"담보물입력"
-        checkout "대출퍼널"
-        merge "본인인증퍼널"
-        merge "사업자퍼널" tag:"사업자입력완료"
-        commit id:"담보물입력"
-        commit type:REVERSE id:"가심사완료"
-```
+<video src="/example.mp4" width={250} muted autoPlay loop className="float-right ml-6 my-6" />
 
 `@use-funnel`은 복잡한 UI 흐름을 간편하게 구현할 수 있도록 도와주는 React 훅이에요.
 
