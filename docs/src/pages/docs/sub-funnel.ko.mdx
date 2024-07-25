@@ -1,7 +1,8 @@
-import { 
-  UseFunnelCodeBlock,
-  Keyword
- } from '@/components'
+import { UseFunnelCodeBlock, Keyword } from '@/components'
+
+# 퍼널 안에 퍼널 만들기
+
+퍼널을 개발하다 보면 하나의 상태를 만들기 위해 여러 단계를 거쳐야 할 때가 있어요. 또는 일정 부분의 퍼널 단계를 다른 곳에서 재활용해야 할 때도 있어요. 이럴 때 퍼널을 서브 퍼널로 나누면 효율적이에요. 흐름도로 보면 다음과 같아요.
 
 ```mermaid
 %%{init: { 'logLevel': 'debug', 'theme': 'base', 'gitGraph': {'showBranches': true, 'showCommitLabel':true,'mainBranchName': 'main-funnel'}} }%%
@@ -18,12 +19,10 @@ gitGraph
   commit id: "C"
 ```
 
-퍼널을 개발하다보면 하나의 상태를 만들기 위해서 내부적으로 여러 단계를 거쳐야할 때가 있어요. 혹은 일정 부분의 퍼널 단계를 다른 곳에서 재활용해야할 때가 있어요.
-
-이 경우 퍼널을 서브 퍼널로 나누어 개발하면 효율적이에요.
+`@use-funnel`은 서브 퍼널을 지원해요. 간단하게 <Keyword>step</Keyword> 하위의 컴포넌트에서 [`useFunnel()`](./use-funnel.ko.mdx)을 사용할 때 다른 `id`를 지정하면 돼요.
 
 <UseFunnelCodeBlock>
-```tsx
+```tsx {9,23}
 import { useFunnel } from "@use-funnel/next";
 
 function useMainFunnel() {
@@ -55,5 +54,3 @@ function useBFunnel() {
 }
 ```
 </UseFunnelCodeBlock>
-
-`@use-funnel` 은 서브 퍼널을 지원해요. 간단하게 <Keyword keyword="step" /> 하위의 컴포넌트에서 `useFunnel()` 을 사용할 때 다른 id를 지정하면 돼요.

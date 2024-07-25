@@ -22,7 +22,7 @@ export const HomePage = ({
           </div>
           <p className="text-3xl">{description}</p>
         </div>
-        <Link href="/docs/introdution">
+        <Link href="/docs/overview">
           <span className="inline-block rounded-xl bg-gray-800 px-10 py-3 text-xl font-bold">{buttonText}</span>
         </Link>
       </div>

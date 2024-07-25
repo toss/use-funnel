@@ -1,0 +1,114 @@
+import { Steps, Callout } from 'nextra/components'
+import { UseFunnelCodeBlock, Keyword } from '@/components'
+
+# 시작하기
+
+`@use-funnel`을 사용해 간단한 회원가입 흐름을 구현해 볼게요. 각 단계의 상태를 정의하고, 이를 통해 단계별로 상태를 안전하게 관리하는 방법을 배울 수 있어요.
+
+<Steps>
+### <Keyword>step</Keyword> 별 <Keyword>context</Keyword> 정의하기
+
+회원가입 과정은 여러 <Keyword>step</Keyword>으로 나눌 수 있어요. 여기서는 이메일 입력, 비밀번호 입력, 그 외 정보 입력의 세 <Keyword>step</Keyword>으로 나눠볼게요. 그리고 각 <Keyword>step</Keyword>마다 필요한 상태를 다음과 같이 타입으로 정의할게요.
+    
+```tsx filename="context.ts"
+// 1. 아무것도 입력 안됨
+type 이메일입력 = { email?: string; password?: string; other?: unknown }
+// 2. 이메일은 입력됨
+type 비밀번호입력 = { email: string; password?: string; other?: unknown }
+// 3. 이메일과 비밀번호 입력됨
+type 그외정보입력 = { email: string; password: string; other?: unknown }
+```
+
+- `이메일입력`: 회원가입의 첫 <Keyword>step</Keyword>이에요. 이메일과 비밀번호 입력 필드가 있지만, 아직 아무것도 입력되지 않은 상태에요. `email`과 `password`는 둘 다 선택(optional) 필드로 정의되어 있어요.
+
+- `비밀번호입력`: 회원가입의 두 번째 <Keyword>step</Keyword>이에요. 사용자가 이메일을 입력한 후 비밀번호를 입력하는 <Keyword>step</Keyword>이에요. 이 <Keyword>step</Keyword>에서는 `email` 필드가 필수적으로 입력되어 있어야 하고, `password`는 선택 필드에요.
+
+- `그외정보입력`: 회원가입의 세 번째 <Keyword>step</Keyword>이에요. 사용자가 이메일과 비밀번호를 모두 입력한 후 추가 정보를 입력하는 <Keyword>step</Keyword>이에요. 이 <Keyword>step</Keyword>에서는 `email`과 `password`가 모두 필수적으로 입력되어 있어야 해요.
+
+이렇게 각 <Keyword>step</Keyword>의 상태를 타입으로 정의하면 코드에서 [타입 안전성](./features.ko.mdx#강력한-타입-안전성으로-관리하는-ui-상태)을 유지할 수 있고, <Keyword>step</Keyword>별로 필요한 정보를 쉽게 추적할 수 있어요.
+    
+### 초기 단계 설정하기
+    
+이제 [`useFunnel(){:tsx}`](./use-funnel.ko.mdx)을 사용해 초기 단계를 설정해 볼게요.
+
+먼저 <Keyword>step</Keyword>을 key로 한 <Keyword>context</Keyword> 객체를 [`useFunnel(){:tsx}`](./use-funnel.ko.mdx)의 제네릭으로 지정해요. 앞 단계에서 각 단계의 상태를 정의한 타입을 [`useFunnel(){:tsx}`](./use-funnel.ko.mdx)에 전달해서 사용하는 거에요. 해당 컴포넌트에 진입했을 때 사용할 <Keyword>step</Keyword>과 <Keyword>context</Keyword> 객체를 `initial` 프로퍼티에 지정해요.
+
+여기서는 초기 단계인 "이메일입력"과 해당 단계에서 사용할 빈 `context` 객체를 설정했어요. `id`는 [한 컴포넌트에 여러 퍼널](/docs/sub-funnel)이 있을 때 구분하기 위한 고유 식별자에요.
+
+<UseFunnelCodeBlock>
+```tsx {5-15}
+import { useFunnel } from "@use-funnel/next";
+import type { 이메일입력, 비밀번호입력, 그외정보입력 } "./context";
+
+function MyFunnelApp() {
+  const funnel = useFunnel<{
+    이메일입력: 이메일입력;
+    비밀번호입력: 비밀번호입력;
+    그외정보입력: 그외정보입력;
+  }>({
+    id: "my-funnel-app",
+    initial: {
+      step: "이메일입력",
+      context: {}
+    }
+  });
+  // ...
+}
+```
+</UseFunnelCodeBlock>
+
+이 방법 이외의 <Keyword>step</Keyword> 별 상태 정의는 [상태 정의 가이드](/docs/context-guide)를 참고하세요.
+    
+### 단계별 <Keyword>context</Keyword>와 <Keyword>history</Keyword> 사용하기
+
+[`useFunnel(){:tsx}`](./use-funnel.ko.mdx)에서 반환된 `step`에 따라 `context`와 `history`를 사용해요. 각 단계별로 UI를 구성하고, 필요한 상태와 이벤트를 처리할 수 있어요.
+
+```tsx
+declare function 이메일입력(props: { onNext: (email: string) => void }): JSX.Element;
+declare function 비밀번호입력(props: { email: string; onNext: (password: string) => void }): JSX.Element;
+declare function 그외정보입력(): JSX.Element;
+
+switch (funnel.step) {
+  case '이메일입력':
+    return <이메일입력 onNext={(email) => funnel.history.push('비밀번호입력', { email })} />;
+  case '비밀번호입력':
+    return (
+      <비밀번호입력
+        email={funnel.context.email} // 이메일 입력에서 입력했기 때문에 undefined가 아니에요!
+        onNext={(password) => funnel.history.push('그외정보입력', { password })}
+      />
+    );
+  case '그외정보입력':
+    return <그외정보입력 />;
+}
+```
+
+- `funnel.context{:jsx}`: 현재 <Keyword>step</Keyword>의 <Keyword>context</Keyword>를 가져올 수 있어요. 예를 들어, "이메일입력" 단계에서 `funnel.context.email`은 `string | undefined` 타입이지만, "비밀번호입력" 단계에서는 `string` 타입으로 추론할 수 있어요.
+
+- `funnel.history.push(){:jsx}`: 다음 단계로 넘어갈 수 있어요. `push()`의 첫 번째 인자로 <Keyword>step</Keyword>을, 두 번째 인자로 해당 <Keyword>step</Keyword> 으로 진입하기 위해 필요한 <Keyword>context</Keyword> 를 받아요.
+- `funnel.history.replace(){:jsx}`: `funnel.history.push()`와 기본 동작은 같지만, 히스토리를 쌓지 않고 현재 <Keyword>step</Keyword> 을 덮어씌워요.
+    
+#### 참고: `<funnel.Render />{:jsx}` 컴포넌트를 사용해 쉽게 구현하기
+
+혹은 [`useFunnel(){:tsx}`](./use-funnel.ko.mdx)이 반환하는 [`<funnel.Render />{:jsx}`](./funnel-render.ko.mdx) 컴포넌트를 사용할 수 있어요. 이 컴포넌트를 사용하면 단계별 UI를 더 간편하게 관리할 수 있어요.
+
+```tsx
+return (
+  <funnel.Render
+    이메일입력={({ history }) => (
+      <이메일입력 onNext={(email) => history.push('비밀번호입력', { email })} />
+    )}
+    비밀번호입력={({ context, history }) => (
+      <비밀번호입력
+        email={context.email}
+        onNext={(password) => history.push('그외정보입력', { password })}
+      />
+    )}
+    그외정보입력={() => <그외정보입력 />}
+  />
+)
+```
+
+[`<funnel.Render />{:jsx}`](./funnel-render.ko.mdx) 컴포넌트를 사용하는 자세한 방법은 [레퍼런스](/docs/funnel-render)를 참고해주세요.
+
+</Steps>

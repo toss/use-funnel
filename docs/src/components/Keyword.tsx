@@ -2,16 +2,16 @@ import { useRouter } from 'next/router';
 
 export const keywords = {
   step: {
-    ko: '사용자가 하나의 동작을 위한 입력값을 여러 화면에 걸쳐서 수행하도록 할 때, 각 화면을 "Step"이라고 불러요.',
-    en: 'When a user performs an input value for one action across multiple screens, each screen is called a "Step".',
+    ko: '사용자가 하나의 목표를 위해 여러 화면에 걸쳐서 필요한 값을 입력할 때, 각 화면이 step이에요.',
+    en: 'When a user performs an input value for one action across multiple screens, each screen is called a "step".',
   },
   context: {
-    ko: '각 Step에서 필요한 입력값을 저장하는 상태에요.',
-    en: 'It is a state that stores the input values required for each Step.',
+    ko: '각 step에서 입력한 값의 상태에요.',
+    en: 'It is a state that stores the input values required for each step.',
   },
   history: {
-    ko: '퍼널에서 Step의 이동과 각 Step에서의 Context 변경 내역을 가진 배열이에요.',
-    en: 'It is an array that contains the movement of Steps in the funnel and the history of Context changes in each Step.',
+    ko: '전체 step의 이동과 각 step에서 입력한 context의 변경 기록을 가지고 있는 배열이에요.',
+    en: 'It is an array that contains the movement of steps in the funnel and the history of context changes in each Step.',
   },
 } satisfies Record<
   string,
@@ -21,7 +21,7 @@ export const keywords = {
   }
 >;
 
-export function Keyword({ keyword }: { keyword: keyof typeof keywords }) {
+export function Keyword({ children: keyword }: { children: keyof typeof keywords }) {
   const router = useRouter();
   return (
     <>

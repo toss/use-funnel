@@ -1,0 +1,67 @@
+import { Callout } from 'nextra/components'
+
+# 오버레이 사용하기
+
+<div className="float-right ml-6 my-6 w-[275px] max-w-[40%]">
+![Overlay 예시](/overlay.png)
+</div>
+
+오버레이는 현재 단계에서 이전 단계를 유지한 채 오른쪽 그림처럼 모달, 바텀시트와 같은 UI를 표현할 때 사용해요. 
+
+다음 예제에서는 "학교입력" 단계에서 "시작일자입력" 단계로 넘어갈 때 오버레이를 사용해요. `<시작일자입력BottomSheet />` 컴포넌트가 렌더링될 때, 이전 단계의 UI인 `<학교입력 />` 컴포넌트는 유지된 상태에요.
+        
+```tsx /overlay/
+<funnel.Render
+  학교입력={({ history }) => (
+    <학교입력
+      onNext={(school) => history.push('시작일자입력', { school })}
+    />
+  )}
+  시작일자입력={funnel.Render.overlay({
+    render({ history, close }) {
+      return (
+        <시작일자입력BottomSheet
+          onNext={() => history.push('다음단계')}
+          onClose={() => close()}
+        />
+      );
+    }
+  })}
+/>
+```
+
+<div className="clear-both" />
+
+<Callout type="warning">
+**주의할 점:** overlay가 라우터의 뒤로가기를 통해 닫힌게 아닌 다른 인터렉션으로 닫힌 경우, 명시적으로 `render()`의 인자인 `close(){:jsx}` 를 실행해줘야 해요. `close(){:jsx}`를 실행하면 히스토리를 통해 이전 단계로 이동해요.
+</Callout>
+
+## 오버레이와 이벤트를 함께 사용하는 예시
+
+오버레이와 [전환 이벤트](/docs/transition-event)를 함께 정의하고 싶다면 `events` 속성을 사용해 보세요.
+
+다음 예제에서는 "이메일입력" 단계에서 전환 이벤트와 오버레이를 함께 사용해요. "이메일입력완료"와 "이메일입력실패" 이벤트를 정의하고, 각 이벤트에 따라 다음 단계로 전환해요.
+
+```tsx
+<funnel.Render
+  이메일입력={funnel.Render.overlay({
+    events: {
+      이메일입력완료: (email: string, { history }) => history.push('비밀번호입력', { email }),
+      이메일입력실패: (error: Error, { history }) => history.push('에러페이지', { error: error.message })
+    },
+    render({ context, dispatch }) {
+      return (
+        <이메일입력
+          email={context.email}
+          onNext={(email) => dispatch('이메일입력완료', email)}
+          onError={(error) => dispatch('이메일입력실패', error)}
+        />
+      )
+    }
+  })}
+/>
+```
+
+<Callout type="warning">
+이벤트를 정의할 때는 렌더링 함수에서 `history`를 사용할 수 없어요. 대신 `events` 객체를 사용해 정의한 이벤트를 `dispatch()`로 호출할 수 있어요.
+</Callout>

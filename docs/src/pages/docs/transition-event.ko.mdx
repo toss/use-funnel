@@ -1,0 +1,74 @@
+import { Keyword } from '@/components'
+import { Callout } from 'nextra/components'
+
+# 전환 이벤트 정의하기
+
+전환 이벤트란 특정 조건이나 사용자 동작에 따라 현재 단계에서 다음 단계로 전환하는 것을 제어하는 방법이에요. 퍼널 내에 여러 가지 경로가 필요할 때 유용하죠. 예를 들어 사용자가 이메일을 입력했을 때 정상적으로 입력한 경우와 입력이 실패한 경우를 다르게 처리해야 할 때 사용할 수 있어요.
+
+전환 이벤트는 현재 <Keyword>step</Keyword>에서 여러 경로가 필요해 이벤트를 정의할 때 사용해요. 현재 <Keyword>step</Keyword>에서 발생할 수 있는 여러 경로를 한번에 정의할 수 있어서 응집력 있는 코드를 만들 수 있어요.
+
+다음은 전환 이벤트를 정의하고 사용하는 예제예요. 
+    
+```tsx
+import { useFunnel } from "@use-funnel/next";
+
+const funnel = useFunnel(/* ... */);
+
+<funnel.Render
+  이메일입력={funnel.Render.with({
+    events: {
+      // 이메일 입력 완료 이벤트
+      이메일입력완료: (email: string, { history }) => {
+        // 비밀번호 입력 단계로 전환
+        history.push('비밀번호입력', { email });
+      },
+      // 이메일 입력 실패 이벤트
+      이메일입력실패: (error: Error, { history }) => {
+        // 에러 페이지로 전환
+        history.push('에러페이지', { error: error.message });
+      }
+    },
+    render({ context, dispatch }) {
+      return (
+        <이메일입력
+          email={context.email}
+          // 이메일 입력 완료 시 이메일입력완료 이벤트 디스패치
+          onNext={(email) => dispatch('이메일입력완료', email)}
+          // 이메일 입력 실패 시 이메일입력실패 이벤트 디스패치
+          onError={(error) => dispatch('이메일입력실패', error)}
+        />
+      );
+    }
+  })}
+/>
+```
+
+위 예제는 전환 이벤트를 정의하고 사용하는 방법을 보여주고 있어요. 이메일입력 단계에서 발생할 수 있는 이벤트를 정의한 후, `dispatch()`로 해당 이벤트를 호출해요.
+
+다음은 이벤트 객체를 포함하는 렌더링 객체의 타입 정의예요.
+
+```ts
+interface FunnelRenderWithEvent<
+  TEvents extends {
+    [eventName: string]: (payload: any, context: FunnelRenderContext) => void
+  },
+  TEventDispatch extends {
+    [eventName in keyof TEvents]: (payload: Parameters<TEvents[eventName]>[0]) => void
+  }[keyof TEvents]
+> {
+  events: TEvents,
+  render: (props: { context: Context; dispatch: TEventDispatch }) => React.ReactNode
+}
+```
+
+- `events` (`object`, required): 이벤트 이름을 키로 가지며, 각 이벤트에 대해 실행할 함수를 값으로 가집니다.
+  - `eventName` (`string`): 이벤트의 이름입니다.
+  - `payload` (`any`): 이벤트 핸들러에 전달되는 데이터입니다.
+  - `context` (`object`): 현재 단계의 상태와 퍼널의 이동을 관리하는 객체입니다.
+- `render` (`function`, required): 렌더링 로직을 정의하는 함수입니다.
+  - `context` (`object`): 현재 단계의 상태를 나타내는 객체입니다.
+  - `dispatch` (`function`): 특정 이벤트를 디스패치하는 함수입니다. 이벤트 객체의 키가 이벤트 이름이 되어 `dispatch` 함수의 첫 번째 인자로 전달되고, 두 번째 인자로는 이벤트 객체에 정의된 함수의 첫 번째 인자가 전달됩니다.
+
+<Callout type="warning">
+이벤트를 정의할 때는 렌더링 함수에서 `history`를 사용할 수 없어요. 대신 `events` 객체를 사용해 정의한 이벤트를 `dispatch()`로 호출할 수 있어요.
+</Callout>

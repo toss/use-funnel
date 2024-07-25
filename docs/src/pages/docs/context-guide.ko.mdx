@@ -1,14 +1,16 @@
 import { Tabs, Callout } from 'nextra/components'
 import { UseFunnelCodeBlock, Keyword } from '@/components'
 
-# <Keyword keyword="step" /> 별 <Keyword keyword="context" /> 정의하기
+# 단계별 <Keyword>context</Keyword> 정의하기
 
-`@use-funnel` 에서는 <Keyword keyword="step" /> 에서 필요한 <Keyword keyword="context" /> 들의 타입을 지정해야해요. 이 문서를 통해 다양한 방법으로 <Keyword keyword="step" /> 별 <Keyword keyword="context" /> 를 정의하는 방법을 알아볼게요.
+`@use-funnel`에서는 각 단계(<Keyword>step</Keyword>)에서 필요한 <Keyword>context</Keyword>의 타입을 지정해야해요. <Keyword>context</Keyword> 를 정의하는 여러가지 방법을 알아볼게요.
 
-## 제네릭으로 정의하기
+## 제네릭으로 정의하는 법
+
+각 <Keyword>step</Keyword>별로 필요한 <Keyword>context</Keyword>의 타입을 제네릭으로 정의하고, <Keyword>step</Keyword> 을 키로, <Keyword>context</Keyword> 의 타입을 값으로 하는 객체 타입을 [`useFunnel()`](./use-funnel.ko.mdx)의 제네릭으로 넘겨주세요.
 
 <UseFunnelCodeBlock>
-```tsx /funnel/
+```tsx {3-8,11-15}
 import { useFunnel } from "@use-funnel/next";
 
 // 1. 아무것도 입력 안됨
@@ -41,22 +43,12 @@ function MyFunnelApp() {
 ```
 </UseFunnelCodeBlock>
 
-각 <Keyword keyword="step" /> 별로 필요한 <Keyword keyword="context" /> 의 타입을 제네릭으로 정의하고, <Keyword keyword="step" /> 을 키로, <Keyword keyword="context" /> 의 타입을 값으로 하는 객체 타입을 `useFunnel()` 의 제네릭으로 넘겨주세요.
+## steps 객체로 정의하는 법
 
-## steps 객체 정의하기
-
-```tsx
-interface FunnelStepOption<TContext> {
-  guard?: (data: unknown) => data is TContext;
-  parse?: (data: unknown) => TContext;
-}
-```
-
-
-`useFunnel()` 의 `steps` 옵션을 통해 <Keyword keyword="step" /> 을 정의하고, `guard()` 혹은 `parse()` 를 통해 <Keyword keyword="context" /> 를 정의할 수 있어요.
+[`useFunnel(){:tsx}`](./use-funnel) 의 [`FunnelStepOption`](./use-funnel#funnelstepoption)을 통해 <Keyword>step</Keyword> 을 정의할 수 있어요. `guard()` 혹은 `parse()` 를 통해 <Keyword>context</Keyword> 를 정의해요.
 
 <UseFunnelCodeBlock>
-```tsx /steps/
+```tsx {27-31}
 import { useFunnel } from "@use-funnel/next";
 
 type FormState = {
@@ -76,8 +68,12 @@ function 비밀번호입력_parse (data: unknown): FormState & { password: strin
   return data;
 }
 
-function 그외정보입력_guard (data: unknown): data is FormState & { password: string; other: unknown } {
-  return 비밀번호입력_guard(data) && 'other' in data;
+function 그외정보입력_parse (data: unknown): FormState & { password: string; other: unknown } {
+  const parseData = 비밀번호입력_guard(data);
+  if (!('other' in parseData)) {
+    throw new Error('그외정보입력 데이터가 아닙니다.');
+  }
+  return parseData;
 }
 
 function MyFunnelApp() {
@@ -86,7 +82,7 @@ function MyFunnelApp() {
     steps: {
       이메일입력: { guard: 이메일입력_guard },
       비밀번호입력: { parse: 비밀번호입력_parse },
-      그외정보입력: { guard: 그외정보입력_guard },
+      그외정보입력: { guard: 그외정보입력_parse },
     },
     initial: {
       step: "이메일입력",
@@ -104,26 +100,35 @@ function MyFunnelApp() {
 ```
 </UseFunnelCodeBlock>
 
-- `guard()` 를 사용하면 해당 <Keyword keyword="step" /> 으로 진입 했을 때 <Keyword keyword="context" /> 가 유효하지 않을 경우, `initial` 에서 정의한 <Keyword keyword="step" /> 과 <Keyword keyword="context" /> 로 대체해요.
-- `parse()` 를 사용하면 해당 <Keyword keyword="step" /> 으로 진입 했을 때 <Keyword keyword="context" /> 가 유효하지 않을 경우, 에러를 발생시켜요.
+- `guard()` 를 사용하면 해당 <Keyword>step</Keyword> 으로 진입 했을 때 <Keyword>context</Keyword> 가 유효하지 않을 경우, `initial` 에서 정의한 <Keyword>step</Keyword> 과 <Keyword>context</Keyword> 로 대체해요.
+- `parse()` 를 사용하면 해당 <Keyword>step</Keyword> 으로 진입 했을 때 <Keyword>context</Keyword> 가 유효하지 않을 경우, 에러를 발생시켜요.
 
 <Callout>
 두 개 모두 정의되어 있을 경우 `guard()` 가 먼저 실행돼요.
 </Callout>
 
-### `createFunnelSteps()` 사용하기
+### `createFunnelSteps()`으로 정의하는 법
 
-```tsx /steps/
+간단하게 다음 <Keyword>step</Keyword>으로 넘어갈 때 초기 <Keyword>context</Keyword>의 특정 키를 선택(optional)에서 필수(required)로 변경하는 <Keyword>step</Keyword>을 만들 수 있어요.
+
+```tsx
 declare function createFunnelSteps<FormState>(): {
   extends: (name: string | string[], options?: { requiredKeys: string | string[] }) => this;
   build: () => Record<string, FunnelStepOption>;
 }
 ```
 
-간단하게 다음 <Keyword keyword="step" /> 으로 넘어갈 때 초기 <Keyword keyword="context" /> 의 특정 키가 optional에서 required로 변경되어 진행되는 <Keyword keyword="step" /> 을 만들 수 있어요.
+- `extends` (`function`): 새로운 퍼널 단계를 확장해서 추가해요.
+  - `name` (`string | string[]`): 확장할 단계의 이름이에요. 문자열 또는 문자열 배열로 지정할 수 있어요.
+  - `options` (`object`, optional): 단계 확장 시 필요한 추가 옵션을 지정해요.
+    - `requiredKeys` (`string | string[]`, optional): 해당 단계에서 필수로 요구되는 키에요. 문자열 또는 문자열 배열로 지정할 수 있어요.
+
+- `build` (`function`): 모든 설정된 퍼널 단계를 빌드해서 반환해요.
+  - 반환값 (`Record<string, FunnelStepOption>`): 단계 이름을 키로 가지며, 각 단계의 옵션을 값으로 가지는 객체에요.
+
 
 <UseFunnelCodeBlock>
-```tsx /funnel/
+```tsx {3-13}
 import { createFunnelSteps, useFunnel } from "@use-funnel/next";
 
 type FormState = {
@@ -133,10 +138,10 @@ type FormState = {
 }
 
 const steps = createFunnelSteps<FormState>()
-   .extends('이메일입력')
-   .extends('비밀번호입력', { requiredKeys: 'email' })
-   .extends('그외정보입력', { requiredKeys: 'password' })
-   .build();
+  .extends('이메일입력')
+  .extends('비밀번호입력', { requiredKeys: 'email' })
+  .extends('그외정보입력', { requiredKeys: 'password' })
+  .build();
 
 function MyFunnelApp() {
   const funnel = useFunnel({
@@ -158,14 +163,13 @@ function MyFunnelApp() {
 ```
 </UseFunnelCodeBlock>
 
+## 런타임 밸리데이터 패키지(Runtime Validator Packages)로 정의하는 법
 
-## Runtime validator package 사용하기
-
-런타임 밸리데이터에서 제공하는 parse와 guard 함수를 사용하는 방법도 있어요. 여기서는 `zod` 와 `superstruct` 를 사용한 예제를 보여드릴게요.
+런타임 밸리데이터 패키지를 사용하면 데이터의 유효성을 검사하고, 타입 안전성을 확보할 수 있어요. 여기서는 대표적인 런타임 밸리데이터 패키지인 `zod`와 `superstruct`를 사용한 예제를 보여드릴게요.
 
 <Tabs items={['zod', 'superstruct']}>
 <Tabs.Tab>
-```tsx /funnel/
+```tsx
 import { z } from 'zod';
 
 const 이메일입력_Schema = z.object({
@@ -201,7 +205,7 @@ function MyFunnelApp() {
 ```
 </Tabs.Tab>
 <Tabs.Tab>
-```tsx /funnel/
+```tsx
 import { partial, object, string, unknown, assign, omit, pick, create } from 'superstruct';
 
 const schema = object({
@@ -249,3 +253,8 @@ function MyFunnelApp() {
 </Tabs.Tab>
 </Tabs>
 
+<Callout type="info">
+**런타임 밸리데이터 패키지(Runtime Validator Packages)란?**
+
+런타임 밸리데이터 패키지는 런타임에 데이터의 유효성을 검사하는 도구에요. 이 패키지들은 주로 데이터의 형식 검증, 데이터 파싱, 타입 안전성 확보 등을 목적으로 사용해요. 개발자가 정의한 스키마(schema)에 따라 데이터를 검증하고, 오류가 있다면 알려줘요. 이러한 패키지들은 주로 폼 입력 검증, API 응답 검증 등 다양한 상황에서 사용해요.
+</Callout>
