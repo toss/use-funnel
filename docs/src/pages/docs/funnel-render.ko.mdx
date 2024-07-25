@@ -1,0 +1,184 @@
+import { Callout } from 'nextra/components'
+import { Keyword, UseFunnelCodeBlock } from '@/components'
+
+# funnel.Render 컴포넌트
+
+`funnel.Render />`는 퍼널의 각 <Keyword>step</Keyword>를 렌더링해요. 
+
+[`useFunnel(){:tsx}`](./use-funnel.ko.mdx)의 반환값인 [UseFunnelResults](/docs/use-funnel#usefunnelresults)에 포함되어 있어요.
+
+```tsx
+interface FunnelRenderComponent<T> extends React.ComponentType<FunnelRenderProps<T>> {
+  with: FunnelRenderWithEvent<T>;
+  overlay: FunnelRenderOverlay<T>;
+};
+```
+
+- [FunnelRenderProps](#funnelrenderprops)
+- [FunnelRenderWithEvent](#funnelrenderwithevent)
+- [FunnelRenderOverlay](#funnelrenderoverlay)
+
+## FunnelRenderProps
+
+각 <Keyword>step</Keyword>의 렌더링 로직을 정의해요.
+
+```tsx
+interface FunnelRenderProps<T> {
+  [key in keyof T]: (props: {
+    context: T[keyof T];
+    history: FunnelHistory<T, key>
+  }) => React.ReactNode
+}
+```
+
+- `context` (`object`): 현재 <Keyword>step</Keyword>의 상태를 나타내는 객체에요. 현재  <Keyword>step</Keyword>에서 필요한 데이터에 접근할 수 있어요.
+- `history` (`object`): 퍼널의 이동을 관리하는 객체에요. 다음  <Keyword>step</Keyword>로 이동하거나 이전  <Keyword>step</Keyword>로 돌아갈 때 사용해요. 자세한 내용은 [`FunnelHistory`](./use-funnel.ko.mdx#funnelhistory)를 참고하세요.
+
+### 예시
+
+다음 예제에서는 각 <Keyword>step</Keyword>(이메일입력, 비밀번호입력, 그외정보입력)의 렌더링 로직을 정의하고, 각 단계에서 필요한 데이터를 전달합니다. `context` 로 해당 단계의 데이터를 받아올 수 있고, `history`로 다음 단계로 이동할 수 있습니다.
+
+```tsx
+import { useFunnel } from "@use-funnel/next";
+
+const funnel = useFunnel(/* ... */);
+return (
+  <funnel.Render
+    이메일입력={({ history }) => (
+      <이메일입력 onNext={(email) => history.push('비밀번호입력', { email })} />
+    )}
+    비밀번호입력={({ context, history }) => (
+      <비밀번호입력
+        email={context.email}
+        onNext={(password) => history.push('그외정보입력', { password })}
+      />
+    )}
+    그외정보입력={() => <그외정보입력 />}
+  />
+)
+```
+
+## FunnelRenderWithEvent
+
+현재 <Keyword>step</Keyword>에서 여러 경로 전환이 필요할 때 사용하는 이벤트 객체를 정의할 수 있어요.
+
+```tsx
+interface FunnelRenderWithEvent<T> {
+  events: {
+    [eventName: string]: (payload: any, funnel: { context: T; history: FunnelHistory<T> }) => void;
+  };
+  render: (props: {
+    context: T;
+    dispatch: (eventName: string, payload: any) => void;
+  }) => React.ReactNode;
+};
+```
+
+- `events` (`object`, required): 이벤트 이름을 키로, 각 이벤트에 대해 실행할 함수를 값으로 가져요.
+  - `eventName` (`string`): 이벤트의 이름이에요.
+  - `payload` (`any`): 이벤트 핸들러에 전달되는 데이터에요.
+  - `funnel` (`object`): 이벤트 핸들러에 전달되는 퍼널 객체로, `context`와 `history`를 포함해요.
+    - `context` (`object`): 현재 <Keyword>step</Keyword>의 상태를 나타내는 객체에요.
+    - `history` (`object`): 퍼널의 이동을 관리하는 객체에요.
+- `render` (`function`, required): 렌더링 로직을 정의하는 함수에요.
+  - `context` (`object`): 현재 <Keyword>step</Keyword>의 상태를 나타내는 객체에요.
+  - `dispatch` (`function`): 특정 이벤트를 디스패치하는 함수에요.
+    - `eventName` (`string`): 디스패치할 이벤트의 이름이에요.
+    - `payload` (`any`): 이벤트와 함께 전달할 데이터에요.
+
+
+### 예시
+
+```tsx
+<funnel.Render
+  이메일입력={funnel.Render.with({
+    events: {
+      이메일입력완료: (email: string, { history }) => history.push('비빌번호입력', { email }),
+      이메일입력실패: (error: Error, { history }) => history.push('에러페이지', { error: error.message })
+    },
+    render({ context, dispatch }) {
+      return (
+        <이메일입력
+          email={context.email}
+          onNext={(email) => dispatch('이메일입력완료', email)}
+          onError={(error) => dispatch('이메일입력실패', error)}
+        />
+      )
+    }
+  })}
+/>
+```
+
+자세한 사용 방법은 [전환 이벤트 정의하기](/docs/transition-event) 문서에서 확인할 수 있어요.
+
+## FunnelRenderOverlay
+
+현재 <Keyword>step</Keyword>을 보여줄 때, 이전 <Keyword>step</Keyword>을 한 화면에 같이 보여주고 싶다면 사용할 수 있는 옵션이에요.
+
+```tsx
+type FunnelRenderOverlay<T> =
+  | FunnelRenderOverlayWithoutEvent<T>
+  | FunnelRenderOverlayWithEvent<T>;
+
+interface FunnelRenderOverlayWithoutEvent<T> {
+  render: (props: {
+    context: T;
+    history: FunnelHistory<T>;
+    close: () => void;
+  }) => React.ReactNode;
+};
+
+interface FunnelRenderOverlayWithEvent<T> {
+  events: {
+    [eventName: string]: (payload: any, funnel: { context: T; history: FunnelHistory<T> }) => void;
+  };
+  render: (props: {
+    context: T;
+    dispatch: (eventName: string, payload: any) => void;
+    close: () => void;
+  }) => React.ReactNode;
+};
+```
+
+#### FunnelRenderOverlayWithoutEvent
+
+- `render` (`function`, required): 렌더링 로직을 정의하는 함수에요.
+  -`context` (`object`): 현재 <Keyword>step</Keyword>의 상태를 나타내는 객체에요.
+  - `history` (`object`): 퍼널의 이동을 관리하는 객체에요.
+  - `close` (`function`): 오버레이를 닫는 함수에요.
+
+#### FunnelRenderOverlayWithEvent
+
+- `events` (`object`, required): 이벤트 이름을 키로, 각 이벤트에 대해 실행할 함수를 값으로 가져요.
+  - `eventName` (`string`): 이벤트의 이름이에요.
+  - `payload` (`any`): 이벤트 핸들러에 전달되는 데이터에요.
+  - `funnel` (`object`): 이벤트 핸들러에 전달되는 퍼널 객체로, `context`와 `history`를 포함해요.
+    -`context` (`object`): 현재 <Keyword>step</Keyword>의 상태를 나타내는 객체에요.
+    - `history` (`object`): 퍼널의 이동을 관리하는 객체에요.
+- `render` (`function`, required): 렌더링 로직을 정의하는 함수에요.
+  -`context` (`object`): 현재 <Keyword>step</Keyword>의 상태를 나타내는 객체에요.
+  - `dispatch` (`function`): 특정 이벤트를 디스패치하는 함수에요.
+    - `eventName` (`string`): 디스패치할 이벤트의 이름이에요.
+    - `payload` (`any`): 이벤트와 함께 전달할 데이터에요.
+  - `close` (`function`): 오버레이를 닫는 함수에요.
+
+
+### 예시
+
+```tsx
+<funnel.Render
+  약관동의={funnel.Render.overlay({
+    render({ context, history, close }) {
+      return (
+        <약관동의
+          email={context.email}
+          onNext={(email) => history.push('비밀번호입력', { email })}
+          onClose={() => close()}
+        />
+      )
+    }
+  })}
+/>
+```
+
+자세한 사용 방법은 [오버레이 사용하기](/docs/overlay)에서 확인할 수 있어요.

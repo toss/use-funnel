@@ -1,0 +1,13 @@
+name: setup pnpm & node
+description: setup pnpm & node
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v4
+      with:
+        version: 9.4.0
+    - uses: actions/setup-node@v4
+      with:
+        cache: 'pnpm'
+        cache-dependency-path: 'pnpm-lock.yaml'
+        node-version-file: '.nvmrc'

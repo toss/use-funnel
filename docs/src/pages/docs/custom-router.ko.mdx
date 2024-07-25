@@ -1,0 +1,110 @@
+# 라우터 직접 만들기
+
+`@use-funnel`은 뒤로 가기와 앞으로 가기를 안정적으로 할 수 있도록 각 퍼널 단계에 대한 상태 스냅샷을 배열로 저장해요. 라우터 패키지에서 기본적으로 제공하는 기능을 사용하지 않고 직접 만드는 방법을 알아볼게요.
+
+먼저 `@use-funnel/core` 패키지를 설치해요.
+
+```shell npm2yarn
+npm install @use-funnel/core --save
+```
+
+다음 코드는 라우터 없이 [`useState`](https://ko.react.dev/reference/react/useState) 만으로 퍼널을 구현한 예제에요.
+
+```tsx filename="src/hooks/useFunnel.ts"
+import { useMemo, useState } from 'react';
+import { createUseFunnel } from '@use-funnel/core';
+
+// createUseFunnel 함수를 사용하여 useFunnel 훅을 정의해요.
+export const useFunnel = createUseFunnel(({ id, initialState }) => {
+  // history는 퍼널의 상태 스냅샷 배열을 관리해요.
+  const [history, setHistory] = useState(() => [initialState]);
+  // currentIndex는 현재 퍼널 단계의 인덱스를 관리해요.
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  return useMemo(
+    () => ({
+      // history와 currentIndex를 반환하여 퍼널의 현재 상태를 나타내요.
+      history,
+      currentIndex,
+      // push 함수는 새로운 상태를 추가하고 현재 인덱스를 업데이트해요.
+      push(state) {
+        setHistory((prev) => {
+          const next = prev.slice(0, currentIndex + 1);
+          return [...next, state];
+        });
+        setCurrentIndex((prev) => prev + 1);
+      },
+      // replace 함수는 현재 상태를 덮어쓰고 상태 스냅샷을 업데이트해요.
+      replace(state) {
+        setHistory((prev) => {
+          const next = prev.slice(0, currentIndex);
+          return [...next, state];
+        });
+      },
+      // go 함수는 현재 인덱스를 delta만큼 이동해요.
+      go(delta) {
+        setCurrentIndex((prev) => prev + delta);
+      },
+    }),
+    [history, currentIndex], // history와 currentIndex가 변경될 때마다 메모이제이션된 값을 반환해요.
+  );
+});
+```
+
+위 코드 예제에서는 `useState`를 사용해서 퍼널의 상태를 관리해요. `createUseFunnel`은 초기 상태를 받아서 퍼널의 상태 스냅샷을 저장하는 배열(`history`)과 현재 인덱스(`currentIndex`)를 관리하는 Hook을 생성해요.
+
+- `push(state)`: 새로운 상태(`state`)를 추가하고, 현재 인덱스를 업데이트해요.
+- `replace(state)`: 현재 상태를 새로운 상태(`state`)로 덮어쓰고, 상태 스냅샷을 업데이트해요.
+- `go(delta)`: 현재 인덱스를 `delta`만큼 이동해요.
+
+이제 `createUseFunnel()`에 넘겨줄 옵션 객체(`CreateUseFunnelOptions<T>`)를 살펴볼게요. 이 인터페이스는 `createUseFunnel()`에 전달되는 옵션을 정의해요.
+
+```tsx
+interface CreateUseFunnelOptions<T> {
+  /**
+   * 퍼널의 고유한 식별자에요. 이걸로 한 페이지에 여러 퍼널이 있을 때 전역 상태를 구분해요.
+   */
+  id: string;
+  /**
+   * `useFunnel()`에서 `initial`로 넘겨준 퍼널의 초기 상태에요. 퍼널 진입 시 이 상태로 시작해요.
+   */
+  initialState: FunnelState<T>;
+}
+
+/**
+ * 퍼널의 상태를 나타내는 인터페이스에요. `step` 은 퍼널의 단계명을 나타내고, `context` 는 해당 단계에서 필요한 상태를 나타내요.
+ */
+interface FunnelState<T> {
+  step: string;
+  context: T;
+}
+```
+
+다음으로, `createUseFunnel()`이 반환하는 결과(`CreateUseFunnelResult<T>`) 인터페이스를 살펴볼게요. 이 인터페이스는 퍼널의 상태와 상태 전환을 관리하는 메서드를 포함해요.
+
+```tsx
+interface CreateUseFunnelResult<T> {
+  /**
+   * 퍼널의 상태 스냅샷 배열이에요. 퍼널 진입 후 쌓인 라우팅 내역을 가진 배열이에요.
+   */
+  history: FunnelState<T>[];
+  /**
+   * 현재 진행 중인 퍼널 단계의 인덱스에요.
+   */
+  currentIndex: number;
+  /**
+   * 현재 `history`에 새로운 상태를 추가하며 다음 퍼널 단계로 이동하는 동작을 구현해요.
+   */
+  push(state: FunnelState<T>): void | Promise<void>;
+  /**
+   * 현재 `history`를 덮어쓰고 다음 퍼널 단계로 이동하는 동작을 구현해요.
+   */
+  replace(state: FunnelState<T>): void | Promise<void>;
+  /**
+   * `history` 배열에서 `delta`만큼 이동하는 동작을 구현해요.
+   */
+  go(delta: number): void | Promise<void>;
+}
+```
+
+이 인터페이스는 퍼널의 상태를 관리하고, 단계 전환을 처리하는 여러 메서드를 포함하고 있어요. 이를 통해 퍼널의 상태를 안정적으로 관리할 수 있어요.

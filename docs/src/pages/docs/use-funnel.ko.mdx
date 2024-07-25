@@ -1,0 +1,146 @@
+import { UseFunnelCodeBlock, Keyword } from '@/components'
+import { Callout } from 'nextra/components'
+
+# `useFunnel()`
+
+`useFunnel()`은 복잡한 UI 흐름을 간편하게 구현할 수 있도록 도와주는 [React Hook](https://ko.react.dev/reference/rules/rules-of-hooks)이에요. Hook은 React 컴포넌트 내에서 사용할 수 있는 함수에요. Hook을 활용하면 컴포넌트의 상태나 라이프사이클 기능을 관리할 수 있어요.
+
+## 인터페이스
+
+`useFunnel()`은 [`UseFunnelOptions`](#usefunneloptions) 옵션을 받고, [`UseFunnelResults`](#usefunnelresults) 객체를 반환해요.
+
+```tsx
+function useFunnel<T>(options: UseFunnelOptions<T>): UseFunnelResults<T>;
+```
+
+* [UseFunnelOptions](#usefunneloptions)
+* [UseFunnelResults](#usefunnelresults)
+* [FunnelHistory](#funnelhistory)
+
+## UseFunnelOptions
+
+퍼널의 초기 상태와 각 단계의 설정을 정의하는 객체에요.
+
+```tsx
+interface UseFunnelOptions<T> {
+  id: string;
+  initial: { step: keyof T, context: T[keyof T] };
+  steps?: { [key in keyof T]?: FunnelStepOption<T[key]> };
+}
+```
+
+- `id` (`string`, required): 퍼널의 고유 식별자에요. 이 식별자로 퍼널 인스턴스를 식별하고 관리해요.
+- `initial` (`object`, required): 퍼널의 초기 상태를 정의해요. `step`에는 `T` 객체의 키가 들어가고, `context`에는 해당 키의 값이 들어가요.
+  - `step` (`string`): 초기 단계의 이름이에요.
+  - `context` (`object`): 초기 단계의 상태를 나타내는 객체에요.
+- `steps` (`object`, optional): 각 단계의 옵션을 정의해요. `T` 객체의 키를 사용하여 [`FunnelStepOption`](#funnelstepoption) 객체를 값으로 받아요.
+
+#### FunnelStepOption
+
+`FunnelStepOption`은 각 단계의 추가 옵션을 정의하는 인터페이스입니다.
+
+```tsx
+interface FunnelStepOption<TContext> {
+  guard?: (data: unknown) => data is TContext;
+  parse?: (data: unknown) => TContext;
+}
+```
+- `guard` (`function`, optional): 데이터를 검증해서 해당 단계의 컨텍스트 타입인지 확인하는 함수입니다.
+- `parse` (`function`, optional): 데이터를 받아 해당 단계의 컨텍스트 타입으로 변환하는 함수입니다.
+
+## UseFunnelResults
+
+퍼널의 상태와 히스토리를 관리하기 위한 속성과 메서드를 포함합니다.
+
+```tsx
+type UseFunnelResults<T> = {
+  [key in keyof T]: {
+    step: key
+    context: T[key];
+    history: FunnelHistory<T, T[key]>;
+  }
+}[keyof T] & {
+  Render: FunnelRenderComponent<T>;
+};
+```
+- `step` (`string`): 현재 퍼널의 단계를 나타내는 속성이에요. T 객체의 키를 사용해요.
+- `context` (`object`): 현재 퍼널의 컨텍스트를 나타내는 속성이에요. step 속성의 값에 따라 정의한 T 객체의 값이 들어가요.
+- `history` (`object`): 퍼널의 이동을 관리하는 객체에요. 자세한 내용은 [`FunnelHistory`](#funnelhistory)를 참고하세요.
+- `<Render />` (`function`): 렌더링을 위한 컴포넌트에요. 자세한 내용은 [`<funnel.Render />`](./funnel-render.ko.mdx)를 참고하세요.
+
+## FunnelHistory
+
+퍼널의 이동을 관리하는 객체에요. 퍼널의 단계 전환을 처리하는 여러 메서드를 포함하고 있어요.
+
+```tsx
+interface FunnelHistory<T> {
+  push: <TStep extends keyof T>(step: TStep, context: T[TStep]) => Promise<void> | void;
+  replace: <TStep extends keyof T>(step: TStep, context: T[TStep]) => Promise<void> | void;
+  go: (index: number) => void | Promise<void>;
+  back: () => void | Promise<void>;
+}
+```
+
+- `push` (`function`): 새로운 단계로 이동해요. 이전 단계의 히스토리를 남겨요.
+  - `step` (`string`): 이동할 단계의 이름이에요.
+  - `context` (`object`): 이동할 단계의 상태를 나타내는 객체에요.
+- `replace` (`function`): 새로운 단계로 이동해요. 이전 단계의 히스토리를 남기지 않아요.
+  - `step` (`string`): 이동할 단계의 이름입니다.
+  - `context` (`object`): 이동할 단계의 상태를 나타내는 객체입니다.
+- `go` (`function`): 현재 인덱스 기준으로 지정된 단계로 이동해요.
+  - `index` (`number`): 이동하려는 단계의 인덱스에요. 현재 단계로부터의 **상대적인 위치**를 나타내요.
+- `back` (`function`): 이전 단계로 이동해요.
+
+## 예시
+
+### 기본 예시
+
+<UseFunnelCodeBlock>
+```tsx
+import { useFunnel, UseFunnelOptions, UseFunnelResults } from "@use-funnel/next";
+
+type T = {
+  helloStep: { message: string; };
+  worldStep: { message: string; message2: string }
+}
+
+const funnel: UseFunnelResults<T> = useFunnel<T>({
+  id: "use-funnel-api-reference",
+  steps: {},
+  initial: {
+    step: "helloStep",
+    context: {
+      message: 'Hello'
+    }
+  },
+} satisfies UseFunnelOptions<T>);
+```
+</UseFunnelCodeBlock>
+
+### 히스토리 관리 예시
+
+<UseFunnelCodeBlock>
+```tsx
+import { useFunnel } from "@use-funnel/next";
+
+type T = {
+  helloStep: { message: string; };
+  worldStep: { message: string; message2: string }
+}
+
+const funnel = useFunnel<T>({
+  id: "use-funnel-history-example",
+  steps: {},
+  initial: {
+    step: "helloStep",
+    context: {
+      message: 'Hello'
+    }
+  },
+});
+
+if (funnel.step === 'helloStep') {
+  funnel.history.push('worldStep', { message2: 'World' });
+}
+```
+</UseFunnelCodeBlock>

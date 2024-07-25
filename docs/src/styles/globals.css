@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.code-highlight-error .highlighted {
+  text-decoration: underline wavy;
+  text-decoration-color: hsl(0, 50%, 50%);
+}
