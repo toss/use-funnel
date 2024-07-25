@@ -23,8 +23,8 @@
     "prepare": "husky",
     "prettier": "prettier --write \"packages/*/{src,test}/**/*.{js,jsx,ts,tsx}\"",
     "changeset": "changeset",
-    "changeset:publish": "pnpm prepack && changeset publish",
-    "changeset:version": "pnpm publish -r"
+    "changeset:publish": "pnpm publish -r",
+    "changeset:version": "changeset version && pnpm i --lockfile-only"
   },
   "husky": {
     "hooks": {
