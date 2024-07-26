@@ -1,5 +1,5 @@
 import { createUseFunnel } from '@use-funnel/core';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/router.js';
 import { useMemo } from 'react';
 import { makePath, removeKeys } from './util';
 
