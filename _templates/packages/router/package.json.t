@@ -8,6 +8,7 @@ to: packages/<%= name %>/package.json
   "type": "module",
   "main": "./src/index.ts",
   "publishConfig": {
+    "access": "public",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "module": "./dist/index.js",
