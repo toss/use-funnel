@@ -1,5 +1,5 @@
 import { createUseFunnel } from '@use-funnel/core';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/router.js';
 import { useMemo } from 'react';
 import { makePath, removeKeys } from './util';
 
@@ -58,12 +58,12 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
             query: {
               ...query,
               [`${QS_KEY}${id}.histories`]: JSON.stringify([...(histories ?? []).slice(0, currentIndex), state]),
-              [`${QS_KEY}${id}.index`]: currentIndex + 1,
+              [`${QS_KEY}${id}.index`]: currentIndex,
             },
           },
           {
             pathname,
-            query: { ...removeKeys(query, [checkHasQSKey]), [`${QS_KEY}${id}.index`]: currentIndex + 1 },
+            query: { ...removeKeys(query, [checkHasQSKey]), [`${QS_KEY}${id}.index`]: currentIndex },
           },
           {
             shallow: true,
