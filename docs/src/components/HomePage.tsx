@@ -15,7 +15,7 @@ export const HomePage = ({
   return (
     <div className="pb-20 mx-auto max-w-[70rem]">
       <div className="flex flex-col items-center justify-center gap-12 pt-16 text-center">
-        <Image src="/logo.png" alt="" width={200} height={200} className="-mb-4" />
+        <Image src="/logo.png" alt="" width={200} height={200} className="-mb-8" />
         <div className="flex flex-col items-center gap-4">
           <div className="relative text-6xl font-bold">
             <span>{title}</span>
@@ -23,7 +23,9 @@ export const HomePage = ({
           <p className="text-3xl">{description}</p>
         </div>
         <Link href="/docs/overview">
-          <span className="inline-block rounded-xl bg-gray-800 px-10 py-3 text-xl font-bold">{buttonText}</span>
+          <span className="inline-block rounded-xl nx-bg-gray-200 dark:nx-bg-neutral-800 px-10 py-3 text-xl font-bold">
+            {buttonText}
+          </span>
         </Link>
       </div>
       <div className="flex flex-col items-start justify-between gap-8 md:flex-row mt-28">
