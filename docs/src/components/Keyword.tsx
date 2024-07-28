@@ -29,7 +29,7 @@ export function Keyword({ children: keyword }: { children: keyof typeof keywords
         data-tooltip-content={keywords[keyword][router.locale as 'ko' | 'en']}
         data-tooltip-place="top"
         data-tooltip-delay-show={300}
-        className="keyword-tooltip font-bold bg-transparent text-white underline underline-offset-4 decoration-4 decoration-slate-600 cursor-help"
+        className="keyword-tooltip font-bold bg-transparent text-current underline underline-offset-4 decoration-[3px] decoration-slate-600 cursor-help"
       >
         {keyword}
       </mark>

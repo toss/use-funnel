@@ -23,7 +23,15 @@ const config: DocsThemeConfig = {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta property="og:title" content={title || '@use-funnel'} />
         <meta property="og:url" content={url} />
-        <meta property="og:description" content={frontMatter.description || '@use-funnel'} />
+        <meta
+          property="og:description"
+          content={
+            frontMatter.description ||
+            (locale === 'ko'
+              ? '강력하고 안전한 단계별 상태 관리 라이브러리'
+              : 'Powerful and safe step-by-step state management library')
+          }
+        />
         <meta property="og:image" content="/logo.png" />
         <link rel="icon" href="/favicon.ico" type="image/ico" />
       </>
@@ -77,10 +85,6 @@ const config: DocsThemeConfig = {
   },
   footer: {
     text: 'MIT 2024 © Viva Republica, Inc.',
-  },
-  darkMode: false,
-  nextThemes: {
-    forcedTheme: 'dark',
   },
 };
 
