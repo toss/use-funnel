@@ -1,4 +1,5 @@
 import { Callout } from 'nextra/components'
+import { Sandpack } from '@/components'
 
 # 오버레이 사용하기
 
@@ -10,7 +11,7 @@ import { Callout } from 'nextra/components'
 
 다음 예제에서는 "학교입력" 단계에서 "시작일자입력" 단계로 넘어갈 때 오버레이를 사용해요. `<시작일자입력BottomSheet />` 컴포넌트가 렌더링될 때, 이전 단계의 UI인 `<학교입력 />` 컴포넌트는 유지된 상태에요.
         
-```tsx /overlay/
+```tsx {7}
 <funnel.Render
   학교입력={({ history }) => (
     <학교입력
@@ -21,7 +22,7 @@ import { Callout } from 'nextra/components'
     render({ history, close }) {
       return (
         <시작일자입력BottomSheet
-          onNext={() => history.push('다음단계')}
+          onNext={(startDate) => history.push('다음단계', { startDate })}
           onClose={() => close()}
         />
       );
@@ -34,6 +35,146 @@ import { Callout } from 'nextra/components'
 
 <Callout type="warning">
 **주의할 점:** overlay가 라우터의 뒤로가기를 통해 닫힌게 아닌 다른 인터렉션으로 닫힌 경우, 명시적으로 `render()`의 인자인 `close(){:jsx}` 를 실행해줘야 해요. `close(){:jsx}`를 실행하면 히스토리를 통해 이전 단계로 이동해요.
+</Callout>
+
+## 예제
+
+<Sandpack dependencies={{ "overlay-kit": "1.3.0" }}>
+
+```tsx Example.tsx active
+import { useFunnel } from "@use-funnel/react-router-dom";
+import { OverlayProvider } from "overlay-kit";
+
+import { SchoolInput } from "./SchoolInput";
+import { StartDateInputBottomSheet } from "./StartDateInputBottomSheet";
+
+export const Example = () => {
+  const funnel = useFunnel<{
+    학교입력: { school?: string };
+    시작일자입력: { school: string; startDate?: string };
+    다음단계: { school: string; startDate: string };
+  }>({
+    id: "overlay-example",
+    initial: {
+      step: "학교입력",
+      context: {},
+    }
+  });
+  return (
+    <OverlayProvider>
+      <funnel.Render
+        학교입력={({ history }) => (
+          <SchoolInput
+            onNext={(school) => history.push('시작일자입력', { school })}
+          />
+        )}
+        시작일자입력={funnel.Render.overlay({
+          render({ history, close }) {
+            return (
+              <StartDateInputBottomSheet
+                onNext={(startDate) => history.push('다음단계', { startDate })}
+                onClose={() => close()}
+              />
+            );
+          }
+        })}
+        다음단계={({ context }) => (
+          <div>
+            <p>학교: {context.school}</p>
+            <p>시작일자: {context.startDate}</p>
+          </div>
+        )}
+      />
+    </OverlayProvider>
+  )
+}
+```
+
+```tsx SchoolInput.tsx
+import { useState } from "react";
+import { RadioGroup, Button, Heading } from "@radix-ui/themes";
+
+interface Props {
+  onNext: (school: string) => void;
+}
+
+export function SchoolInput({ onNext }: Props) {
+  const [school, setSchool] = useState("A")
+  return (
+    <div>
+      <Heading as="h1" mb="2">Select your school</Heading>
+      <RadioGroup.Root value={school} onValueChange={setSchool} name="example" mb="3">
+        <RadioGroup.Item value="A">A School</RadioGroup.Item>
+        <RadioGroup.Item value="B">B School</RadioGroup.Item>
+        <RadioGroup.Item value="C">C School</RadioGroup.Item>
+      </RadioGroup.Root>
+      <Button onClick={() => onNext(school)}>Next</Button>
+    </div>
+  )
+};
+```
+
+```tsx StartDateInputBottomSheet.tsx
+import { useEffect, useRef } from "react";
+import { overlay } from "overlay-kit";
+import { Dialog, Flex, TextField, Text, Button } from "@radix-ui/themes";
+
+interface Props {
+  onNext: (startDate: string) => void;
+  onClose: () => void;
+}
+
+export function StartDateInputBottomSheet({ onNext, onClose }: Props) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const overlayId = overlay.open(({ isOpen, close }) => (
+      <Dialog.Root open={isOpen} onOpenChange={() => {
+        onClose()
+        close()
+      }}>
+        <Dialog.Content maxWidth="450px">
+          <Dialog.Title>Enter your start date</Dialog.Title>
+          <Flex direction="column" gap="3">
+            <label>
+              <Text as="div" size="2" mb="1" weight="bold">
+                Start date
+              </Text>
+              <TextField.Root
+                ref={inputRef}
+                placeholder="YYYY-MM-DD"
+              />
+            </label>
+          </Flex>
+          <Flex gap="3" mt="4" justify="end">
+            <Dialog.Close>
+              <Button variant="soft" color="gray">
+                Cancel
+              </Button>
+            </Dialog.Close>
+            <Button
+              onClick={() => {
+                onNext(inputRef.current!.value);
+              }}
+            >
+              Save
+            </Button>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
+    ));
+    return () => {
+      overlay.unmount(overlayId);
+    }
+  }, []);
+  return null;
+};
+
+```
+
+</Sandpack>
+
+<Callout>
+위 예제에서 오버레이를 쉽게 관리하기 위해 [overlay-kit](https://overlay-kit.slash.page)을 사용했어요.
 </Callout>
 
 ## 오버레이와 이벤트를 함께 사용하는 예시

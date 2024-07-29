@@ -51,7 +51,10 @@ export const Sandpack = (props: SandpackProps) => {
       <CustomPreset
         layoutOptions={props.layoutOptions}
         editorOptions={props.editorOptions}
-        previewOptions={props.previewOptions}
+        previewOptions={{
+          ...props.previewOptions,
+          showNavigator: true,
+        }}
       />
     </SandpackProvider>
   );
