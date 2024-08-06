@@ -1,4 +1,4 @@
-import '../styles/globals.css'
+import '../styles/globals.css';
 
 import { Tooltip } from 'react-tooltip';
 
@@ -6,7 +6,7 @@ export default function App({ Component, pageProps }) {
   return (
     <>
       <Component {...pageProps} />
-      <Tooltip anchorSelect={`.keyword-tooltip`} />
+      <Tooltip style={{ maxWidth: '90%' }} anchorSelect={`.keyword-tooltip`} />
     </>
   );
 }
