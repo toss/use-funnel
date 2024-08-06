@@ -61,7 +61,7 @@
   },
   "peerDependencies": {
     "@react-navigation/native": ">=6",
-    "react": "^17 || ^18"
+    "react": ">=16.8"
   },
   "sideEffects": false
 }

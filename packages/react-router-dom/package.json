@@ -52,7 +52,7 @@
     "vitest": "^1.6.0"
   },
   "peerDependencies": {
-    "react": "^17 || ^18",
+    "react": ">=16.8",
     "react-router-dom": ">=6"
   },
   "sideEffects": false
