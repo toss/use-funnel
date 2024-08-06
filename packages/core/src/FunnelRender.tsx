@@ -76,7 +76,8 @@ export function FunnelRender<TStepContextMap extends AnyStepContextMap>(
   } else if (render.type === 'render') {
     renderEntires.push([funnelRenderStep.step, render.render(funnelRenderStep)]);
   } else if (render.type === 'overlay') {
-    for (const step of funnelRenderStep.beforeSteps.slice().reverse()) {
+    const beforeSteps = funnelRenderStep.historySteps.slice(0, funnelRenderStep.index);
+    for (const step of beforeSteps.slice().reverse()) {
       const stepRender = steps[step.step];
       // NOTE: cannot use history in overlay render before steps
       if (typeof stepRender === 'function') {

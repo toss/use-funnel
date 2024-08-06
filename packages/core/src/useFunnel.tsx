@@ -112,7 +112,8 @@ export function createUseFunnel(useFunnelRouter: FunnelRouter): UseFunnel {
               context: validContext,
             }),
         history,
-        beforeSteps: router.history.slice(0, router.currentIndex),
+        index: router.currentIndex,
+        historySteps: router.history,
       };
     }, [currentState, history, router.history, router.currentIndex]);
 

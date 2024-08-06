@@ -62,7 +62,8 @@ export type FunnelStep<TStepContextMap extends AnyStepContextMap, TStepKey exten
   step: TStepKey;
   context: TStepContextMap[TStepKey];
   history: FunnelHistory<TStepContextMap, TStepKey>;
-  beforeSteps: FunnelState<keyof TStepContextMap & string, TStepContextMap[keyof TStepContextMap]>[];
+  index: number;
+  historySteps: FunnelState<keyof TStepContextMap & string, TStepContextMap[keyof TStepContextMap]>[];
 };
 
 export type FunnelStepByContextMap<TStepContextMap extends AnyStepContextMap> = {
