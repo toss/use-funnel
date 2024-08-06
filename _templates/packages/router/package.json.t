@@ -54,7 +54,7 @@ to: packages/<%= name %>/package.json
     "vitest": "^1.6.0"
   },
   "peerDependencies": {
-    "react": "^17 || ^18"
+    "react": ">=16.8"
   },
   "sideEffects": false
 }
