@@ -12,7 +12,7 @@ const withNextra = require('nextra')({
 /** @type {import('next').NextConfig} */
 module.exports = withNextra({
   i18n: {
-    locales: ['ko'],
-    defaultLocale: 'ko',
+    locales: ['ko', 'en'],
+    defaultLocale: 'en',
   },
 });

@@ -5,7 +5,7 @@ import { Keyword, UseFunnelCodeBlock } from '@/components'
 
 `funnel.Render />`는 퍼널의 각 <Keyword>step</Keyword>를 렌더링해요. 
 
-[`useFunnel(){:tsx}`](./use-funnel.ko.mdx)의 반환값인 [UseFunnelResults](/docs/use-funnel#usefunnelresults)에 포함되어 있어요.
+[`useFunnel(){:tsx}`](./use-funnel)의 반환값인 [UseFunnelResults](/docs/use-funnel#usefunnelresults)에 포함되어 있어요.
 
 ```tsx
 interface FunnelRenderComponent<T> extends React.ComponentType<FunnelRenderProps<T>> {
@@ -32,7 +32,7 @@ interface FunnelRenderProps<T> {
 ```
 
 - `context` (`object`): 현재 <Keyword>step</Keyword>의 상태를 나타내는 객체에요. 현재  <Keyword>step</Keyword>에서 필요한 데이터에 접근할 수 있어요.
-- `history` (`object`): 퍼널의 이동을 관리하는 객체에요. 다음  <Keyword>step</Keyword>로 이동하거나 이전  <Keyword>step</Keyword>로 돌아갈 때 사용해요. 자세한 내용은 [`FunnelHistory`](./use-funnel.ko.mdx#funnelhistory)를 참고하세요.
+- `history` (`object`): 퍼널의 이동을 관리하는 객체에요. 다음  <Keyword>step</Keyword>로 이동하거나 이전  <Keyword>step</Keyword>로 돌아갈 때 사용해요. 자세한 내용은 [`FunnelHistory`](./use-funnel#funnelhistory)를 참고하세요.
 
 ### 예시
 

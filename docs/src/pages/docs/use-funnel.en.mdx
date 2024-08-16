@@ -1,0 +1,155 @@
+import { UseFunnelCodeBlock, Keyword } from '@/components'
+import { Callout } from 'nextra/components'
+
+# `useFunnel()`
+
+{/* `useFunnel()`은 복잡한 UI 흐름을 간편하게 구현할 수 있도록 도와주는 [React Hook](https://ko.react.dev/reference/rules/rules-of-hooks)이에요. Hook은 React 컴포넌트 내에서 사용할 수 있는 함수에요. Hook을 활용하면 컴포넌트의 상태나 라이프사이클 기능을 관리할 수 있어요.
+ */}
+`useFunnel()` is a [React Hook](https://ko.react.dev/reference/rules/rules-of-hooks) that helps you easily implement complex UI flows. Hooks are functions that you can use within React components. By using hooks, you can manage the state and lifecycle functions of components.
+
+## Interface
+
+`useFunnel()` takes the [`UseFunnelOptions`](#usefunneloptions) option and returns the [`UseFunnelResults`](#usefunnelresults) object.
+
+```tsx
+function useFunnel<T>(options: UseFunnelOptions<T>): UseFunnelResults<T>;
+```
+
+* [UseFunnelOptions](#usefunneloptions)
+* [UseFunnelResults](#usefunnelresults)
+* [FunnelHistory](#funnelhistory)
+
+## UseFunnelOptions
+
+An object that defines the initial state of the funnel and the settings for each step.
+
+```tsx
+interface UseFunnelOptions<T> {
+  id: string;
+  initial: { step: keyof T, context: T[keyof T] };
+  steps?: { [key in keyof T]?: FunnelStepOption<T[key]> };
+}
+```
+
+- `id` (`string`, required): A unique identifier for the funnel. This identifier is used to identify and manage funnel instances.
+- `initial` (`object`, required): Defines the initial state of the funnel. `step` contains the key of `T` object, and `context` contains the value of that key.
+  - `step` (`string`): The name of the initial step.
+  - `context` (`object`): An object representing the state of the initial step.
+- `steps` (`object`, optional): Defines the options for each step. Use the key of the `T` object to receive a [`FunnelStepOption`](#funnelstepoption) object as the value.
+
+#### FunnelStepOption
+
+`FunnelStepOption` is an interface that defines additional options for each step.
+
+```tsx
+interface FunnelStepOption<TContext> {
+  guard?: (data: unknown) => data is TContext;
+  parse?: (data: unknown) => TContext;
+}
+```
+
+- `guard` (`function`, optional): A function that validates the data to determine if it is the context type of that step.
+- `parse` (`function`, optional): A function that converts data to the context type of that step.
+
+## UseFunnelResults
+
+Contains properties and methods to manage the state and history of the funnel.
+
+```tsx
+type UseFunnelResults<T> = {
+  [key in keyof T]: {
+    step: key
+    context: T[key];
+    history: FunnelHistory<T, T[key]>;
+  }
+}[keyof T] & {
+  index: number;
+  historySteps: { step: keyof T, context: T[keyof T] }[];
+  Render: FunnelRenderComponent<T>;
+};
+```
+
+- `step` (`string`): A property that represents the current step of the funnel. It uses the key of the T object.
+- `context` (`object`): A property that represents the state of the current step. It contains the value of the T object defined according to the value of the step property.
+- `history` (`object`): An object managing the transitions of the funnel. Use it to move to the next step or return to the previous step. For more information, see [`FunnelHistory`](#funnelhistory).
+- `index` (`number`): The index of the current step of the funnel. It is the same as the index of the `historySteps` array.
+- `historySteps` (`array`): An array of objects representing the history of the funnel. Each object contains the step name and context of the step.
+- `<Render />` (`function`): A component for rendering. For more information, see [`<funnel.Render />`](./funnel-render.mdx).
+
+## FunnelHistory
+
+An object that manages the transitions of the funnel. It contains several methods for handling the transition of the funnel steps.
+
+```tsx
+interface FunnelHistory<T> {
+  push: <TStep extends keyof T>(step: TStep, context: T[TStep]) => Promise<void> | void;
+  replace: <TStep extends keyof T>(step: TStep, context: T[TStep]) => Promise<void> | void;
+  go: (index: number) => void | Promise<void>;
+  back: () => void | Promise<void>;
+}
+```
+
+- `push` (`function`): Adds a new state and moves to the next funnel step.
+  - `step` (`string`): The name of the next step.
+  - `context` (`object`): An object representing the state of the next step.
+- `replace` (`function`): Overwrites the current state with a new state and moves to the next funnel step.
+  - `step` (`string`): The name of the next step.
+  - `context` (`object`): An object representing the state of the next step.
+- `go` (`function`): Moves to the step at the specified index in the `historySteps` array.
+  - `index` (`number`): The index of the step to move to.
+- `back` (`function`): Moves to the previous step.
+
+## Example
+
+### Basic Usage
+
+<UseFunnelCodeBlock>
+```tsx
+import { useFunnel, UseFunnelOptions, UseFunnelResults } from "@use-funnel/next";
+
+type T = {
+  helloStep: { message: string; };
+  worldStep: { message: string; message2: string }
+}
+
+const funnel: UseFunnelResults<T> = useFunnel<T>({
+  id: "use-funnel-api-reference",
+  steps: {},
+  initial: {
+    step: "helloStep",
+    context: {
+      message: 'Hello'
+    }
+  },
+} satisfies UseFunnelOptions<T>);
+```
+</UseFunnelCodeBlock>
+
+### History Management Example
+
+
+<UseFunnelCodeBlock>
+```tsx
+import { useFunnel } from "@use-funnel/next";
+
+type T = {
+  helloStep: { message: string; };
+  worldStep: { message: string; message2: string }
+}
+
+const funnel = useFunnel<T>({
+  id: "use-funnel-history-example",
+  steps: {},
+  initial: {
+    step: "helloStep",
+    context: {
+      message: 'Hello'
+    }
+  },
+});
+
+if (funnel.step === 'helloStep') {
+  funnel.history.push('worldStep', { message2: 'World' });
+}
+```
+</UseFunnelCodeBlock>

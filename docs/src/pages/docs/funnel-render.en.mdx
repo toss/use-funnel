@@ -1,0 +1,184 @@
+import { Callout } from 'nextra/components'
+import { Keyword, UseFunnelCodeBlock } from '@/components'
+
+# funnel.Render Component
+
+The `funnel.Render` component renders each <Keyword>step</Keyword> of the funnel.
+
+It is included in the [UseFunnelResults](/docs/use-funnel#usefunnelresults) returned by [`useFunnel()`](./use-funnel).
+
+```tsx
+interface FunnelRenderComponent<T> extends React.ComponentType<FunnelRenderProps<T>> {
+  with: FunnelRenderWithEvent<T>;
+  overlay: FunnelRenderOverlay<T>;
+};
+```
+
+- [FunnelRenderProps](#funnelrenderprops)
+- [FunnelRenderWithEvent](#funnelrenderwithevent)
+- [FunnelRenderOverlay](#funnelrenderoverlay)
+
+## FunnelRenderProps
+
+Defines the rendering logic for each <Keyword>step</Keyword>.
+
+```typescript
+interface FunnelRenderProps<T> {
+  [key in keyof T]: (props: {
+    context: T[key];
+    history: FunnelHistory<T, key>;
+  }) => React.ReactNode;
+}
+```
+
+- `context` (`object`): An object representing the state of the current <Keyword>step</Keyword>.
+- `history` (`object`): An object managing the transitions of the funnel. Use it to move to the next <Keyword>step</Keyword> or return to the previous <Keyword>step</Keyword>. For more information, see [`FunnelHistory`](./use-funnel#funnelhistory).
+
+### Example
+
+In the following example, we define the rendering logic for each <Keyword>step</Keyword> (`EmailInput`, `PasswordInput`, `OtherInput`) and pass the necessary data for each step. You can access the data for each step using `context` and move to the next step using `history`.
+
+<UseFunnelCodeBlock>
+```tsx
+import { useFunnel } from "@use-funnel/next";
+
+const funnel = useFunnel(/* ... */);
+return (
+  <funnel.Render
+    EmailInput={({ history }) => (
+      <EmailInput onNext={(email) => history.push('PasswordInput', { email })} />
+    )}
+    PasswordInput={({ context, history }) => (
+      <PasswordInput
+        email={context.email}
+        onNext={(password) => history.push('OtherInput', { password })}
+      />
+    )}
+    OtherInput={() => <OtherInput />}
+  />
+);
+```
+</UseFunnelCodeBlock>
+
+## FunnelRenderWithEvent
+
+Allows you to define an event object for multiple transitions within the current <Keyword>step</Keyword>.
+
+```typescript
+interface FunnelRenderWithEvent<T> {
+  events: {
+    [eventName: string]: (payload: any, funnel: { context: T; history: FunnelHistory<T> }) => void;
+  };
+  render: (props: {
+    context: T;
+    dispatch: (eventName: string, payload: any) => void;
+  }) => React.ReactNode;
+}
+```
+
+- `events` (`object`): An object containing event handlers for each event name.
+  - `eventName` (`string`): The name of the event.
+  - `payload` (`any`): The data passed to the event handler.
+  - `funnel` (`object`): An object containing the current <Keyword>step</Keyword> state and the funnel history. Use it to access the current state and manage transitions.
+    - `context` (`object`): An object representing the state of the current <Keyword>step</Keyword>.
+    - `history` (`object`): An object managing the transitions of the funnel. Use it to move to the next <Keyword>step</Keyword> or return to the previous <Keyword>step</Keyword>. For more information, see [`FunnelHistory`](./use-funnel#funnelhistory).
+- `render` (`function`): A function that returns a React node.
+  - `context` (`object`): An object representing the state of the current <Keyword>step</Keyword>.
+  - `dispatch` (`function`): A function that dispatches an event.
+    - `eventName` (`string`): The name of the event.
+    - `payload` (`any`): The data passed to the event handler.
+
+### Example
+
+```tsx
+<funnel.Render
+  EmailInput={funnel.Render.with({
+    events: {
+      EmailInputSuccess: (email: string, { history }) => history.push('PasswordInput', { email }),
+      EmailInputFail: (error: Error, { history }) => history.push('ErrorStep', { error: error.message })
+    },
+    render({ context, dispatch }) {
+      return (
+        <EmailInput
+          email={context.email}
+          onNext={(email) => dispatch('EmailInputSuccess', email)}
+          onError={(error) => dispatch('EmailInputFail', error)}
+        />
+      );
+    }
+  })}
+/>
+```
+
+For detailed usage, visit the [Define transition event](https://use-funnel.slash.page/docs/transition-event).
+
+## FunnelRenderOverlay
+
+If you want to show the previous <Keyword>step</Keyword> on the same screen when displaying the current <Keyword>step</Keyword>, you can use this option.
+
+```typescript
+type FunnelRenderOverlay<T> =
+  | FunnelRenderOverlayWithoutEvent<T>
+  | FunnelRenderOverlayWithEvent<T>;
+
+interface FunnelRenderOverlayWithoutEvent<T> {
+  render: (props: {
+    context: T;
+    history: FunnelHistory<T>;
+    close: () => void;
+  }) => React.ReactNode;
+}
+
+interface FunnelRenderOverlayWithEvent<T> {
+  events: {
+    [eventName: string]: (payload: any, funnel: { context: T; history: FunnelHistory<T> }) => void;
+  };
+  render: (props: {
+    context: T;
+    dispatch: (eventName: string, payload: any) => void;
+    close: () => void;
+  }) => React.ReactNode;
+}
+```
+
+#### FunnelRenderOverlayWithoutEvent
+
+- `render` (`function`): A function that returns a React node.
+  - `context` (`object`): An object representing the state of the current <Keyword>step</Keyword>.
+  - `history` (`object`): An object managing the transitions of the funnel. Use it to move to the next <Keyword>step</Keyword> or return to the previous <Keyword>step</Keyword>. For more information, see [`FunnelHistory`](./use-funnel#funnelhistory).
+  - `close` (`function`): A function that closes the overlay.
+
+#### FunnelRenderOverlayWithEvent
+
+- `events` (`object`): An object containing event handlers for each event name.
+  - `eventName` (`string`): The name of the event.
+  - `payload` (`any`): The data passed to the event handler.
+  - `funnel` (`object`): An object containing the current <Keyword>step</Keyword> state and the funnel history. Use it to access the current state and manage transitions.
+    - `context` (`object`): An object representing the state of the current <Keyword>step</Keyword>.
+    - `history` (`object`): An object managing the transitions of the funnel. Use it to move to the next <Keyword>step</Keyword> or return to the previous <Keyword>step</Keyword>. For more information, see [`FunnelHistory`](./use-funnel#funnelhistory).
+- `render` (`function`): A function that returns a React node.
+  - `context` (`object`): An object representing the state of the current <Keyword>step</Keyword>.
+  - `dispatch` (`function`): A function that dispatches an event.
+    - `eventName` (`string`): The name of the event.
+    - `payload` (`any`): The data passed to the event handler.
+  - `close` (`function`): A function that closes the overlay.
+
+### Example
+
+```tsx
+<funnel.Render
+  TermsAgree={funnel.Render.overlay({
+    render({ context, history, close }) {
+      return (
+        <TermsAgree
+          email={context.email}
+          onNext={(email) => history.push('PasswordInput', { email })}
+          onClose={() => close()}
+        />
+      );
+    }
+  })}
+/>
+```
+
+For detailed usage, visit the [Use overlay](https://use-funnel.slash.page/docs/overlay).

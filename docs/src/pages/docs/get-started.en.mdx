@@ -1,0 +1,108 @@
+import { Steps, Callout } from 'nextra/components'
+import { UseFunnelCodeBlock, Keyword } from '@/components'
+
+# Getting started
+
+Let's implement a simple sign-up flow using `@use-funnel`. You'll learn how to define the state of each step and safely manage the state step by step.
+
+<Steps>
+### Defining <Keyword>context</Keyword> step by step
+
+The sign-up process can be divided into several steps. Here, we'll divide it into three steps: email input, password input, and other information input. And we'll define the state required for each step as follows.
+
+```tsx filename="context.ts"
+// 1. Nothing entered
+type EmailInput = { email?: string; password?: string; other?: unknown }
+// 2. Email entered
+type PasswordInput = { email: string; password?: string; other?: unknown }
+// 3. Email and password entered
+type OtherInfoInput = { email: string; password: string; other?: unknown }
+```
+
+- `EmailInput`: The first step of sign-up. Although there are email and password input fields, nothing has been entered yet. Both `email` and `password` are defined as optional fields.
+
+- `PasswordInput`: The second step of sign-up. After the user enters the email, they enter the password. In this step, the `email` field must be entered, and the `password` is an optional field.
+
+- `OtherInfoInput`: The third step of sign-up. After the user enters both the email and password, they enter additional information. In this step, both `email` and `password` must be entered.
+
+By defining the state of each step as a type, you can maintain [type safety](./features.mdx#ui-state-managed-with-strong-type-safety) in your code and easily track the information required for each step.
+
+### Setting the initial step
+
+Now let's set the initial step using [`useFunnel()`](./use-funnel).
+
+First, specify the object type with the key as the step and the context object as the value in the generics of [`useFunnel()`](./use-funnel). Pass the type you defined for each step in the previous step to [`useFunnel()`](./use-funnel). Specify the step and context object to be used when entering the component in the `initial` property.
+
+Here, we set the initial step to "EmailInput" and an empty `context` object to be used in that step. `id` is a unique identifier to distinguish when there are multiple funnels in one component.
+
+<UseFunnelCodeBlock>
+```tsx {5-15}
+import { useFunnel } from "@use-funnel/next";
+import type { EmailInput, PasswordInput, OtherInfoInput } "./context";
+
+function MyFunnelApp() {
+  const funnel = useFunnel<{
+    EmailInput: EmailInput;
+    PasswordInput: PasswordInput;
+    OtherInfoInput: OtherInfoInput;
+  }>({
+    id: "my-funnel-app",
+    initial: {
+      step: "EmailInput",
+      context: {}
+    }
+  });
+  // ...
+}
+```
+</UseFunnelCodeBlock>
+
+For other ways to define the state of each step, see the [state definition guide](/docs/context-guide).
+
+### Using <Keyword>context</Keyword> and <Keyword>history</Keyword> step by step
+
+[`useFunnel()`](./use-funnel) returns `context` and `history` based on the `step`. You can configure the UI for each step and handle the required state and events.
+
+```tsx
+declare function EmailInput(props: { onNext: (email: string) => void }): JSX.Element;
+declare function PasswordInput(props: { onNext: (password: string) => void }): JSX.Element;
+declare function OtherInfoInput(props: { onNext: (other: unknown) => void }): JSX.Element;
+
+switch (funnel.step) {
+  case "EmailInput":
+    return <EmailInput onNext={(email) => funnel.history.push("PasswordInput", { email })} />;
+  case "PasswordInput":
+    return <PasswordInput email={funnel.context.email} onNext={(password) => funnel.history.push("OtherInfoInput", { ...funnel.context, password })} />;
+  case "OtherInfoInput":
+    return <OtherInfoInput onNext={(other) => funnel.history.push("Finish", { ...funnel.context, other })} />;
+}
+```
+
+- `funnel.context{:jsx}`: You can get the `context` of the current `step`. For example, in the "EmailInput" step, `funnel.context.email` is of type `string | undefined`, but in the "PasswordInput" step, it can be inferred as type `string`.
+- `funnel.history.push(){:jsx}`: You can move to the next step. Pass the `step` as the first argument to `push()` and the `context` required to enter that `step` as the second argument.
+- `funnel.history.replace(){:jsx}`: The basic behavior is the same as `funnel.history.push()`, but it replaces the current `step` without stacking the history.
+
+#### Note: Implementing easily using `<funnel.Render />`
+
+If you want to define the rendering logic for each step in one place, you can use `<funnel.Render />`. This component allows you to define the rendering logic for each step and pass the necessary data for each step.
+
+```tsx
+return (
+  <funnel.Render
+    EmailInput={({ history }) => (
+      <EmailInput onNext={(email) => history.push("PasswordInput", { email })} />
+    )}
+    PasswordInput={({ context, history }) => (
+      <PasswordInput email={context.email} onNext={(password) => history.push("OtherInfoInput", { ...context, password })} />
+    )}
+    OtherInfoInput={({ context, history }) => (
+      <OtherInfoInput onNext={(other) => history.push("Finish", { ...context, other })} />
+    )}
+    Finish={() => <Finish />}
+  />
+);
+```
+
+The detailed usage of the [`<funnel.Render />`](./funnel-render) component is available in the [reference](/docs/funnel-render).
+
+</Steps>

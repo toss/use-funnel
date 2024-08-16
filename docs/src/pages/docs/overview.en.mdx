@@ -1,0 +1,19 @@
+import { Keyword, KeywordDescription } from '@/components';
+
+# Overview
+
+<video src="/example.mp4" poster='/overay.png' width={250} height={543} playsInline muted autoPlay loop className="float-right ml-6 my-6 max-w-[40%]" />
+
+`@use-funnel` is a [React Hook](https://react.dev/reference/rules/rules-of-hooks) that helps you easily implement complex UI flows.
+
+In the example screen on the right, you can see the UI flow where users enter their occupation → school / company → registration date in order. You can also move to the previous step by going back. To implement such a complex UI flow, you need to manage step-by-step states and history.
+
+With `@use-funnel`, you can easily implement such a UI flow.
+
+## Concepts
+
+Let me explain the terms used in `@use-funnel`.
+
+* <Keyword>step</Keyword> : <KeywordDescription keyword="step" /> In the example on the right, it's the occupation, school / company, and registration date input screens.
+* <Keyword>context</Keyword> : <KeywordDescription keyword="context" /> In the example on the right, it's the values entered on each screen, such as occupation, school / company, and date.
+* <Keyword>history</Keyword> : <KeywordDescription keyword="history" /> In the example on the right, it's the complete record of the screens the user has moved through and the values entered on each step.
