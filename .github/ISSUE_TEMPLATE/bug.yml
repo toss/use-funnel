@@ -1,0 +1,56 @@
+name: Bug Report
+description: Report a bug
+labels: [bug]
+title: '[Bug]:'
+body:
+  - type: dropdown
+    id: package
+    attributes:
+      label: Package Scope
+      description: Is this issue related to a specific package?
+      multiple: true
+      options:
+        - '@use-funnel/core'
+        - '@use-funnel/react-router-dom'
+        - '@use-funnel/next'
+        - '@use-funnel/react-navigation-native'
+        - '@use-funnel/browser'
+        - etc
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      description: Description what bug we need to fix
+      label: Bug description
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+
+  - type: textarea
+    id: reproduction-steps
+    attributes:
+      label: To Reproduce
+      description: Please tell me in detail how to reproduce it. If it seems to occur only in a specific environment, please also provide information about the OS and the environment
+      placeholder: |
+        Minimal reproducible code or describe steps to reproduce. Optional, but recommended
+
+  - type: textarea
+    id: possible-solution
+    attributes:
+      label: Possible Solution
+      placeholder: I think this is probably...
+    validations:
+      required: false
+
+  - type: textarea
+    id: etc
+    attributes:
+      label: etc.
+    validations:
+      required: false
