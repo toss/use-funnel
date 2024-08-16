@@ -1,6 +1,6 @@
 # Creating a Custom Router
 
-`@use-funnel` stores state snapshots for each funnel step in an array, allowing for stable backward and forward navigation. Here’s how to create a custom router without using the basic functions provided by router packages.
+`@use-funnel` stores state snapshots of each funnel step in an array, enabling stable backward and forward navigation. Here’s how to create a custom router without relying on the built-in functions provided by router packages.
 
 First, install the `@use-funnel/core` package
 
@@ -8,7 +8,7 @@ First, install the `@use-funnel/core` package
 npm install @use-funnel/core --save
 ```
 
-Below is an example of implementing a funnel using only [`useState`](https://react.dev/reference/react/useState) without a router.
+Here’s an example of implementing a funnel using only [`useState`](https://react.dev/reference/react/useState), without a router.
 
 ```tsx filename="src/hooks/useFunnel.ts"
 import { useMemo, useState } from 'react';
@@ -23,7 +23,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
 
   return useMemo(
     () => ({
-      // Return history and currentIndex to represent the current state of the funnel.
+      // Returns the history and currentIndex, representing the current state of the funnel.
       history,
       currentIndex,
       // push function adds a new state and updates the current index.
@@ -34,7 +34,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
         });
         setCurrentIndex((prev) => prev + 1);
       },
-      // replace function overwrites the current state and updates the state snapshot.
+      // replace function replaces the current state and updates the state snapshot.
       replace(state) {
         setHistory((prev) => {
           const next = prev.slice(0, currentIndex);
@@ -80,7 +80,7 @@ interface FunnelState<T> {
 }
 ```
 
-Finally, let’s look at the `CreateUseFunnelResult<T>` interface that describes the result returned by `createUseFunnel()`. This interface includes methods for managing funnel state and transitions.
+Finally, let’s examine the `CreateUseFunnelResult<T>` interface, which that describes the result returned by `createUseFunnel()`. This interface includes methods for managing funnel state and transitions.
 
 ```tsx
 interface CreateUseFunnelResult<T> {
@@ -107,4 +107,4 @@ interface CreateUseFunnelResult<T> {
 }
 ```
 
-This interface includes various methods to manage the funnel state and handle step transitions, ensuring stable state management for your funnel.
+This interface includes various methods to manage the funnel state and handle step transitions, ensuring robust state management for your funnel.

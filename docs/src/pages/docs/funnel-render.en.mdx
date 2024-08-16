@@ -1,9 +1,9 @@
 import { Callout } from 'nextra/components'
 import { Keyword, UseFunnelCodeBlock } from '@/components'
 
-# funnel.Render Component
+# `funnel.Render` Component
 
-The `funnel.Render` component renders each <Keyword>step</Keyword> of the funnel.
+The `funnel.Render` component is responsible for rendering each <Keyword>step</Keyword> of the funnel.
 
 It is included in the [UseFunnelResults](/docs/use-funnel#usefunnelresults) returned by [`useFunnel()`](./use-funnel).
 
@@ -20,7 +20,7 @@ interface FunnelRenderComponent<T> extends React.ComponentType<FunnelRenderProps
 
 ## FunnelRenderProps
 
-Defines the rendering logic for each <Keyword>step</Keyword>.
+Specifies the rendering logic for each <Keyword>step</Keyword>.
 
 ```typescript
 interface FunnelRenderProps<T> {
@@ -36,7 +36,7 @@ interface FunnelRenderProps<T> {
 
 ### Example
 
-In the following example, we define the rendering logic for each <Keyword>step</Keyword> (`EmailInput`, `PasswordInput`, `OtherInput`) and pass the necessary data for each step. You can access the data for each step using `context` and move to the next step using `history`.
+In the following example demonstrates how to define the rendering logic for each <Keyword>step</Keyword> (`EmailInput`, `PasswordInput`, `OtherInput`) and pass the necessary data for each step. You can access the data for each step using `context` and move to the next step using `history`.
 
 <UseFunnelCodeBlock>
 ```tsx
@@ -62,7 +62,7 @@ return (
 
 ## FunnelRenderWithEvent
 
-Allows you to define an event object for multiple transitions within the current <Keyword>step</Keyword>.
+Enables the definition of an event object for multiple transitions within the current <Keyword>step</Keyword>.
 
 ```typescript
 interface FunnelRenderWithEvent<T> {
@@ -110,11 +110,11 @@ interface FunnelRenderWithEvent<T> {
 />
 ```
 
-For detailed usage, visit the [Define transition event](https://use-funnel.slash.page/docs/transition-event).
+For more detailed instructions, see the [Define transition event](https://use-funnel.slash.page/docs/transition-event).
 
 ## FunnelRenderOverlay
 
-If you want to show the previous <Keyword>step</Keyword> on the same screen when displaying the current <Keyword>step</Keyword>, you can use this option.
+This option allows you to display the previous <Keyword>step</Keyword> on the same screen when displaying the current <Keyword>step</Keyword>, you can use this option.
 
 ```typescript
 type FunnelRenderOverlay<T> =
@@ -181,4 +181,4 @@ interface FunnelRenderOverlayWithEvent<T> {
 />
 ```
 
-For detailed usage, visit the [Use overlay](https://use-funnel.slash.page/docs/overlay).
+For more detailed instructions, see the [Use overlay](https://use-funnel.slash.page/docs/overlay).

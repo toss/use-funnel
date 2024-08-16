@@ -1,18 +1,12 @@
 import { Keyword } from '@/components'
 import { Callout } from 'nextra/components'
 
-# Define transition event
+# Define Transition Events
 
-{/* 
-전환 이벤트란 특정 조건이나 사용자 동작에 따라 현재 단계에서 다음 단계로 전환하는 것을 제어하는 방법이에요. 퍼널 내에 여러 가지 경로가 필요할 때 유용하죠. 예를 들어 사용자가 이메일을 입력했을 때 정상적으로 입력한 경우와 입력이 실패한 경우를 다르게 처리해야 할 때 사용할 수 있어요.
-*/}
-Transition events are used to define and control the transition from the current step to the next step based on specific conditions or user actions. They are useful when multiple paths are needed within a funnel. For example, when a user enters an email, you may need to handle the case where the input is successful differently from when it fails.
+Transition events allow you to define and control how the current step transitions to the next step based on specific conditions or user actions. They are useful when multiple paths are needed within a funnel. For example, when a user enters an email, you may need to handle the case where the input is successful differently from when it fails.
 
-{/* 전환 이벤트는 현재 <Keyword>step</Keyword>에서 여러 경로가 필요해 이벤트를 정의할 때 사용해요. 현재 <Keyword>step</Keyword>에서 발생할 수 있는 여러 경로를 한번에 정의할 수 있어서 응집력 있는 코드를 만들 수 있어요.
- */}
-Transition events are used to define events when multiple paths are needed within the current step. You can define multiple paths that can occur in the current step at once, allowing you to create cohesive code.
+Transition events are particularly useful when multiple paths are required within the current step. You can define multiple paths that can occur in the current step at once, enabling you to write more cohesive code.
 
-{/* 다음은 전환 이벤트를 정의하고 사용하는 예제예요. */}
 Here's an example of defining and using transition events.
 
 ```tsx
@@ -21,27 +15,27 @@ import { useFunnel } from "@use-funnel/next";
 const funnel = useFunnel(/* ... */);
 
 <funnel.Render
-  이메일입력={funnel.Render.with({
+  EmailInput={funnel.Render.with({
     events: {
-      // 이메일 입력 완료 이벤트
-      이메일입력완료: (email: string, { history }) => {
-        // 비밀번호 입력 단계로 전환
+      // Email input success event
+      EmailInputSuccess: (email: string, { history }) => {
+        // Transition to the password input step
         history.push('비밀번호입력', { email });
       },
-      // 이메일 입력 실패 이벤트
-      이메일입력실패: (error: Error, { history }) => {
-        // 에러 페이지로 전환
+      // 이메일 입력 Fail 이벤트
+      EmailInputFail: (error: Error, { history }) => {
+        // Transition to the error page
         history.push('에러페이지', { error: error.message });
       }
     },
     render({ context, dispatch }) {
       return (
-        <이메일입력
+        <EmailInput
           email={context.email}
-          // 이메일 입력 완료 시 이메일입력완료 이벤트 디스패치
-          onNext={(email) => dispatch('이메일입력완료', email)}
-          // 이메일 입력 실패 시 이메일입력실패 이벤트 디스패치
-          onError={(error) => dispatch('이메일입력실패', error)}
+          // Dispatch EmailInputSuccess event when email input is successful
+          onNext={(email) => dispatch('EmailInputSuccess', email)}
+          // Dispatch EmailInputFail event when email input fails
+          onError={(error) => dispatch('EmailInputFail', error)}
         />
       );
     }
@@ -49,10 +43,8 @@ const funnel = useFunnel(/* ... */);
 />
 ```
 
-{/* 위 예제는 전환 이벤트를 정의하고 사용하는 방법을 보여주고 있어요. 이메일입력 단계에서 발생할 수 있는 이벤트를 정의한 후, `dispatch()`로 해당 이벤트를 호출해요. */}
-This example shows how to define and use transition events. After defining the events that can occur in the email input step, you can call the corresponding event using `dispatch()`.
+This example shows how to define and use transition events. Once the events for the email input step are defined, you can trigger the appropriate event using `dispatch()`.
 
-{/* 다음은 이벤트 객체를 포함하는 렌더링 객체의 타입 정의예요. */}
 Here's the type definition for a rendering object that includes an event object.
 
 ```ts
@@ -69,14 +61,14 @@ interface FunnelRenderWithEvent<
 }
 ```
 
-- `events` (`object`, required): An object containing event handlers for each event name.
+- `events` (`object`, required): An object mapping event names to their respective handlers.
   - `eventName` (`string`): The name of the event.
   - `payload` (`any`): The data passed to the event handler.
   - `context` (`object`): An object representing the state of the current step.
 - `render` (`function`): A function that returns a React node.
   - `context` (`object`): An object representing the state of the current step.
-  - `dispatch` (`function`): A function that dispatches an event.
+  - `dispatch` (`function`): A function that triggers the specified event.
 
 <Callout type="warning">
-You cannot use `history` in the rendering function when defining events. Instead, you can call the events defined in the `events` object using `dispatch()`.
+You cannot use `history` in the rendering function when defining events. Instead, you should trigger the events defined in the `events` object using `dispatch()`.
 </Callout>

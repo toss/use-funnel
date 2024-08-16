@@ -1,8 +1,8 @@
 import { UseFunnelCodeBlock, Keyword, Sandpack } from '@/components'
 
-# Create funnel inside funnel
+# Creating a Funnel within a Funnel
 
-When developing a funnel, there are times when you need to go through multiple steps to create a single state. Or you may need to reuse a part of the funnel steps elsewhere. In such cases, dividing the funnel into sub-funnels can be efficient. The flowchart looks like this:
+When developing a funnel, you may need to go through multiple steps to achieve a particular state. Alternatively, you might need to reuse a portion of the funnel steps in another context. In these situations, dividing the funnel into sub-funnels can be an efficient approach. The flowchart would looks like this:
 
 ```mermaid
 %%{init: { 'logLevel': 'debug', 'theme': 'base', 'gitGraph': {'showBranches': true, 'showCommitLabel':true,'mainBranchName': 'main-funnel'}} }%%
@@ -19,7 +19,7 @@ gitGraph
   commit id: "C"
 ```
 
-`@use-funnel` supports sub-funnels. Simply specify a different `id` when using [`useFunnel()`](./use-funnel.mdx) in the components under the <Keyword>step</Keyword>.
+`@use-funnel` supports sub-funnels. You simply need to specify a different `id` when using [`useFunnel()`](./use-funnel.mdx) in the components with in a particular <Keyword>step</Keyword>.
 
 
 <div className='h-8' />
@@ -93,24 +93,24 @@ export function BFunnel({ a, onNext }: Props) {
       B1={({ history }) => (
         <div>
           <h2>B1 Step</h2>
-          <p>before a value: {a}</p>
+          <p>previous a value: {a}</p>
           <button onClick={() => history.push('B2', { hello: 'Hello' })}>Next</button>
         </div>
       )}
       B2={({ context, history }) => (
         <div>
           <h2>B2 Step</h2>
-          <p>before a value: {a}</p>
-          <p>before hello value: {context.hello}</p>
+          <p>previous a value: {a}</p>
+          <p>previous hello value: {context.hello}</p>
           <button onClick={() => history.push('B3', { world: 'World' })}>Next</button>
         </div>
       )}
       B3={({ context }) => (
         <div>
           <h2>B3 Step</h2>
-          <p>before a value: {a}</p>
-          <p>before hello value: {context.hello}</p>
-          <p>before world value: {context.world}</p>
+          <p>previous a value: {a}</p>
+          <p>previous hello value: {context.hello}</p>
+          <p>previous world value: {context.world}</p>
           <button onClick={() => onNext(`${context.hello} ${context.world} from BFunnel`)}>Next</button>
         </div>
       )}

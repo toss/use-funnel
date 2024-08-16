@@ -7,9 +7,9 @@ import { Sandpack } from '@/components'
 ![Overlay example](/overlay.png)
 </div>
 
-Overlay is used to display UI such as modals, bottom sheets, etc. while maintaining the previous step as shown in the image on the right.
+The overlay is used to display UI such as modals, bottom sheets, and similar components. while maintaining the previous step as shown in the image on the right.
 
-In the following example, when moving from the "School Input" step to the "Start Date Input" step, an overlay is used. When the `<StartDateInputBottomSheet />` component is rendered, the UI of the previous step `<SchoolInput />` is maintained.
+In the following example, when moving from the "School Input" step to the "Start Date Input" step, an overlay is used. When the `<StartDateInputBottomSheet />` component is rendered, the UI of the previous step `<SchoolInput />` is remains visible.
 
 ```tsx {7}
 <funnel.Render
@@ -34,7 +34,7 @@ In the following example, when moving from the "School Input" step to the "Start
 <div className="clear-both" />
 
 <Callout type="warning">
-**Note:** If the overlay is closed by an interaction other than the router's back button, you need to explicitly execute `close()` in the `render()` argument. When you execute `close()`, you move to the previous step through the history.
+**Note:** If the overlay is closed by an interaction other than the router's back button, you need to explicitly execute `close()` in the `render()` argument. Executing `close()` will navigate to the previous step through the history.
 </Callout>
 
 ## Example
@@ -175,9 +175,9 @@ export function StartDateInputBottomSheet({ onNext, onClose }: Props) {
 
 ## Overlay with event example
 
-If you want to define an overlay and [transition events](/docs/transition-event) together, use the `events` property.
+To define an overlay along with [transition events](/docs/transition-event), use the `events` property.
 
-In the following example, the "Email Input" step uses transition events and an overlay together. Define the "Email Input Complete" and "Email Input Fail" events, and transition to the next step for each event.
+In the following example, the "Email Input" step uses transition events and an overlay together. Define the "Email Input Complete" and "Email Input Fail" events, and trigger the transition to the next step for each event.
 
 ```tsx
 <funnel.Render
@@ -200,5 +200,5 @@ In the following example, the "Email Input" step uses transition events and an o
 ```
 
 <Callout type="warning">
-When defining events, you cannot use `history` in the rendering function. Instead, you can call the defined events using `dispatch()`.
+You cannot use `history` in the rendering function when defining events. Instead, you should trigger the events defined in the `events` object using `dispatch()`.
 </Callout>

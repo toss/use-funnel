@@ -1,9 +1,9 @@
 import { Tabs, Callout } from 'nextra/components'
 import { UseFunnelCodeBlock, Keyword } from '@/components'
 
-# Defining <Keyword>context</Keyword> step by step
+# Step-by-Step Definition of <Keyword>context</Keyword>
 
-In `@use-funnel`, you need to specify the type of <Keyword>context</Keyword> required at each step (<Keyword>step</Keyword>). Let's look at various ways to define <Keyword>context</Keyword>.
+In `@use-funnel`, you need to define the type of <Keyword>context</Keyword> required at each step (<Keyword>step</Keyword>). Let's look at different ways to define <Keyword>context</Keyword>.
 
 ## Defining with generics
 
@@ -100,7 +100,7 @@ function MyFunnelApp() {
 ```
 </UseFunnelCodeBlock>
 
-- `guard` (`function`, optional): A function that verifies whether the data is of the context type of that step.
+- `guard` (`function`, optional): A function that checks if the data is of the context type of that step.
 - `parse` (`function`, optional): A function that converts data to the context type of that step.
 
 <Callout>
@@ -109,7 +109,7 @@ function MyFunnelApp() {
 
 ### `createFunnelSteps()` to define
 
-You can create a <Keyword>step</Keyword> that changes a specific key of the initial <Keyword>context</Keyword> from optional to required when moving to the next <Keyword>step</Keyword> simply.
+You can create a <Keyword>step</Keyword> that changes a specific key of the initial <Keyword>context</Keyword> from optional to required when transitioning to the next <Keyword>step</Keyword> simply.
 
 ```tsx
 declare function createFunnelSteps<FormState>(): {
@@ -164,7 +164,7 @@ function MyFunnelApp() {
 
 ## Using Runtime Validator Packages
 
-Use runtime validator packages to ensure data validity and type safety. Here are examples using `zod` and `superstruct`.
+Use runtime validator packages to validate data and ensure type safety. Here are examples using `zod` and `superstruct`.
 
 <Tabs items={['zod', 'superstruct']}>
 <Tabs.Tab>

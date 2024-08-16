@@ -1,10 +1,10 @@
 import { Keyword, KeywordDescription } from '@/components';
 
-# Key Features
+# Main Features
 
 ## Overview
 
-`@use-funnel` helps manage the state of each <Keyword>step</Keyword> safely with strong type support and maintains consistent history state, ensuring the user has the correct state at each step.
+`@use-funnel` helps safely manage the state of each <Keyword>step</Keyword> safely with strong type support and ensures consistent history state, ensuring the user has the correct state at each step.
 
 ## Managing UI State with Strong Type Safety
 
@@ -23,7 +23,7 @@ type Funnel =
 const [funnel, setFunnel] = useState<Funnel>({ step: "A", context: { a: "a" } });
 ```
 
-But, this approach has several issues:
+However, this approach has several issues:
 
 ```tsx
 // When transitioning from A to B, only `b` should be required, but `a` is also required.
@@ -32,7 +32,7 @@ setFunnel({ step: "B", context: { a: funnel.context.a, b: "new b" } }) // no com
 ```
 
 - **Complex History Management**: You need to implement history operations like going back and forward separately.
-- **Difficulty in State Transitions**: It's challenging to filter out only the required states when transitioning between steps. For example, when transitioning from step A to B, only `b` should be required, but in a typical implementation, `a` might also be required.
+- **Difficulty in State Transitions**: It's can be difficult to isolate only the required states when transitioning between steps. For example, when transitioning from step A to B, only `b` should be required, but in a typical implementation, `a` might also be required.
 
 ## Easy Management with `@use-funnel`
 
@@ -60,7 +60,7 @@ funnel.step === "A" && typeof funnel.context.a // "string" | "undefined"
 funnel.step === "B" && typeof funnel.context.a // "string"
 ```
 
-Ensuring type safety for the <Keyword>context</Keyword> property of each <Keyword>step</Keyword> guarantees that you can clearly define the required <Keyword>context</Keyword> and prevent errors.
+By ensuring type safety for the <Keyword>context</Keyword> property of each <Keyword>step</Keyword> guarantees that you can clearly define the necessary <Keyword>context</Keyword> and prevent errors.
 
 ---
 
@@ -101,13 +101,13 @@ Now that the type definition is satisfied, the error no longer occurs.
 
 ## Easy History State Management
 
-Managing history state is crucial for implementing complex UI flows. `@use-funnel` manages state and history together, storing state snapshots and updating the current state based on route changes.
+Effective history state management is crucial for implementing complex UI flows. `@use-funnel` manages state and history together, storing state snapshots and updating the current state based on route changes.
 
 ### History Management
 
 With `@use-funnel`, you can easily manage the history of state transitions. This ensures that navigating back and forth between steps maintains the correct state.
 
-Let's consider a simple funnel with three steps: A → B → C.
+Consider a simple funnel with three steps: A → B → C.
 
 ```mermaid
 sequenceDiagram

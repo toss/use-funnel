@@ -4,13 +4,13 @@
     "title": "Introduction"
   },
   "overview": "Overview",
-  "features": "Features",
+  "features": "Main Features",
   "--- Guide": {
     "type": "separator",
     "title": "Guide"
   },
-  "install": "Install",
-  "get-started": "Get Started",
+  "install": "Installation",
+  "get-started": "Getting Started",
   "--- Reference": {
     "type": "separator",
     "title": "Reference"
@@ -21,9 +21,9 @@
     "type": "separator",
     "title": "Advanced"
   },
-  "context-guide": "Define context step by step",
-  "sub-funnel": "Create funnel inside funnel",
-  "custom-router": "Creating a custom router",
-  "transition-event": "Define transition event",
-  "overlay": "Use overlay"
+  "context-guide": "Step-by-Step Definition of context",
+  "sub-funnel": "Creating a Funnel within a Funnel",
+  "custom-router": "Creating a Custom Router",
+  "transition-event": "Define Transition Events",
+  "overlay": "Using Overlay"
 }
