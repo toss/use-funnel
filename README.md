@@ -10,7 +10,7 @@
 
 `@use-funnel` is a [React Hook](https://react.dev/reference/rules/rules-of-hooks) that helps you easily implement complex UI flows.
 
-## Concepts
+## Core Concepts
 
 ### Strong Type Support
 
@@ -23,6 +23,39 @@ Manage states by history, so you can easily manage back and forth.
 ### Various Router Support
 
 Supports browser history, react-router-dom, next.js, @react-navigation/native, etc.
+
+## Example
+
+```tsx
+import { useFunnel } from '@use-funnel/react-router-dom';
+
+export function App() {
+  const funnel = useFunnel<{
+    Step1: { message?: string; flag?: boolean };
+    Step2: { message: string; flag?: boolean };
+    Step3: { message: string; flag: boolean };
+  }>({
+    id: 'hello-world',
+    initial: {
+      step: 'Step1',
+      context: {},
+    },
+  });
+  return (
+    <funnel.Render
+      Step1={({ history }) => <Step1 onNext={(message) => history.push('Step2', { message })} />}
+      Step2={({ context, history }) => (
+        <Step2 message={context.message} onNext={(flag) => history.push('Step3', { flag })} />
+      )}
+      Step3={({ context }) => <Step3 message={context.message} flag={context.flag} />}
+    />
+  );
+}
+
+declare function Step1(props: { onNext: (message: string) => void }): React.ReactNode;
+declare function Step2(props: { message: string; onNext: (flag: boolean) => void }): React.ReactNode;
+declare function Step3(props: { message: string; flag: boolean }): React.ReactNode;
+```
 
 ## Visit [use-funnel.slash.page](https://use-funnel.slash.page) for docs, guides, API and more!
 
