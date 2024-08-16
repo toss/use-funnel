@@ -31,7 +31,14 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toss/use-funnel.git",
+    "directory": "packages/core"
+  },
+  "license": "MIT",
+  "homepage": "https://use-funnel.slash.page/",
+  "bugs": "https://github.com/toss/use-funnel/issues",
   "devDependencies": {
     "@testing-library/react": "^15.0.7",
     "@testing-library/user-event": "^14.5.2",

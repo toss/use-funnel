@@ -30,11 +30,18 @@ to: packages/<%= name %>/package.json
     "build": "rimraf dist && concurrently \"pnpm:build:*\"",
     "build:dist": "tsup",
     "build:types": "tsc -p tsconfig.build.json --emitDeclarationOnly",
-    "prepublish": "pnpm test && pnpm build",
+    "prepublish": "pnpm test && pnpm build"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toss/use-funnel.git",
+    "directory": "packages/<%= name %>"
+  },
+  "license": "MIT",
+  "homepage": "https://use-funnel.slash.page/",
+  "bugs": "https://github.com/toss/use-funnel/issues",
   "dependencies": {
     "@use-funnel/core": "workspace:^"
   },

@@ -32,7 +32,14 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/toss/use-funnel.git",
+    "directory": "packages/next"
+  },
+  "license": "MIT",
+  "homepage": "https://use-funnel.slash.page/",
+  "bugs": "https://github.com/toss/use-funnel/issues",
   "dependencies": {
     "@use-funnel/core": "workspace:^"
   },
