@@ -85,8 +85,6 @@ if (funnel.step === "A") {
 }
 ```
 
-{/* 이 코드에서 에러가 발생하는 이유는 빈 객체 `{}`를 사용해서 `B` <Keyword>step</Keyword>으로 전환하려고 시도하기 때문이에요. B <Keyword>step</Keyword>의 타입 정의에 따르면, `b`는 필수로 값이 필요한 프로퍼티에요. 빈 객체는 이러한 타입 정의와 다르기 때문에 에러가 발생합니다.
- */}
 The error occurs because you are trying to transition to the `B` step using an empty object `{}`. According to the type definition of the `B` step, `b` is a required property. Since an empty object does not match this type definition, an error occurs.
 
 To resolve the error, you need to provide the required property `b` value when transitioning to the `B` step. For example, you can modify the code as follows:

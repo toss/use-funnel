@@ -1,6 +1,6 @@
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 /**
- * TBase에서 TResult로 변환할때, 필수로 필요한 키들을 추출한다.
+ * Extracts the keys that are required when converting from TBase to TResult.
  * @example RequiredCompareKeys<{a: string, b?: string}, {a: string, b: string}> // 'b'
  */
 export type RequiredCompareKeys<TBase, TResult> = {
@@ -18,7 +18,7 @@ export type RequiredCompareKeys<TBase, TResult> = {
 }[keyof TBase | keyof TResult];
 
 /**
- * TBase에서 TResult로 변환할때, 선택적으로 필요한 키들을 추출한다.
+ * Extracts the keys that are optional when converting from TBase to TResult.
  * @example OptionalCompareKeys<{a: string, b?: string}, {a: string, b: string}> // 'a'
  */
 type OptionalCompareKeys<TBase, TResult> = {
@@ -36,8 +36,8 @@ type OptionalCompareKeys<TBase, TResult> = {
 }[keyof TBase | keyof TResult];
 
 /**
- * TBase와 TResult를 비교하여, 필수로 필요한 키들은 TResult의 값을 사용하고,
- * 선택적으로 필요한 키들은 TBase의 값을 사용하여 새로운 객체를 만든다.
+ * Compares TBase with TResult to create a new object that uses TResult's values for required keys,
+ * and TBase's values for optional keys.
  */
 export type CompareMergeContext<TBase, TResult> = Prettify<
   {
