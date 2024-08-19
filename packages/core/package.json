@@ -1,7 +1,7 @@
 {
   "name": "@use-funnel/core",
   "version": "0.0.2",
-  "description": "",
+  "description": "A powerful and safe step-by-step state management library",
   "type": "module",
   "main": "./src/index.ts",
   "publishConfig": {
@@ -30,7 +30,7 @@
     "prepublish": "pnpm test && pnpm build"
   },
   "keywords": [],
-  "author": "",
+  "author": "Minu Kang <minukang@toss.im> & Sunyoung Kwon <line0@toss.im>",
   "repository": {
     "type": "git",
     "url": "https://github.com/toss/use-funnel.git",
