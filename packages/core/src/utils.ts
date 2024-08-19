@@ -7,7 +7,7 @@ interface Store<T> {
 }
 
 /**
- * 훅 내부에서 컴포넌트를 만들 때 훅의 상태를 해당 컴포넌트에 전달하고 싶을 때 사용하는 훅
+ * A hook used to pass the state of the hook to a component when creating the component inside the hook.
  */
 export function useStateSubscriberStore<T>(state: T) {
   const stateRef = useRef(state);

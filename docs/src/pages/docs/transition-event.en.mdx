@@ -20,12 +20,12 @@ const funnel = useFunnel(/* ... */);
       // Email input success event
       EmailInputSuccess: (email: string, { history }) => {
         // Transition to the password input step
-        history.push('비밀번호입력', { email });
+        history.push('PasswordInput', { email });
       },
-      // 이메일 입력 Fail 이벤트
+      // Email input fail event
       EmailInputFail: (error: Error, { history }) => {
         // Transition to the error page
-        history.push('에러페이지', { error: error.message });
+        history.push('ErrorPage', { error: error.message });
       }
     },
     render({ context, dispatch }) {
