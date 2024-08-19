@@ -77,9 +77,9 @@ type UseFunnelResults<T> = {
 퍼널의 이동을 관리하는 객체에요. 퍼널의 단계 전환을 처리하는 여러 메서드를 포함하고 있어요.
 
 ```tsx
-interface FunnelHistory<T> {
-  push: <TStep extends keyof T>(step: TStep, context: T[TStep]) => Promise<void> | void;
-  replace: <TStep extends keyof T>(step: TStep, context: T[TStep]) => Promise<void> | void;
+interface FunnelHistory<TContextMap, TCurrentStep extends keyof TContextMap> {
+  push: <TTargetStep extends keyof TContextMap>(step: TTargetStep, context: TContextMap[TTargetStep] | ((prev: TContextMap<TCurrentStep>) => T[TTargetStep])) => Promise<void> | void;
+  replace: <TTargetStep extends keyof TContextMap>(step: TTargetStep, context: TContextMap[TTargetStep] | ((prev: TContextMap<TCurrentStep>) => T[TTargetStep])) => Promise<void> | void;
   go: (index: number) => void | Promise<void>;
   back: () => void | Promise<void>;
 }
@@ -87,10 +87,10 @@ interface FunnelHistory<T> {
 
 - `push` (`function`): 새로운 단계로 이동해요. 이전 단계의 히스토리를 남겨요.
   - `step` (`string`): 이동할 단계의 이름이에요.
-  - `context` (`object`): 이동할 단계의 상태를 나타내는 객체에요.
+  - `context` (`object` | `function`): 이동할 단계의 상태를 나타내는 객체에요. 혹은 현재 단계 상태를 이용해서 다음 단계 상태를 만드는 함수를 넣을 수 있어요.
 - `replace` (`function`): 새로운 단계로 이동해요. 이전 단계의 히스토리를 남기지 않아요.
   - `step` (`string`): 이동할 단계의 이름입니다.
-  - `context` (`object`): 이동할 단계의 상태를 나타내는 객체입니다.
+  - `context` (`object` | `function`): 이동할 단계의 상태를 나타내는 객체입니다. 혹은 현재 단계 상태를 이용해서 다음 단계 상태를 만드는 함수를 넣을 수 있어요.
 - `go` (`function`): 현재 인덱스 기준으로 지정된 단계로 이동해요.
   - `index` (`number`): 이동하려는 단계의 인덱스에요. 현재 단계로부터의 **상대적인 위치**를 나타내요.
 - `back` (`function`): 이전 단계로 이동해요.

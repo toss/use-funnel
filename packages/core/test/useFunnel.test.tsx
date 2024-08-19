@@ -135,8 +135,8 @@ describe('Test useFunnel()', () => {
           <funnel.Render
             A={funnel.Render.with({
               events: {
-                GoB: (payload: { id: string }, { history }) => {
-                  history.push('B', { id: payload.id });
+                GoB: ({ id }: { id: string }, { history }) => {
+                  history.push('B', (prev) => ({ ...prev, id }));
                 },
               },
               render({ dispatch }) {

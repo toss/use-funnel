@@ -26,35 +26,81 @@ Supports browser history, react-router-dom, next.js, @react-navigation/native, a
 
 ## Example
 
+
+https://github.com/user-attachments/assets/8300d4ed-ab02-436e-a5a6-99c8d732e32f
+
+
 ```tsx
 import { useFunnel } from '@use-funnel/react-router-dom';
 
 export function App() {
   const funnel = useFunnel<{
-    Step1: { message?: string; flag?: boolean };
-    Step2: { message: string; flag?: boolean };
-    Step3: { message: string; flag: boolean };
+    SelectJob: { jobType?: 'STUDENT' | 'EMPLOYEE' };
+    SelectSchool: { jobType: 'STUDENT'; school?: string };
+    SelectEmployee: { jobType: 'EMPLOYEE'; company?: string };
+    EnterJoinDate: { jobType: 'STUDENT'; school: string } | { jobType: 'EMPLOYEE'; company: string };
+    Confirm: ({ jobType: 'STUDENT'; school: string } | { jobType: 'EMPLOYEE'; company: string }) & { joinDate: string };
   }>({
     id: 'hello-world',
     initial: {
-      step: 'Step1',
+      step: 'SelectJob',
       context: {},
     },
   });
   return (
     <funnel.Render
-      Step1={({ history }) => <Step1 onNext={(message) => history.push('Step2', { message })} />}
-      Step2={({ context, history }) => (
-        <Step2 message={context.message} onNext={(flag) => history.push('Step3', { flag })} />
+      SelectJob={funnel.Render.with({
+        events: {
+          selectSchool: (_, { history }) => history.push('SelectSchool', { jobType: 'STUDENT' }),
+          selectEmployee: (_, { history }) => history.push('SelectEmployee', { jobType: 'EMPLOYEE' }),
+        },
+        render({ dispatch }) {
+          return (
+            <SelectJob
+              onSelectSchool={() => dispatch('selectSchool')}
+              onSelectEmployee={() => dispatch('selectEmployee')}
+            />
+          );
+        },
+      })}
+      SelectSchool={({ history }) => <SelectSchool onNext={(school) => history.push('EnterJoinDate', { school })} />}
+      SelectEmployee={({ history }) => (
+        <SelectEmployee
+          onNext={(company) =>
+            history.push('EnterJoinDate', (prev) => ({
+              ...prev,
+              company,
+            }))
+          }
+        />
       )}
-      Step3={({ context }) => <Step3 message={context.message} flag={context.flag} />}
+      EnterJoinDate={funnel.Render.overlay({
+        render({ history, close }) {
+          return (
+            <EnterJoinDateBottomSheet
+              onNext={(joinDate) => history.push('Confirm', { joinDate })}
+              onClose={() => close()}
+            />
+          );
+        },
+      })}
+      Confirm={({ context }) =>
+        context.jobType === 'STUDENT' ? (
+          <ConfirmStudent school={context.school} joinDate={context.joinDate} />
+        ) : (
+          <ConfirmEmployee company={context.company} joinDate={context.joinDate} />
+        )
+      }
     />
   );
 }
 
-declare function Step1(props: { onNext: (message: string) => void }): React.ReactNode;
-declare function Step2(props: { message: string; onNext: (flag: boolean) => void }): React.ReactNode;
-declare function Step3(props: { message: string; flag: boolean }): React.ReactNode;
+declare function SelectJob(props: { onSelectSchool(): void; onSelectEmployee(): void }): JSX.Element;
+declare function SelectSchool(props: { onNext(school: string): void }): JSX.Element;
+declare function SelectEmployee(props: { onNext(company: string): void }): JSX.Element;
+declare function EnterJoinDateBottomSheet(props: { onNext(joinDate: string): void; onClose(): void }): JSX.Element;
+declare function ConfirmStudent(props: { school: string; joinDate: string }): JSX.Element;
+declare function ConfirmEmployee(props: { company: string; joinDate: string }): JSX.Element;
 ```
 
 ## Visit [use-funnel.slash.page](https://use-funnel.slash.page) for docs, guides, API and more!

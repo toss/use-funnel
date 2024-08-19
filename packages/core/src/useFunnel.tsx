@@ -71,11 +71,14 @@ export function createUseFunnel(useFunnelRouter: FunnelRouter): UseFunnel {
     );
 
     const history: FunnelHistory<TStepContextMap, keyof TStepContextMap & string> = useMemo(() => {
-      const transition = (step: keyof TStepContextMap, assignContext?: object) => {
-        const newContext = {
-          ...currentStateRef.current.context,
-          ...assignContext,
-        };
+      const transition = (step: keyof TStepContextMap, assignContext?: object | ((prev: object) => object)) => {
+        const newContext =
+          typeof assignContext === 'function'
+            ? assignContext(currentStateRef.current.context)
+            : {
+                ...currentStateRef.current.context,
+                ...assignContext,
+              };
         const context = parseStepContext(step, newContext);
         return context == null
           ? optionsRef.current.initial
@@ -100,7 +103,7 @@ export function createUseFunnel(useFunnelRouter: FunnelRouter): UseFunnel {
         go: router.go,
         back: () => router.go(-1),
       };
-    }, [router.replace, router.push, router.go, optionsRef]);
+    }, [router.replace, router.push, router.go, optionsRef, parseStepContext]);
 
     const step = useMemo(() => {
       const validContext = parseStepContext(currentState.step, currentState.context);
@@ -115,7 +118,7 @@ export function createUseFunnel(useFunnelRouter: FunnelRouter): UseFunnel {
         index: router.currentIndex,
         historySteps: router.history,
       };
-    }, [currentState, history, router.history, router.currentIndex]);
+    }, [currentState, history, router.history, router.currentIndex, parseStepContext]);
 
     const currentStepStoreRef = useStateSubscriberStore(step);
 

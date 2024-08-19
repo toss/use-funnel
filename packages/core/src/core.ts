@@ -23,10 +23,16 @@ type TransitionFnArguments<TName extends PropertyKey, TContext> =
 type TransitionFn<TState extends AnyFunnelState, TNextState extends AnyFunnelState> = <
   TName extends TNextState['step'],
 >(
-  ...args: TransitionFnArguments<
-    TName,
-    CompareMergeContext<TState['context'], GetFunnelStateByName<TNextState, TName>['context']>
-  >
+  ...args:
+    | TransitionFnArguments<
+        TName,
+        CompareMergeContext<TState['context'], GetFunnelStateByName<TNextState, TName>['context']>
+      >
+    | [
+        target: TName,
+        callback: (prev: TState['context']) => GetFunnelStateByName<TNextState, TName>['context'],
+        option?: FunnelRouterTransitionOption,
+      ]
 ) => Promise<GetFunnelStateByName<TNextState, TName>>;
 
 export type FunnelStateByContextMap<TStepContextMap extends AnyStepContextMap> = {
