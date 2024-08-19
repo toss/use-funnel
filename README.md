@@ -14,15 +14,15 @@
 
 ### Strong Type Support
 
-By comparing the type of the current step with the type of the next step, you can safely manage only the necessary states.
+By comparing the type of the current step with the next, you can ensure that only the required states are managed safely.
 
 ### State Management by History
 
-Manage states by history, so you can easily manage back and forth.
+Manage states based on history, making it easy to handle backward and forward navigation.
 
 ### Various Router Support
 
-Supports browser history, react-router-dom, next.js, @react-navigation/native, etc.
+Supports browser history, react-router-dom, next.js, @react-navigation/native, and more.
 
 ## Example
 

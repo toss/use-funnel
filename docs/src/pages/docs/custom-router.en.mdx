@@ -1,0 +1,110 @@
+# Creating a Custom Router
+
+`@use-funnel` stores state snapshots of each funnel step in an array, enabling stable backward and forward navigation. Here’s how to create a custom router without relying on the built-in functions provided by router packages.
+
+First, install the `@use-funnel/core` package
+
+```shell npm2yarn
+npm install @use-funnel/core --save
+```
+
+Here’s an example of implementing a funnel using only [`useState`](https://react.dev/reference/react/useState), without a router.
+
+```tsx filename="src/hooks/useFunnel.ts"
+import { useMemo, useState } from 'react';
+import { createUseFunnel } from '@use-funnel/core';
+
+// Define the useFunnel hook using the createUseFunnel function.
+export const useFunnel = createUseFunnel(({ id, initialState }) => {
+  // history manages the array of state snapshots for the funnel.
+  const [history, setHistory] = useState(() => [initialState]);
+  // currentIndex manages the index of the current funnel step.
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  return useMemo(
+    () => ({
+      // Returns the history and currentIndex, representing the current state of the funnel.
+      history,
+      currentIndex,
+      // push function adds a new state and updates the current index.
+      push(state) {
+        setHistory((prev) => {
+          const next = prev.slice(0, currentIndex + 1);
+          return [...next, state];
+        });
+        setCurrentIndex((prev) => prev + 1);
+      },
+      // replace function replaces the current state and updates the state snapshot.
+      replace(state) {
+        setHistory((prev) => {
+          const next = prev.slice(0, currentIndex);
+          return [...next, state];
+        });
+      },
+      // go function moves the current index by delta.
+      go(delta) {
+        setCurrentIndex((prev) => prev + delta);
+      },
+    }),
+    [history, currentIndex] // Returns memoized values whenever history and currentIndex change.
+  );
+});
+```
+
+The above code example uses `useState` to manage the funnel’s state. The `createUseFunnel` function creates a hook that manages the array of state snapshots (`history`) and the current index (`currentIndex`).
+
+- `push(state)`: Adds a new state and updates the current index.
+- `replace(state)`: Overwrites the current state with a new state and updates the state snapshot.
+- `go(delta)`: Moves the current index by `delta`.
+
+Next, let's look at the `CreateUseFunnelOptions<T>` interface for the options object passed to `createUseFunnel()`.
+
+```tsx
+interface CreateUseFunnelOptions<T> {
+  /**
+   * A unique identifier for the funnel. This distinguishes global state when there are multiple funnels on one page.
+   */
+  id: string;
+  /**
+   * The initial state of the funnel passed as `initial` in `useFunnel()`. This state is used at the entry of the funnel.
+   */
+  initialState: FunnelState<T>;
+}
+
+/**
+ * An interface representing the state of the funnel. `step` indicates the name of the funnel step, and `context` represents the state required for that step.
+ */
+interface FunnelState<T> {
+  step: string;
+  context: T;
+}
+```
+
+Finally, let’s examine the `CreateUseFunnelResult<T>` interface, which that describes the result returned by `createUseFunnel()`. This interface includes methods for managing funnel state and transitions.
+
+```tsx
+interface CreateUseFunnelResult<T> {
+  /**
+   * An array of state snapshots of the funnel. It holds the routing history accumulated after entering the funnel.
+   */
+  history: FunnelState<T>[];
+  /**
+   * The index of the current funnel step in progress.
+   */
+  currentIndex: number;
+  /**
+   * Implements the action of adding a new state to the current `history` and moving to the next funnel step.
+   */
+  push(state: FunnelState<T>): void | Promise<void>;
+  /**
+   * Implements the action of overwriting the current `history` with a new state and moving to the next funnel step.
+   */
+  replace(state: FunnelState<T>): void | Promise<void>;
+  /**
+   * Implements the action of moving by `delta` in the `history` array.
+   */
+  go(delta: number): void or Promise<void>;
+}
+```
+
+This interface includes various methods to manage the funnel state and handle step transitions, ensuring robust state management for your funnel.

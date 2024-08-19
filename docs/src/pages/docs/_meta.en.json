@@ -1,0 +1,29 @@
+{
+  "--- introduction": {
+    "type": "separator",
+    "title": "Introduction"
+  },
+  "overview": "Overview",
+  "features": "Main Features",
+  "--- Guide": {
+    "type": "separator",
+    "title": "Guide"
+  },
+  "install": "Installation",
+  "get-started": "Getting Started",
+  "--- Reference": {
+    "type": "separator",
+    "title": "Reference"
+  },
+  "use-funnel": "useFunnel()",
+  "funnel-render": "funnel.Render Component",
+  "--- Advanced": {
+    "type": "separator",
+    "title": "Advanced"
+  },
+  "context-guide": "Step-by-Step Definition of context",
+  "sub-funnel": "Creating a Funnel within a Funnel",
+  "custom-router": "Creating a Custom Router",
+  "transition-event": "Define Transition Events",
+  "overlay": "Using Overlay"
+}

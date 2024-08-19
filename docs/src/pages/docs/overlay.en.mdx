@@ -1,0 +1,204 @@
+import { Callout } from 'nextra/components'
+import { Sandpack } from '@/components'
+
+# Using Overlay
+
+<div className="float-right ml-6 my-6 w-[275px] max-w-[40%]">
+![Overlay example](/overlay.png)
+</div>
+
+The overlay is used to display UI such as modals, bottom sheets, and similar components. while maintaining the previous step as shown in the image on the right.
+
+In the following example, when moving from the "School Input" step to the "Start Date Input" step, an overlay is used. When the `<StartDateInputBottomSheet />` component is rendered, the UI of the previous step `<SchoolInput />` is remains visible.
+
+```tsx {7}
+<funnel.Render
+  SchoolInput={({ history }) => (
+    <SchoolInput
+      onNext={(school) => history.push('StartDateInput', { school })}
+    />
+  )}
+  StartDateInput={funnel.Render.overlay({
+    render({ history, close }) {
+      return (
+        <StartDateInputBottomSheet
+          onNext={(startDate) => history.push('NextStep', { startDate })}
+          onClose={() => close()}
+        />
+      );
+    }
+  })}
+/>
+```
+
+<div className="clear-both" />
+
+<Callout type="warning">
+**Note:** If the overlay is closed by an interaction other than the router's back button, you need to explicitly execute `close()` in the `render()` argument. Executing `close()` will navigate to the previous step through the history.
+</Callout>
+
+## Example
+
+<Sandpack dependencies={{ "overlay-kit": "1.3.0" }}>
+
+```tsx Example.tsx active
+import { useFunnel } from "@use-funnel/react-router-dom";
+import { OverlayProvider } from "overlay-kit";
+
+import { SchoolInput } from "./SchoolInput";
+import { StartDateInputBottomSheet } from "./StartDateInputBottomSheet";
+
+export const Example = () => {
+  const funnel = useFunnel<{
+    SchoolInput: { school?: string };
+    StartDateInput: { school: string; startDate?: string };
+    NextStep: { school: string; startDate: string };
+  }>({
+    id: "overlay-example",
+    initial: {
+      step: "SchoolInput",
+      context: {},
+    },
+  });
+
+  return (
+    <OverlayProvider>
+      <funnel.Render
+        SchoolInput={({ history }) => (
+          <SchoolInput
+            onNext={(school) => history.push('StartDateInput', { school })}
+          />
+        )}
+        StartDateInput={funnel.Render.overlay({
+          render({ history, close }) {
+            return (
+              <StartDateInputBottomSheet
+                onNext={(startDate) => history.push('NextStep', { startDate })}
+                onClose={() => close()}
+              />
+            );
+          }
+        })}
+      />
+    </OverlayProvider>
+  );
+};
+```
+
+
+```tsx SchoolInput.tsx
+import { useState } from "react";
+import { RadioGroup, Button, Heading } from "@radix-ui/themes";
+
+interface Props {
+  onNext: (school: string) => void;
+}
+
+export function SchoolInput({ onNext }: Props) {
+  const [school, setSchool] = useState("A")
+  return (
+    <div>
+      <Heading as="h1" mb="2">Select your school</Heading>
+      <RadioGroup.Root value={school} onValueChange={setSchool} name="example" mb="3">
+        <RadioGroup.Item value="A">A School</RadioGroup.Item>
+        <RadioGroup.Item value="B">B School</RadioGroup.Item>
+        <RadioGroup.Item value="C">C School</RadioGroup.Item>
+      </RadioGroup.Root>
+      <Button onClick={() => onNext(school)}>Next</Button>
+    </div>
+  )
+};
+```
+
+```tsx StartDateInputBottomSheet.tsx
+import { useEffect, useRef } from "react";
+import { overlay } from "overlay-kit";
+import { Dialog, Flex, TextField, Text, Button } from "@radix-ui/themes";
+
+interface Props {
+  onNext: (startDate: string) => void;
+  onClose: () => void;
+}
+
+export function StartDateInputBottomSheet({ onNext, onClose }: Props) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const overlayId = overlay.open(({ isOpen, close }) => (
+      <Dialog.Root open={isOpen} onOpenChange={() => {
+        onClose()
+        close()
+      }}>
+        <Dialog.Content maxWidth="450px">
+          <Dialog.Title>Enter your start date</Dialog.Title>
+          <Flex direction="column" gap="3">
+            <label>
+              <Text as="div" size="2" mb="1" weight="bold">
+                Start date
+              </Text>
+              <TextField.Root
+                ref={inputRef}
+                placeholder="YYYY-MM-DD"
+              />
+            </label>
+          </Flex>
+          <Flex gap="3" mt="4" justify="end">
+            <Dialog.Close>
+              <Button variant="soft" color="gray">
+                Cancel
+              </Button>
+            </Dialog.Close>
+            <Button
+              onClick={() => {
+                onNext(inputRef.current!.value);
+              }}
+            >
+              Save
+            </Button>
+          </Flex>
+        </Dialog.Content>
+      </Dialog.Root>
+    ));
+    return () => {
+      overlay.unmount(overlayId);
+    }
+  }, []);
+  return null;
+};
+
+```
+
+</Sandpack>
+
+<Callout>
+**Note:** The `overlay-kit` library is used in the example above. You can use any overlay library you prefer.
+</Callout>
+
+## Overlay with event example
+
+To define an overlay along with [transition events](/docs/transition-event), use the `events` property.
+
+In the following example, the "Email Input" step uses transition events and an overlay together. Define the "Email Input Complete" and "Email Input Fail" events, and trigger the transition to the next step for each event.
+
+```tsx
+<funnel.Render
+  EmailInput={funnel.Render.overlay({
+    events: {
+      EmailInputComplete: (email: string, { history }) => history.push('PasswordInput', { email }),
+      EmailInputFail: (error: Error, { history }) => history.push('ErrorPage', { error: error.message })
+    },
+    render({ context, dispatch }) {
+      return (
+        <EmailInput
+          email={context.email}
+          onNext={(email) => dispatch('EmailInputComplete', email)}
+          onError={(error) => dispatch('EmailInputFail', error)}
+        />
+      );
+    }
+  })}
+/>
+```
+
+<Callout type="warning">
+You cannot use `history` in the rendering function when defining events. Instead, you should trigger the events defined in the `events` object using `dispatch()`.
+</Callout>

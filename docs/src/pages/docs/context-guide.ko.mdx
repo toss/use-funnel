@@ -48,7 +48,7 @@ function MyFunnelApp() {
 [`useFunnel(){:tsx}`](./use-funnel) 의 [`FunnelStepOption`](./use-funnel#funnelstepoption)을 통해 <Keyword>step</Keyword> 을 정의할 수 있어요. `guard()` 혹은 `parse()` 를 통해 <Keyword>context</Keyword> 를 정의해요.
 
 <UseFunnelCodeBlock>
-```tsx {27-31}
+```tsx {9-26,35-39}
 import { useFunnel } from "@use-funnel/next";
 
 type FormState = {
@@ -79,15 +79,15 @@ function 그외정보입력_parse (data: unknown): FormState & { password: strin
 function MyFunnelApp() {
   const funnel = useFunnel({
     id: "step-by-step",
-    steps: {
-      이메일입력: { guard: 이메일입력_guard },
-      비밀번호입력: { parse: 비밀번호입력_parse },
-      그외정보입력: { guard: 그외정보입력_parse },
-    },
     initial: {
       step: "이메일입력",
       context: {}
-    }
+    },
+    steps: {
+      이메일입력: { guard: 이메일입력_guard },
+      비밀번호입력: { parse: 비밀번호입력_parse },
+      그외정보입력: { parse: 그외정보입력_parse },
+    },
   })
 
   funnel.step === '이메일입력' && typeof funnel.context.email // "string" | "undefined"
@@ -128,7 +128,7 @@ declare function createFunnelSteps<FormState>(): {
 
 
 <UseFunnelCodeBlock>
-```tsx {3-13}
+```tsx {3-13, 22}
 import { createFunnelSteps, useFunnel } from "@use-funnel/next";
 
 type FormState = {
@@ -255,6 +255,5 @@ function MyFunnelApp() {
 
 <Callout type="info">
 **런타임 밸리데이터 패키지(Runtime Validator Packages)란?**
-
 런타임 밸리데이터 패키지는 런타임에 데이터의 유효성을 검사하는 도구에요. 이 패키지들은 주로 데이터의 형식 검증, 데이터 파싱, 타입 안전성 확보 등을 목적으로 사용해요. 개발자가 정의한 스키마(schema)에 따라 데이터를 검증하고, 오류가 있다면 알려줘요. 이러한 패키지들은 주로 폼 입력 검증, API 응답 검증 등 다양한 상황에서 사용해요.
 </Callout>

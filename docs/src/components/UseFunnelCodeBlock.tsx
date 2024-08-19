@@ -1,14 +1,31 @@
 import { Tabs } from 'nextra/components';
 import { useEffect, useRef } from 'react';
 
-export const useFunnelPackages = ['next', 'react-router-dom', 'react-navigation-native', 'browser'];
+export const useFunnelPackages = [
+  {
+    packageName: 'next',
+    packageTitle: 'Next.js page router',
+  },
+  {
+    packageName: 'react-router-dom',
+    packageTitle: 'react-router-dom',
+  },
+  {
+    packageName: 'react-navigation-native',
+    packageTitle: '@react-navigation/native',
+  },
+  {
+    packageName: 'browser',
+    packageTitle: 'browser history api',
+  },
+];
 
 export function UseFunnelCodeBlock({ children }: React.PropsWithChildren<unknown>) {
   return (
-    <Tabs items={useFunnelPackages} storageKey="favorite-package">
+    <Tabs items={useFunnelPackages.map((p) => p.packageTitle)} storageKey="favorite-package">
       {useFunnelPackages.map((item) => (
-        <Tabs.Tab key={item}>
-          <UseFunnelImportReplace packageName={item}>{children}</UseFunnelImportReplace>
+        <Tabs.Tab key={item.packageTitle}>
+          <UseFunnelImportReplace packageName={item.packageName}>{children}</UseFunnelImportReplace>
         </Tabs.Tab>
       ))}
     </Tabs>
@@ -33,8 +50,8 @@ function UseFunnelImportReplace({
           const tokens = Array.from(line.querySelectorAll('[style*="token-string-expression"]'));
           tokens.forEach((token) => {
             for (const targetPackage of useFunnelPackages) {
-              if (token.textContent?.includes(targetPackage)) {
-                token.textContent = token.textContent.replace(targetPackage, packageName);
+              if (token.textContent?.includes(targetPackage.packageName)) {
+                token.textContent = token.textContent.replace(targetPackage.packageName, packageName);
               }
             }
           });

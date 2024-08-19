@@ -1,0 +1,74 @@
+import { Keyword } from '@/components'
+import { Callout } from 'nextra/components'
+
+# Define Transition Events
+
+Transition events allow you to define and control how the current step transitions to the next step based on specific conditions or user actions. They are useful when multiple paths are needed within a funnel. For example, when a user enters an email, you may need to handle the case where the input is successful differently from when it fails.
+
+Transition events are particularly useful when multiple paths are required within the current step. You can define multiple paths that can occur in the current step at once, enabling you to write more cohesive code.
+
+Here's an example of defining and using transition events.
+
+```tsx
+import { useFunnel } from "@use-funnel/next";
+
+const funnel = useFunnel(/* ... */);
+
+<funnel.Render
+  EmailInput={funnel.Render.with({
+    events: {
+      // Email input success event
+      EmailInputSuccess: (email: string, { history }) => {
+        // Transition to the password input step
+        history.push('비밀번호입력', { email });
+      },
+      // 이메일 입력 Fail 이벤트
+      EmailInputFail: (error: Error, { history }) => {
+        // Transition to the error page
+        history.push('에러페이지', { error: error.message });
+      }
+    },
+    render({ context, dispatch }) {
+      return (
+        <EmailInput
+          email={context.email}
+          // Dispatch EmailInputSuccess event when email input is successful
+          onNext={(email) => dispatch('EmailInputSuccess', email)}
+          // Dispatch EmailInputFail event when email input fails
+          onError={(error) => dispatch('EmailInputFail', error)}
+        />
+      );
+    }
+  })}
+/>
+```
+
+This example shows how to define and use transition events. Once the events for the email input step are defined, you can trigger the appropriate event using `dispatch()`.
+
+Here's the type definition for a rendering object that includes an event object.
+
+```ts
+interface FunnelRenderWithEvent<
+  TEvents extends {
+    [eventName: string]: (payload: any, context: FunnelRenderContext) => void
+  },
+  TEventDispatch extends {
+    [eventName in keyof TEvents]: (payload: Parameters<TEvents[eventName]>[0]) => void
+  }[keyof TEvents]
+> {
+  events: TEvents,
+  render: (props: { context: Context; dispatch: TEventDispatch }) => React.ReactNode
+}
+```
+
+- `events` (`object`, required): An object mapping event names to their respective handlers.
+  - `eventName` (`string`): The name of the event.
+  - `payload` (`any`): The data passed to the event handler.
+  - `context` (`object`): An object representing the state of the current step.
+- `render` (`function`): A function that returns a React node.
+  - `context` (`object`): An object representing the state of the current step.
+  - `dispatch` (`function`): A function that triggers the specified event.
+
+<Callout type="warning">
+You cannot use `history` in the rendering function when defining events. Instead, you should trigger the events defined in the `events` object using `dispatch()`.
+</Callout>

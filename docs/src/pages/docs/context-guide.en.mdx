@@ -1,0 +1,256 @@
+import { Tabs, Callout } from 'nextra/components'
+import { UseFunnelCodeBlock, Keyword } from '@/components'
+
+# Step-by-Step Definition of <Keyword>context</Keyword>
+
+In `@use-funnel`, you need to define the type of <Keyword>context</Keyword> required at each step (<Keyword>step</Keyword>). Let's look at different ways to define <Keyword>context</Keyword>.
+
+## Defining with generics
+
+Define the type of <Keyword>context</Keyword> required for each <Keyword>step</Keyword> as a generic, and pass the object type with <Keyword>step</Keyword> as the key and the type of <Keyword>context</Keyword> as the value to the generics of [`useFunnel()`](./use-funnel.mdx).
+
+<UseFunnelCodeBlock>
+```tsx {3-8,11-15}
+import { useFunnel } from "@use-funnel/next";
+
+// 1. Nothing entered
+type EmailInput = { email?: string; password?: string; other?: unknown }
+// 2. Email entered
+type PasswordInput = { email: string; password?: string; other?: unknown }
+// 3. Email and password entered
+type OtherInfoInput = { email: string; password: string; other?: unknown }
+
+function MyFunnelApp() {
+  const funnel = useFunnel<{
+    EmailInput: EmailInput;
+    PasswordInput: PasswordInput;
+    OtherInfoInput: OtherInfoInput;
+  }>({
+    id: "how-to-define-step-contexts",
+    initial: {
+      step: "EmailInput",
+      context: {}
+    }
+  });
+
+  funnel.step === 'EmailInput' && typeof funnel.context.email // "string" | "undefined"
+  funnel.step === 'PasswordInput' && typeof funnel.context.email // "string"
+
+  funnel.step === 'PasswordInput' && typeof funnel.context.password // "string" | "undefined"
+  funnel.step === 'OtherInfoInput' && typeof funnel.context.password // "string"
+  // ...
+}
+```
+</UseFunnelCodeBlock>
+
+## Defining with steps object
+
+You can define <Keyword>step</Keyword> through [`FunnelStepOption`](./use-funnel#funnelstepoption) of [`useFunnel()`](./use-funnel). Define <Keyword>context</Keyword> through `guard()` or `parse()`.
+
+<UseFunnelCodeBlock>
+```tsx {9-26,35-39}
+import { useFunnel } from "@use-funnel/next";
+
+type FormState = {
+  email?: string;
+  password?: string;
+  other?: unknown;
+}
+
+function EmailInput_guard (data: unknown): data is FormState {
+  return typeof data === 'object' && typeof data.email === 'string';
+}
+
+function PasswordInput_parse (data: unknown): FormState & { password: string } {
+  if (!(data != null && typeof data === 'object' && 'password' in data)) {
+    throw new Error('Invalid passwordInput data');
+  }
+  return data;
+}
+
+function OtherInfoInput_parse (data: unknown): FormState & { password: string; other: unknown } {
+  const parseData = PasswordInput_parse(data);
+  if (!('other' in data)) {
+    throw new Error('Invalid otherInfoInput data');
+  }
+  return parseData;
+}
+
+function MyFunnelApp() {
+  const funnel = useFunnel<FormState>({
+    id: "how-to-define-step-contexts",
+    initial: {
+      step: "EmailInput",
+      context: {}
+    },
+    steps: {
+      EmailInput: { guard: EmailInput_guard },
+      PasswordInput: { parse: PasswordInput_parse },
+      OtherInfoInput: { parse: OtherInfoInput_parse },
+    }
+  });
+
+  funnel.step === 'EmailInput' && typeof funnel.context.email // "string" | "undefined"
+  funnel.step === 'PasswordInput' && typeof funnel.context.email // "string"
+
+  funnel.step === 'PasswordInput' && typeof funnel.context.password // "string" | "undefined"
+  funnel.step === 'OtherInfoInput' && typeof funnel.context.password // "string"
+  // ...
+}
+```
+</UseFunnelCodeBlock>
+
+- `guard` (`function`, optional): A function that checks if the data is of the context type of that step.
+- `parse` (`function`, optional): A function that converts data to the context type of that step.
+
+<Callout>
+  If both are defined, `guard()` is executed first.
+</Callout>
+
+### `createFunnelSteps()` to define
+
+You can create a <Keyword>step</Keyword> that changes a specific key of the initial <Keyword>context</Keyword> from optional to required when transitioning to the next <Keyword>step</Keyword> simply.
+
+```tsx
+declare function createFunnelSteps<FormState>(): {
+  extends: (name: string | string[], options?: { requiredKeys: string | string[] }) => this;
+  build: () => Record<string, FunnelStepOption>;
+}
+```
+
+- `extends` (`function`): Extends a new funnel step.
+  - `name` (`string`): The name of the new funnel step.
+  - `options` (`object`, optional): Options for the new funnel step.
+    - `requiredKeys` (`string`): The key to be required in the initial context.
+
+- `build` (`function`): Builds the funnel steps.
+  - Returns (`Record<string, FunnelStepOption>`): An object with the step name as the key and the options of each step as the value.
+
+<UseFunnelCodeBlock>
+```tsx {3-13, 22}
+import { createFunnelSteps, useFunnel } from "@use-funnel/next";
+
+type FormState = {
+  email?: string;
+  password?: string;
+  other?: unknown;
+}
+
+const steps = createFunnelSteps<FormState>()
+  .extends('EmailInput')
+  .extends('PasswordInput', { requiredKeys: 'email' })
+  .extends('OtherInfoInput', { requiredKeys: 'password' })
+  .build();
+
+function MyFunnelApp() {
+  const funnel = useFunnel({
+    id: "create-funnel-steps",
+    initial: {
+      step: "EmailInput",
+      context: {}
+    },
+    steps
+  });
+
+  funnel.step === 'EmailInput' && typeof funnel.context.email // "string" | "undefined"
+  funnel.step === 'PasswordInput' && typeof funnel.context.email // "string"
+
+  funnel.step === 'PasswordInput' && typeof funnel.context.password // "string" | "undefined"
+  funnel.step === 'OtherInfoInput' && typeof funnel.context.password // "string"
+  // ...
+}
+```
+</UseFunnelCodeBlock>
+
+## Using Runtime Validator Packages
+
+Use runtime validator packages to validate data and ensure type safety. Here are examples using `zod` and `superstruct`.
+
+<Tabs items={['zod', 'superstruct']}>
+<Tabs.Tab>
+```tsx
+import { z } from 'zod';
+
+const emailInputSchema = z.object({
+  email: z.string(),
+  password: z.string(),
+  other: z.unknown()
+}).partial();
+
+const passwordInputSchema = emailInputSchema.required({ email: true });
+const otherInfoInputSchema = passwordInputSchema.required({ password: true });
+
+function MyFunnelApp() {
+  const funnel = useFunnel({
+    id: "zod-example",
+    steps: {
+      EmailInput: { parse: emailInputSchema.parse },
+      PasswordInput: { parse: passwordInputSchema.parse },
+      OtherInfoInput: { parse: otherInfoInputSchema.parse },
+    },
+    initial: {
+      step: "EmailInput",
+      context: {}
+    }
+  });
+
+  funnel.step === 'EmailInput' && typeof funnel.context.email // "string" | "undefined"
+  funnel.step === 'PasswordInput' && typeof funnel.context.email // "string"
+
+  funnel.step === 'PasswordInput' && typeof funnel.context.password // "string" | "undefined"
+  funnel.step === 'OtherInfoInput' && typeof funnel.context.password // "string"
+  // ...
+}
+```
+</Tabs.Tab>
+<Tabs.Tab>
+```tsx
+import { partial, object, string, unknown, assign, omit, pick, create } from 'superstruct';
+
+const schema = object({
+  email: string(),
+  password: string(),
+  other: unknown()
+})
+
+const emailInputSchema = partial(schema);
+
+const passwordInputSchema = assign(
+  omit(emailInputSchema, ['email']),
+  pick(schema, ['email'])
+);
+
+const otherInfoInputSchema = assign(
+  omit(passwordInputSchema, ['password']),
+  pick(schema, ['password'])
+);
+
+function MyFunnelApp() {
+  const funnel = useFunnel({
+    id: "superstruct-example",
+    steps: {
+      EmailInput: { parse: (data) => create(data, emailInputSchema) }
+      PasswordInput: { parse: (data) => create(data, passwordInputSchema) },
+      OtherInfoInput: { parse: (data) => create(data, otherInfoInputSchema) },
+    },
+    initial: {
+      step: "EmailInput",
+      context: {}
+    }
+  });
+
+  funnel.step === 'EmailInput' && typeof funnel.context.email // "string" | "undefined"
+  funnel.step === 'PasswordInput' && typeof funnel.context.email // "string"
+
+  funnel.step === 'PasswordInput' && typeof funnel.context.password // "string" | "undefined"
+  funnel.step === 'OtherInfoInput' && typeof funnel.context.password // "string"
+  // ...
+}
+```
+</Tabs.Tab>
+</Tabs>
+
+<Callout type="info">
+**Runtime Validator Packages?**
+These packages validate data and ensure type safety at runtime. They are used for form input validation, API response validation, etc.
+</Callout>

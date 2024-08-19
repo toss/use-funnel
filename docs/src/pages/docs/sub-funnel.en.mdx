@@ -1,0 +1,122 @@
+import { UseFunnelCodeBlock, Keyword, Sandpack } from '@/components'
+
+# Creating a Funnel within a Funnel
+
+When developing a funnel, you may need to go through multiple steps to achieve a particular state. Alternatively, you might need to reuse a portion of the funnel steps in another context. In these situations, dividing the funnel into sub-funnels can be an efficient approach. The flowchart would looks like this:
+
+```mermaid
+%%{init: { 'logLevel': 'debug', 'theme': 'base', 'gitGraph': {'showBranches': true, 'showCommitLabel':true,'mainBranchName': 'main-funnel'}} }%%
+gitGraph
+  commit id: "A"
+  commit id: "B"
+  branch "b-funnel"
+  checkout "b-funnel"
+  commit id: "B-1"
+  commit id: "B-2"
+  commit id: "B-3"
+  checkout "main-funnel"
+  merge "b-funnel"
+  commit id: "C"
+```
+
+`@use-funnel` supports sub-funnels. You simply need to specify a different `id` when using [`useFunnel()`](./use-funnel.mdx) in the components with in a particular <Keyword>step</Keyword>.
+
+
+<div className='h-8' />
+<Sandpack>
+
+```tsx Example.tsx active
+import { useFunnel } from "@use-funnel/react-router-dom";
+
+import { BFunnel } from "./BFunnel";
+
+export function Example() {
+  const funnel = useFunnel<{
+    A: { a?: string; b?: string; };
+    B: { a: string; b?: string; };
+    C: { a: string; b: string; };
+  }>({
+    id: "main-funnel",
+    initial: {
+      step: "A",
+      context: {}
+    }
+  });
+  return (
+    <funnel.Render
+      A={({ history }) => (
+        <div>
+          <h1>A Step</h1>
+          <button onClick={() => history.push('B', { a: 'a' })}>Next</button>
+        </div>
+      )}
+      B={({ context, history }) => (
+        <div>
+          <h1>B Step</h1>
+          <BFunnel a={context.a} onNext={b => history.push('C', { b })} />
+        </div>
+      )}
+      C={({ context }) => (
+        <div>
+          <h1>C Step</h1>
+          <p>a: {context.a}</p>
+          <p>b: {context.b}</p>
+        </div>
+      )}
+    />
+  )
+}
+```
+
+```tsx BFunnel.tsx
+import { useFunnel } from "@use-funnel/react-router-dom";
+
+interface Props {
+  a: string;
+  onNext: (b: string) => void;
+}
+
+export function BFunnel({ a, onNext }: Props) {
+  const funnel = useFunnel<{
+    B1: { hello?: string; world?: string;};
+    B2: { hello: string; world?: string; };
+    B3: { hello: string; world: string; };
+  }>({
+    id: "b-funnel",
+    initial: {
+      step: "B1",
+      context: {}
+    }
+  });
+  return (
+    <funnel.Render
+      B1={({ history }) => (
+        <div>
+          <h2>B1 Step</h2>
+          <p>previous a value: {a}</p>
+          <button onClick={() => history.push('B2', { hello: 'Hello' })}>Next</button>
+        </div>
+      )}
+      B2={({ context, history }) => (
+        <div>
+          <h2>B2 Step</h2>
+          <p>previous a value: {a}</p>
+          <p>previous hello value: {context.hello}</p>
+          <button onClick={() => history.push('B3', { world: 'World' })}>Next</button>
+        </div>
+      )}
+      B3={({ context }) => (
+        <div>
+          <h2>B3 Step</h2>
+          <p>previous a value: {a}</p>
+          <p>previous hello value: {context.hello}</p>
+          <p>previous world value: {context.world}</p>
+          <button onClick={() => onNext(`${context.hello} ${context.world} from BFunnel`)}>Next</button>
+        </div>
+      )}
+    />
+  )
+}
+```
+
+</Sandpack>
