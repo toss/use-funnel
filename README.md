@@ -26,6 +26,10 @@ Supports browser history, react-router-dom, next.js, @react-navigation/native, a
 
 ## Example
 
+
+https://github.com/user-attachments/assets/8300d4ed-ab02-436e-a5a6-99c8d732e32f
+
+
 ```tsx
 import { useFunnel } from '@use-funnel/react-router-dom';
 
