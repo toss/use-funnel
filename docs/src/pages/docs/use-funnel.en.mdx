@@ -80,8 +80,8 @@ An object that manages the transitions of the funnel. It contains several method
 
 ```tsx
 interface FunnelHistory<T> {
-  push: <TStep extends keyof T>(step: TStep, context: T[TStep]) => Promise<void> | void;
-  replace: <TStep extends keyof T>(step: TStep, context: T[TStep]) => Promise<void> | void;
+  push: <TStep extends keyof T>(step: TStep, context: T[TStep] | SetStateAction<T[TStep]>) => Promise<void> | void;
+  replace: <TStep extends keyof T>(step: TStep, context: T[TStep] | SetStateAction<T[TStep]>) => Promise<void> | void;
   go: (index: number) => void | Promise<void>;
   back: () => void | Promise<void>;
 }
@@ -89,10 +89,10 @@ interface FunnelHistory<T> {
 
 - `push` (`function`): Adds a new state and moves to the next funnel step.
   - `step` (`string`): The name of the next step.
-  - `context` (`object`): An object representing the state of the next step.
+  - `context` (`object`): An object representing the state of the next step. You can also pass a function that uses the current step state to create the next step state.
 - `replace` (`function`): Replaces the current state with a new one and transitions to the next step.
   - `step` (`string`): The name of the next step.
-  - `context` (`object`): An object representing the state of the next step.
+  - `context` (`object`): An object representing the state of the next step. You can also pass a function that uses the current step state to create the next step state.
 - `go` (`function`): Moves to the step at the specified index in the `historySteps` array.
   - `index` (`number`): The index of the step to move to.
 - `back` (`function`): Moves to the previous step.
