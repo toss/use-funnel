@@ -3,7 +3,7 @@ import { Keyword, UseFunnelCodeBlock } from '@/components'
 
 # funnel.Render 컴포넌트
 
-`<funnel.Render />`는 퍼널의 각 <Keyword>step</Keyword>를 렌더링해요. 
+`<funnel.Render />`는 퍼널의 각 <Keyword>step</Keyword>을 렌더링해요. 
 
 [`useFunnel(){:tsx}`](./use-funnel)의 반환값인 [UseFunnelResults](/docs/use-funnel#usefunnelresults)에 포함되어 있어요.
 
@@ -31,12 +31,12 @@ interface FunnelRenderProps<T> {
 }
 ```
 
-- `context` (`object`): 현재 <Keyword>step</Keyword>의 상태를 나타내는 객체에요. 현재  <Keyword>step</Keyword>에서 필요한 데이터에 접근할 수 있어요.
-- `history` (`object`): 퍼널의 이동을 관리하는 객체에요. 다음  <Keyword>step</Keyword>로 이동하거나 이전  <Keyword>step</Keyword>로 돌아갈 때 사용해요. 자세한 내용은 [`FunnelHistory`](./use-funnel#funnelhistory)를 참고하세요.
+- `context` (`object`): 현재 <Keyword>step</Keyword>의 상태를 나타내는 객체에요. 현재 <Keyword>step</Keyword>에서 필요한 데이터에 접근할 수 있어요.
+- `history` (`object`): 퍼널의 이동을 관리하는 객체에요. 다음 <Keyword>step</Keyword>로 이동하거나 이전 <Keyword>step</Keyword>로 돌아갈 때 사용해요. 자세한 내용은 [`FunnelHistory`](./use-funnel#funnelhistory)를 참고하세요.
 
 ### 예시
 
-다음 예제에서는 각 <Keyword>step</Keyword>(이메일입력, 비밀번호입력, 그외정보입력)의 렌더링 로직을 정의하고, 각 단계에서 필요한 데이터를 전달합니다. `context` 로 해당 단계의 데이터를 받아올 수 있고, `history`로 다음 단계로 이동할 수 있습니다.
+다음 예제에서는 각 <Keyword>step</Keyword>(이메일입력, 비밀번호입력, 그외정보입력)의 렌더링 로직을 정의하고, 각 단계에서 필요한 데이터를 전달합니다. `context`로 해당 단계의 데이터를 받아올 수 있고, `history`로 다음 단계로 이동할 수 있습니다.
 
 ```tsx
 import { useFunnel } from "@use-funnel/next";
@@ -60,7 +60,7 @@ return (
 
 ## FunnelRenderWithEvent
 
-현재 <Keyword>step</Keyword>에서 여러 경로 전환이 필요할 때 사용하는 이벤트 객체를 정의할 수 있어요.
+현재 <Keyword>step</Keyword>에서 다양한 경로로 전환이 필요할 때 사용하는 이벤트 객체를 정의할 수 있어요.
 
 ```tsx
 interface FunnelRenderWithEvent<T> {
