@@ -15,23 +15,28 @@ export type GetFunnelStateByName<TFunnelState extends AnyFunnelState, TName exte
   { step: TName }
 >;
 
-type TransitionFnArguments<TName extends PropertyKey, TContext> =
-  Partial<TContext> extends TContext
-    ? [target: TName, context?: TContext, option?: FunnelRouterTransitionOption]
-    : [target: TName, context: TContext, option?: FunnelRouterTransitionOption];
+export type RouteOption = Partial<Record<string, any>>;
 
-type TransitionFn<TState extends AnyFunnelState, TNextState extends AnyFunnelState> = <
-  TName extends TNextState['step'],
->(
+type TransitionFnArguments<TName extends PropertyKey, TContext, TRouteOption extends RouteOption> =
+  Partial<TContext> extends TContext
+    ? [target: TName, context?: TContext, option?: FunnelRouterTransitionOption & TRouteOption]
+    : [target: TName, context: TContext, option?: FunnelRouterTransitionOption & TRouteOption];
+
+type TransitionFn<
+  TState extends AnyFunnelState,
+  TNextState extends AnyFunnelState,
+  TRouteOption extends RouteOption,
+> = <TName extends TNextState['step']>(
   ...args:
     | TransitionFnArguments<
         TName,
-        CompareMergeContext<TState['context'], GetFunnelStateByName<TNextState, TName>['context']>
+        CompareMergeContext<TState['context'], GetFunnelStateByName<TNextState, TName>['context']>,
+        TRouteOption
       >
     | [
         target: TName,
         callback: (prev: TState['context']) => GetFunnelStateByName<TNextState, TName>['context'],
-        option?: FunnelRouterTransitionOption,
+        option?: FunnelRouterTransitionOption & TRouteOption,
       ]
 ) => Promise<GetFunnelStateByName<TNextState, TName>>;
 
@@ -42,38 +47,45 @@ export type FunnelStateByContextMap<TStepContextMap extends AnyStepContextMap> =
 export type FunnelTransition<
   TStepContextMap extends AnyStepContextMap,
   TStepKey extends keyof TStepContextMap & string,
+  TRouteOption extends RouteOption,
 > = TransitionFn<
   FunnelState<TStepKey, TStepContextMap[TStepKey]>,
   {
     [NextStepKey in keyof TStepContextMap & string]: FunnelState<NextStepKey, TStepContextMap[NextStepKey]>;
-  }[keyof TStepContextMap & string]
+  }[keyof TStepContextMap & string],
+  TRouteOption
 >;
 
 export interface FunnelHistory<
   TStepContextMap extends AnyStepContextMap,
   TStepKey extends keyof TStepContextMap & string,
+  TRouteOption extends RouteOption,
 > {
-  push: FunnelTransition<TStepContextMap, TStepKey>;
-  replace: FunnelTransition<TStepContextMap, TStepKey>;
+  push: FunnelTransition<TStepContextMap, TStepKey, TRouteOption>;
+  replace: FunnelTransition<TStepContextMap, TStepKey, TRouteOption>;
   go: (index: number) => void | Promise<void>;
   back: () => void | Promise<void>;
 }
 
-interface GlobalFunnelHistory<TStepContextMap extends AnyStepContextMap> {
-  push: FunnelTransition<TStepContextMap, keyof TStepContextMap & string>;
-  replace: FunnelTransition<TStepContextMap, keyof TStepContextMap & string>;
+interface GlobalFunnelHistory<TStepContextMap extends AnyStepContextMap, TRouteOption extends RouteOption> {
+  push: FunnelTransition<TStepContextMap, keyof TStepContextMap & string, TRouteOption>;
+  replace: FunnelTransition<TStepContextMap, keyof TStepContextMap & string, TRouteOption>;
 }
 
-export type FunnelStep<TStepContextMap extends AnyStepContextMap, TStepKey extends keyof TStepContextMap & string> = {
+export type FunnelStep<
+  TStepContextMap extends AnyStepContextMap,
+  TStepKey extends keyof TStepContextMap & string,
+  TRouteOption extends RouteOption,
+> = {
   step: TStepKey;
   context: TStepContextMap[TStepKey];
-  history: FunnelHistory<TStepContextMap, TStepKey>;
+  history: FunnelHistory<TStepContextMap, TStepKey, TRouteOption>;
   index: number;
   historySteps: FunnelState<keyof TStepContextMap & string, TStepContextMap[keyof TStepContextMap]>[];
 };
 
-export type FunnelStepByContextMap<TStepContextMap extends AnyStepContextMap> = {
-  [key in keyof TStepContextMap & string]: FunnelStep<TStepContextMap, key>;
+export type FunnelStepByContextMap<TStepContextMap extends AnyStepContextMap, TRouteOption extends RouteOption> = {
+  [key in keyof TStepContextMap & string]: FunnelStep<TStepContextMap, key, TRouteOption>;
 }[keyof TStepContextMap & string] & {
-  history: GlobalFunnelHistory<TStepContextMap>;
+  history: GlobalFunnelHistory<TStepContextMap, TRouteOption>;
 };
