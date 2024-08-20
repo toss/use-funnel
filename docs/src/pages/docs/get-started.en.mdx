@@ -12,18 +12,18 @@ The sign-up process can be divided into several steps. Here, we'll divide it int
 
 ```tsx filename="context.ts"
 // 1. Nothing entered
-type EmailInput = { email?: string; password?: string; other?: unknown }
+type EmailInputType = { email?: string; password?: string; other?: unknown }
 // 2. Email entered
-type PasswordInput = { email: string; password?: string; other?: unknown }
+type PasswordInputType = { email: string; password?: string; other?: unknown }
 // 3. Email and password entered
-type OtherInfoInput = { email: string; password: string; other?: unknown }
+type OtherInfoInputType = { email: string; password: string; other?: unknown }
 ```
 
-- `EmailInput`: The first step of sign-up. Although there are email and password input fields, nothing has been entered yet. Both `email` and `password` are defined as optional fields.
+- `EmailInputType`: The first step of sign-up. Although there are email and password input fields, nothing has been entered yet. Both `email` and `password` are defined as optional fields.
 
-- `PasswordInput`: The second step of sign-up. After the user enters the email, they enter the password. In this step, the `email` field must be entered, and the `password` is an optional field.
+- `PasswordInputType`: The second step of sign-up. After the user enters the email, they enter the password. In this step, the `email` field must be entered, and the `password` is an optional field.
 
-- `OtherInfoInput`: The third step of sign-up. After the user enters both the email and password, they enter additional information. In this step, both `email` and `password` must be entered.
+- `OtherInfoInputType`: The third step of sign-up. After the user enters both the email and password, they enter additional information. In this step, both `email` and `password` must be entered.
 
 By defining the state of each step as a type, you can maintain [type safety](./features.mdx#ui-state-managed-with-strong-type-safety) in your code and easily track the information required for each step.
 
@@ -38,13 +38,13 @@ Here, we set the initial step to "EmailInput" and an empty `context` object to b
 <UseFunnelCodeBlock>
 ```tsx {5-15}
 import { useFunnel } from "@use-funnel/next";
-import type { EmailInput, PasswordInput, OtherInfoInput } "./context";
+import type { EmailInputType, PasswordInputType, OtherInfoInputType } "./context";
 
 function MyFunnelApp() {
   const funnel = useFunnel<{
-    EmailInput: EmailInput;
-    PasswordInput: PasswordInput;
-    OtherInfoInput: OtherInfoInput;
+    EmailInput: EmailInputType;
+    PasswordInput: PasswordInputType;
+    OtherInfoInput: OtherInfoInputType;
   }>({
     id: "my-funnel-app",
     initial: {

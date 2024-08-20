@@ -12,18 +12,18 @@ import { UseFunnelCodeBlock, Keyword } from '@/components'
     
 ```tsx filename="context.ts"
 // 1. 아무것도 입력 안됨
-type 이메일입력 = { email?: string; password?: string; other?: unknown }
+type 이메일입력타입 = { email?: string; password?: string; other?: unknown }
 // 2. 이메일은 입력됨
-type 비밀번호입력 = { email: string; password?: string; other?: unknown }
+type 비밀번호입력타입 = { email: string; password?: string; other?: unknown }
 // 3. 이메일과 비밀번호 입력됨
-type 그외정보입력 = { email: string; password: string; other?: unknown }
+type 그외정보입력타입 = { email: string; password: string; other?: unknown }
 ```
 
-- `이메일입력`: 회원가입의 첫 <Keyword>step</Keyword>이에요. 이메일과 비밀번호 입력 필드가 있지만, 아직 아무것도 입력되지 않은 상태에요. `email`과 `password`는 둘 다 선택(optional) 필드로 정의되어 있어요.
+- `이메일입력타입`: 회원가입의 첫 <Keyword>step</Keyword>이에요. 이메일과 비밀번호 입력 필드가 있지만, 아직 아무것도 입력되지 않은 상태에요. `email`과 `password`는 둘 다 선택(optional) 필드로 정의되어 있어요.
 
-- `비밀번호입력`: 회원가입의 두 번째 <Keyword>step</Keyword>이에요. 사용자가 이메일을 입력한 후 비밀번호를 입력하는 <Keyword>step</Keyword>이에요. 이 <Keyword>step</Keyword>에서는 `email` 필드가 필수적으로 입력되어 있어야 하고, `password`는 선택 필드에요.
+- `비밀번호입력타입`: 회원가입의 두 번째 <Keyword>step</Keyword>이에요. 사용자가 이메일을 입력한 후 비밀번호를 입력하는 <Keyword>step</Keyword>이에요. 이 <Keyword>step</Keyword>에서는 `email` 필드가 필수적으로 입력되어 있어야 하고, `password`는 선택 필드에요.
 
-- `그외정보입력`: 회원가입의 세 번째 <Keyword>step</Keyword>이에요. 사용자가 이메일과 비밀번호를 모두 입력한 후 추가 정보를 입력하는 <Keyword>step</Keyword>이에요. 이 <Keyword>step</Keyword>에서는 `email`과 `password`가 모두 필수적으로 입력되어 있어야 해요.
+- `그외정보입력타입`: 회원가입의 세 번째 <Keyword>step</Keyword>이에요. 사용자가 이메일과 비밀번호를 모두 입력한 후 추가 정보를 입력하는 <Keyword>step</Keyword>이에요. 이 <Keyword>step</Keyword>에서는 `email`과 `password`가 모두 필수적으로 입력되어 있어야 해요.
 
 이렇게 각 <Keyword>step</Keyword>의 상태를 타입으로 정의하면 코드에서 [타입 안전성](./features.ko.mdx#강력한-타입-안전성으로-관리하는-ui-상태)을 유지할 수 있고, <Keyword>step</Keyword>별로 필요한 정보를 쉽게 추적할 수 있어요.
     
@@ -38,13 +38,13 @@ type 그외정보입력 = { email: string; password: string; other?: unknown }
 <UseFunnelCodeBlock>
 ```tsx {5-15}
 import { useFunnel } from "@use-funnel/next";
-import type { 이메일입력, 비밀번호입력, 그외정보입력 } "./context";
+import type { 이메일입력타입, 비밀번호입력타입, 그외정보입력타입 } "./context";
 
 function MyFunnelApp() {
   const funnel = useFunnel<{
-    이메일입력: 이메일입력;
-    비밀번호입력: 비밀번호입력;
-    그외정보입력: 그외정보입력;
+    이메일입력: 이메일입력타입;
+    비밀번호입력: 비밀번호입력타입;
+    그외정보입력: 그외정보입력타입;
   }>({
     id: "my-funnel-app",
     initial: {
