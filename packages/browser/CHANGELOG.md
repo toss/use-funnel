@@ -1,5 +1,16 @@
 # @use-funnel/browser
 
+## 0.1.0
+
+### Minor Changes
+
+- [#35](https://github.com/toss/use-funnel/pull/35) [`b18ca52`](https://github.com/toss/use-funnel/commit/b18ca527c98cd1389654de65f4d371169a1a5731) Thanks [@minuukang](https://github.com/minuukang)! - Update using `SetStateAction` at router context set, apply custom route option interface
+
+### Patch Changes
+
+- Updated dependencies [[`b18ca52`](https://github.com/toss/use-funnel/commit/b18ca527c98cd1389654de65f4d371169a1a5731)]:
+  - @use-funnel/core@0.1.0
+
 ## 0.0.2
 
 ### Patch Changes
