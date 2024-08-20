@@ -1,9 +1,9 @@
 ---
-'@use-funnel/browser': minor
-'@use-funnel/core': minor
-'@use-funnel/next': minor
-'@use-funnel/react-navigation-native': minor
-'@use-funnel/react-router-dom': minor
+'@use-funnel/browser': patch
+'@use-funnel/core': patch
+'@use-funnel/next': patch
+'@use-funnel/react-navigation-native': patch
+'@use-funnel/react-router-dom': patch
 ---
 
 Update using `SetStateAction` at router context set, apply custom route option interface
