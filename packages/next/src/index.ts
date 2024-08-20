@@ -9,7 +9,13 @@ const QS_KEY = 'funnel.';
 
 const checkHasQSKey = (key: string) => key.startsWith(QS_KEY);
 
-export const useFunnel = createUseFunnel(({ id, initialState }) => {
+interface NextPageRouteOption {
+  shallow?: boolean;
+  locale?: string | false;
+  scroll?: boolean;
+}
+
+export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialState }) => {
   const router = useRouter();
 
   const _currentIndex = Number(router.query?.[`${QS_KEY}${id}.index`]);
@@ -28,7 +34,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
     () => ({
       history: histories,
       currentIndex,
-      async push(state) {
+      async push(state, { scroll, locale, shallow = true } = {}) {
         const { pathname, query } = makePath(router);
 
         await router.push(
@@ -45,11 +51,13 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
             query: { ...removeKeys(query, [checkHasQSKey]), [`${QS_KEY}${id}.index`]: currentIndex + 1 },
           },
           {
-            shallow: true,
+            shallow,
+            locale,
+            scroll,
           },
         );
       },
-      async replace(state) {
+      async replace(state, { scroll, locale, shallow = true } = {}) {
         const { pathname, query } = makePath(router);
 
         await router.replace(
@@ -66,7 +74,9 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
             query: { ...removeKeys(query, [checkHasQSKey]), [`${QS_KEY}${id}.index`]: currentIndex },
           },
           {
-            shallow: true,
+            shallow,
+            locale,
+            scroll,
           },
         );
       },

@@ -1,33 +1,45 @@
 import { Fragment, useMemo, useRef } from 'react';
-import { AnyStepContextMap, FunnelHistory, FunnelStep } from './core.js';
+import { AnyStepContextMap, FunnelHistory, FunnelStep, RouteOption } from './core.js';
 import { FunnelRouterTransitionOption } from './router.js';
 
-export type FunnelStepByContextMap<TStepContextMap extends AnyStepContextMap> = {
-  [TStepKey in keyof TStepContextMap & string]: FunnelStep<TStepContextMap, TStepKey>;
+export type FunnelStepByContextMap<TStepContextMap extends AnyStepContextMap, TRouteOption extends RouteOption> = {
+  [TStepKey in keyof TStepContextMap & string]: FunnelStep<TStepContextMap, TStepKey, TRouteOption>;
 }[keyof TStepContextMap & string];
 
-export type FunnelRenderReady<TStepContextMap extends AnyStepContextMap> = FunnelStepByContextMap<TStepContextMap>;
+export type FunnelRenderReady<
+  TStepContextMap extends AnyStepContextMap,
+  TRouteOption extends RouteOption,
+> = FunnelStepByContextMap<TStepContextMap, TRouteOption>;
 
 export type FunnelRenderOverlayHandler = {
   close: () => void;
 };
 
-export type RenderResult<TStepContextMap extends AnyStepContextMap, TStepKey extends keyof TStepContextMap & string> =
+export type RenderResult<
+  TStepContextMap extends AnyStepContextMap,
+  TStepKey extends keyof TStepContextMap & string,
+  TRouteOption extends RouteOption,
+> =
   | {
       type: 'render';
-      render: (step: FunnelStep<TStepContextMap, TStepKey>) => React.ReactNode;
+      render: (step: FunnelStep<TStepContextMap, TStepKey, TRouteOption>) => React.ReactNode;
     }
   | {
       type: 'overlay';
-      render: (step: FunnelStep<TStepContextMap, TStepKey> & FunnelRenderOverlayHandler) => React.ReactNode;
+      render: (
+        step: FunnelStep<TStepContextMap, TStepKey, TRouteOption> & FunnelRenderOverlayHandler,
+      ) => React.ReactNode;
     };
 
-export interface FunnelRenderComponentProps<TStepContextMap extends AnyStepContextMap> {
-  funnel: FunnelRenderReady<TStepContextMap>;
+export interface FunnelRenderComponentProps<
+  TStepContextMap extends AnyStepContextMap,
+  TRouteOption extends RouteOption,
+> {
+  funnel: FunnelRenderReady<TStepContextMap, TRouteOption>;
   steps: {
     [TStepKey in keyof TStepContextMap & string]:
-      | RenderResult<TStepContextMap, TStepKey>
-      | ((step: FunnelStep<TStepContextMap, TStepKey>) => React.ReactNode);
+      | RenderResult<TStepContextMap, TStepKey, TRouteOption>
+      | ((step: FunnelStep<TStepContextMap, TStepKey, TRouteOption>) => React.ReactNode);
   };
 }
 
@@ -35,15 +47,15 @@ function neverUseHistory(): never {
   throw new Error('Cannot use history in overlay render before steps.');
 }
 
-const overlayBeforeHistory: FunnelHistory<any, any> = {
+const overlayBeforeHistory: FunnelHistory<any, any, any> = {
   push: neverUseHistory,
   replace: neverUseHistory,
   go: neverUseHistory,
   back: neverUseHistory,
 };
 
-export function FunnelRender<TStepContextMap extends AnyStepContextMap>(
-  props: FunnelRenderComponentProps<TStepContextMap>,
+export function FunnelRender<TStepContextMap extends AnyStepContextMap, TRouteOption extends RouteOption>(
+  props: FunnelRenderComponentProps<TStepContextMap, TRouteOption>,
 ) {
   const { funnel, steps } = props;
   const render = steps[funnel.step];
@@ -124,14 +136,15 @@ export function FunnelRender<TStepContextMap extends AnyStepContextMap>(
 function useOverwriteFunnelHistoryTransitionArgument<
   TStepContextMap extends AnyStepContextMap,
   TStepKey extends keyof TStepContextMap & string,
+  TRouteOption extends RouteOption,
 >(
-  history: FunnelHistory<TStepContextMap, TStepKey>,
+  history: FunnelHistory<TStepContextMap, TStepKey, TRouteOption>,
   callback: (
     step: TStepKey,
     context?: TStepContextMap[TStepKey],
     option?: FunnelRouterTransitionOption,
   ) => FunnelRouterTransitionOption,
-): FunnelHistory<TStepContextMap, TStepKey> {
+): FunnelHistory<TStepContextMap, TStepKey, TRouteOption> {
   const callbackRef = useRef(callback);
   callbackRef.current = callback;
   return useMemo(() => {

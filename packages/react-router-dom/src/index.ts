@@ -4,7 +4,13 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 export * from '@use-funnel/core';
 
-export const useFunnel = createUseFunnel(({ id, initialState }) => {
+interface ReactRouterDomRouteOption {
+  preventScrollReset?: boolean;
+  unstable_flushSync?: boolean;
+  unstable_viewTransition?: boolean;
+}
+
+export const useFunnel = createUseFunnel<ReactRouterDomRouteOption>(({ id, initialState }) => {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -35,7 +41,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
     () => ({
       history,
       currentIndex,
-      push(state) {
+      push(state, { preventScrollReset, unstable_flushSync, unstable_viewTransition } = {}) {
         setSearchParams(
           (prev) => {
             prev.set(`${id}.step`, state.step);
@@ -48,10 +54,13 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
               [`${id}.context`]: state.context,
               [`${id}.histories`]: [...(history ?? []), state],
             },
+            preventScrollReset,
+            unstable_flushSync,
+            unstable_viewTransition,
           },
         );
       },
-      replace(state) {
+      replace(state, { preventScrollReset, unstable_flushSync, unstable_viewTransition } = {}) {
         setSearchParams(
           (prev) => {
             prev.set(`${id}.step`, state.step);
@@ -64,6 +73,9 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
               [`${id}.context`]: state.context,
               [`${id}.histories}`]: [...(history ?? []).slice(0, currentIndex), state],
             },
+            preventScrollReset,
+            unstable_flushSync,
+            unstable_viewTransition,
           },
         );
       },
