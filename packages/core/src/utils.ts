@@ -10,8 +10,7 @@ interface Store<T> {
  * A hook used to pass the state of the hook to a component when creating the component inside the hook.
  */
 export function useStateSubscriberStore<T>(state: T) {
-  const stateRef = useRef(state);
-  stateRef.current = state;
+  const stateRef = useUpdatableRef(state);
 
   const stateStoreRef = useRef<Store<T>>({
     listeners: [],

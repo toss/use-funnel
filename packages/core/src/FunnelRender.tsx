@@ -1,6 +1,7 @@
-import { Fragment, useMemo, useRef } from 'react';
+import { Fragment, useMemo } from 'react';
 import { AnyStepContextMap, FunnelHistory, FunnelStep, RouteOption } from './core.js';
 import { FunnelRouterTransitionOption } from './router.js';
+import { useUpdatableRef } from './utils.js';
 
 export type FunnelStepByContextMap<TStepContextMap extends AnyStepContextMap, TRouteOption extends RouteOption> = {
   [TStepKey in keyof TStepContextMap & string]: FunnelStep<TStepContextMap, TStepKey, TRouteOption>;
@@ -145,8 +146,8 @@ function useOverwriteFunnelHistoryTransitionArgument<
     option?: FunnelRouterTransitionOption,
   ) => FunnelRouterTransitionOption,
 ): FunnelHistory<TStepContextMap, TStepKey, TRouteOption> {
-  const callbackRef = useRef(callback);
-  callbackRef.current = callback;
+  const callbackRef = useUpdatableRef(callback);
+
   return useMemo(() => {
     return {
       ...history,
