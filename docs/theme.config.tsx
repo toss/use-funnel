@@ -21,6 +21,9 @@ const config: DocsThemeConfig = {
     return (
       <>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="google-site-verification" content="r1VBovAYczFN4z_Mi_wIkBOfQuWV8H05OEPtHmBjolU" />
+        <link rel="alternate" hrefLang="ko" href="https://use-funnel.slash.page/ko" />
+        <link rel="alternate" hrefLang="en" href="https://use-funnel.slash.page/en" />
         <meta property="og:title" content={title || '@use-funnel'} />
         <meta property="og:url" content={url} />
         <meta
