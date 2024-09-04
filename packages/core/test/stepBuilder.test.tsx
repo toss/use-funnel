@@ -32,13 +32,14 @@ const steps = createFunnelSteps(formState)
       parse: meta.parse,
     };
   })
-  .extends(['약관동의', '그_다음_화면'], (formState) => {
+  .extends(['약관동의'], (formState) => {
     const meta = formState.required({ passwordConfirm: true });
     return {
       meta,
       parse: meta.parse,
     };
   })
+  .extends('그_다음_화면')
   .build();
 
 // const steps2 = createFunnelSteps<z.infer<typeof formState>>()
@@ -68,6 +69,31 @@ describe('createContextGuard spec', () => {
           id: 'asdasdasd',
         });
       }).toThrow();
+    });
+  });
+
+  describe('when step is extends with empty option', () => {
+    test('step option is equal then previous step option', () => {
+      const step1 = steps.그_다음_화면;
+      const step2 = steps.약관동의;
+      expect(step1).toEqual(step2);
+      expect(
+        step1.parse({
+          id: 'asdasdasd',
+          password: '1234',
+          passwordConfirm: '1234',
+        }),
+      ).toEqual({
+        id: 'asdasdasd',
+        password: '1234',
+        passwordConfirm: '1234',
+      });
+      expect(() =>
+        step1.parse({
+          id: 'asdasdasd',
+          password: '1234',
+        }),
+      ).toThrow();
     });
   });
 

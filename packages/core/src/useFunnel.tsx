@@ -10,7 +10,7 @@ import {
 import { FunnelRender, FunnelRenderComponentProps } from './FunnelRender.js';
 import { overlayRenderWith, renderWith } from './renderHelpers.js';
 import { FunnelRouter } from './router.js';
-import { FunnelStepOption } from './stepBuilder.js';
+import { FunnelStepOption, funnelStepOptionIsGuard, funnelStepOptionIsParse } from './stepBuilder.js';
 import { useStateStore, useStateSubscriberStore, useUpdatableRef } from './utils.js';
 
 export interface UseFunnelOptions<TStepContextMap extends AnyStepContextMap> {
@@ -67,11 +67,11 @@ export function createUseFunnel<TRouteOption extends RouteOption>(
           return context as TStepContextMap[TStep];
         }
         // 1. check parse function
-        if (stepOption.parse != null) {
+        if (funnelStepOptionIsParse(stepOption)) {
           return stepOption.parse(context);
         }
         // 2. check guard function
-        if (stepOption.guard != null) {
+        if (funnelStepOptionIsGuard(stepOption)) {
           return stepOption.guard(context) ? context : null;
         }
         return null;
