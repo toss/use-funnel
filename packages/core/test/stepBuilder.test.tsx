@@ -77,6 +77,23 @@ describe('createContextGuard spec', () => {
       const step1 = steps.그_다음_화면;
       const step2 = steps.약관동의;
       expect(step1).toEqual(step2);
+      expect(
+        step1.parse({
+          id: 'asdasdasd',
+          password: '1234',
+          passwordConfirm: '1234',
+        }),
+      ).toEqual({
+        id: 'asdasdasd',
+        password: '1234',
+        passwordConfirm: '1234',
+      });
+      expect(() =>
+        step1.parse({
+          id: 'asdasdasd',
+          password: '1234',
+        }),
+      ).toThrow();
     });
   });
 
