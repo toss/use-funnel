@@ -1,7 +1,18 @@
-export interface FunnelStepOption<TContext, TMeta = never> {
-  meta?: TMeta;
-  guard?: (data: unknown) => data is TContext;
-  parse?: (data: unknown) => TContext;
+export type FunnelStepOption<TContext, TMeta = never> = { meta?: TMeta } & (
+  | { guard: (data: unknown) => data is TContext }
+  | { parse: (data: unknown) => TContext }
+);
+
+export function funnelStepOptionIsGuard<TContext>(
+  option: FunnelStepOption<TContext, any>,
+): option is { guard: (data: unknown) => data is TContext } {
+  return 'guard' in option && typeof option.guard === 'function';
+}
+
+export function funnelStepOptionIsParse<TContext>(
+  option: FunnelStepOption<TContext, any>,
+): option is { parse: (data: unknown) => TContext } {
+  return 'parse' in option && typeof option.parse === 'function';
 }
 
 type FunnelStepMap = Record<string, FunnelStepOption<any, any> | undefined>;
