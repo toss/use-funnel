@@ -1,5 +1,14 @@
 # @use-funnel/browser
 
+## 0.0.4
+
+### Patch Changes
+
+- [#50](https://github.com/toss/use-funnel/pull/50) [`ec232c9`](https://github.com/toss/use-funnel/commit/ec232c9116775ac835a029304925e6bbe14752e9) Thanks [@minuukang](https://github.com/minuukang)! - fix(core): When createFunnelStep() extends step has empty option, will setup previous FunnelStepOption
+
+- Updated dependencies [[`ec232c9`](https://github.com/toss/use-funnel/commit/ec232c9116775ac835a029304925e6bbe14752e9)]:
+  - @use-funnel/core@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes
