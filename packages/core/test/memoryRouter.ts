@@ -1,7 +1,12 @@
 import { useMemo, useState } from 'react';
 import { FunnelRouter } from '../src/router.js';
+import { createUseFunnel } from '../src/useFunnel.js';
 
-export const MemoryRouter: FunnelRouter = ({ initialState }) => {
+interface MemoryRouterOption {
+  __foo?: 'bar';
+}
+
+export const MemoryRouter: FunnelRouter<MemoryRouterOption> = ({ initialState }) => {
   const [history, setHistory] = useState<(typeof initialState)[]>([initialState]);
   const [currentIndex, setCurrentIndex] = useState(0);
   return useMemo(
@@ -25,3 +30,5 @@ export const MemoryRouter: FunnelRouter = ({ initialState }) => {
     [history, currentIndex],
   );
 };
+
+export const useFunnel = createUseFunnel<MemoryRouterOption>(MemoryRouter);
