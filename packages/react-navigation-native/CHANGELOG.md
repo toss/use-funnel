@@ -1,5 +1,14 @@
 # @use-funnel/react-navigation-native
 
+## 0.0.5
+
+### Patch Changes
+
+- [#53](https://github.com/toss/use-funnel/pull/53) [`d2e642e`](https://github.com/toss/use-funnel/commit/d2e642e78135fd4082d4194ea02917a145b33b27) Thanks [@minuukang](https://github.com/minuukang)! - fix(core): when createFunnelSteps extends with no option at initial the context assigned never type
+
+- Updated dependencies [[`d2e642e`](https://github.com/toss/use-funnel/commit/d2e642e78135fd4082d4194ea02917a145b33b27)]:
+  - @use-funnel/core@0.0.5
+
 ## 0.0.4
 
 ### Patch Changes
