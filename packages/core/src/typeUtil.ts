@@ -3,8 +3,8 @@ export type Prettify<T> = Omit<T, never>;
  * Extracts the keys that are required when converting from TBase to TResult.
  * @example RequiredCompareKeys<{a: string, b?: string}, {a: string, b: string}> // 'b'
  */
-export type RequiredCompareKeys<TBase, TResult> = {
-  [K in keyof TBase | keyof TResult]: K extends keyof TResult
+export type RequiredCompareKeys<TBase, TResult> = keyof TResult | keyof TBase extends infer K
+  ? K extends keyof TResult
     ? K extends keyof TBase
       ? TBase[K] extends TResult[K]
         ? never
@@ -12,15 +12,15 @@ export type RequiredCompareKeys<TBase, TResult> = {
       : undefined extends TResult[K]
         ? never
         : K
-    : never;
-}[keyof TBase | keyof TResult];
+    : never
+  : never;
 
 /**
  * Extracts the keys that are optional when converting from TBase to TResult.
  * @example OptionalCompareKeys<{a: string, b?: string}, {a: string, b: string}> // 'a'
  */
-export type OptionalCompareKeys<TBase, TResult> = {
-  [K in keyof TBase | keyof TResult]: K extends keyof TResult
+export type OptionalCompareKeys<TBase, TResult> = keyof TBase | keyof TResult extends infer K
+  ? K extends keyof TResult
     ? K extends keyof TBase
       ? TBase[K] extends TResult[K]
         ? K
@@ -30,8 +30,8 @@ export type OptionalCompareKeys<TBase, TResult> = {
         : never
     : K extends keyof TBase
       ? K
-      : never;
-}[keyof TBase | keyof TResult];
+      : never
+  : never;
 
 /**
  * Compares TBase with TResult to create a new object that uses TResult's values for required keys,
