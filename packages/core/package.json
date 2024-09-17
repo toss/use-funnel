@@ -22,8 +22,8 @@
     "package.json"
   ],
   "scripts": {
-    "test": "vitest run",
-    "test:unit": "vitest --root test/",
+    "test": "vitest run --typecheck",
+    "test:unit": "vitest --typecheck --root test/",
     "build": "rimraf dist && concurrently \"pnpm:build:*\"",
     "build:dist": "tsup",
     "build:types": "tsc -p tsconfig.build.json --emitDeclarationOnly",

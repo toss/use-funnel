@@ -1,4 +1,4 @@
-export type Prettify<T> = { [K in keyof T]: T[K] } & {};
+export type Prettify<T> = Omit<T, never>;
 /**
  * Extracts the keys that are required when converting from TBase to TResult.
  * @example RequiredCompareKeys<{a: string, b?: string}, {a: string, b: string}> // 'b'
@@ -12,16 +12,14 @@ export type RequiredCompareKeys<TBase, TResult> = {
       : undefined extends TResult[K]
         ? never
         : K
-    : K extends keyof TBase
-      ? never
-      : never;
+    : never;
 }[keyof TBase | keyof TResult];
 
 /**
  * Extracts the keys that are optional when converting from TBase to TResult.
  * @example OptionalCompareKeys<{a: string, b?: string}, {a: string, b: string}> // 'a'
  */
-type OptionalCompareKeys<TBase, TResult> = {
+export type OptionalCompareKeys<TBase, TResult> = {
   [K in keyof TBase | keyof TResult]: K extends keyof TResult
     ? K extends keyof TBase
       ? TBase[K] extends TResult[K]
@@ -31,7 +29,7 @@ type OptionalCompareKeys<TBase, TResult> = {
         ? K
         : never
     : K extends keyof TBase
-      ? never
+      ? K
       : never;
 }[keyof TBase | keyof TResult];
 
