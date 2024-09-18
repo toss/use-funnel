@@ -54,6 +54,13 @@ describe('typeUtil test', () => {
       });
     });
 
+    describe('When TBase has no key and TResult has compare optional key', () => {
+      test('Should return the keys that are optional when converting from TBase to TResult', () => {
+        type Result = OptionalCompareKeys<{ a: string }, { a: string; b?: string }>;
+        expectTypeOf<Result>().toEqualTypeOf<'a' | 'b'>();
+      });
+    });
+
     describe('When TBase has no keys', () => {
       test('Should return the never', () => {
         type Result = OptionalCompareKeys<{}, { a: string; b: string }>;
@@ -95,6 +102,13 @@ describe('typeUtil test', () => {
       test('Should return the new object that uses TResult values for required keys, and TBase values for optional keys', () => {
         type Result = CompareMergeContext<{ a: string }, { a: string; b: string }>;
         expectTypeOf<Result>().toEqualTypeOf<{ a?: string; b: string }>();
+      });
+    });
+
+    describe('When TBase has no key and TResult has compare optional key', () => {
+      test('Should return the new object that uses TResult values for optional keys, and TBase values for optional keys', () => {
+        type Result = CompareMergeContext<{ a: string }, { a: string; b?: string }>;
+        expectTypeOf<Result>().toEqualTypeOf<{ a?: string; b?: string }>();
       });
     });
 
