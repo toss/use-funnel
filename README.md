@@ -63,7 +63,16 @@ export function App() {
           );
         },
       })}
-      SelectSchool={({ history }) => <SelectSchool onNext={(school) => history.push('EnterJoinDate', { school })} />}
+      SelectSchool={({ history }) => (
+        <SelectSchool 
+          onNext={(school) => 
+            history.push('EnterJoinDate', (prev) => ({ 
+                ...prev, 
+                school 
+            }))
+          } 
+        />
+      )}
       SelectEmployee={({ history }) => (
         <SelectEmployee
           onNext={(company) =>
