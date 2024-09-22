@@ -67,8 +67,8 @@ export function App() {
         <SelectSchool 
           onNext={(school) => 
             history.push('EnterJoinDate', (prev) => ({ 
-                ...prev, 
-                school 
+              ...prev, 
+              school 
             }))
           } 
         />
