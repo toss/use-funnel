@@ -19,8 +19,6 @@ describe('Test useFunnel next router', () => {
         },
       });
 
-      console.log(funnel);
-
       switch (funnel.step) {
         case 'A': {
           return (
