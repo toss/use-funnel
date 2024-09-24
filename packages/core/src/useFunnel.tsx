@@ -57,7 +57,7 @@ export function createUseFunnel<TRouteOption extends RouteOption>(
       id: options.id,
       initialState: options.initial,
     });
-    const currentState = router.history[router.currentIndex] as FunnelStateByContextMap<TStepContextMap>;
+    const currentState = (router.history[router.currentIndex] ?? options.initial) as FunnelStateByContextMap<TStepContextMap>;
     const currentStateRef = useUpdatableRef(currentState);
 
     const parseStepContext = useCallback(
