@@ -7,7 +7,11 @@ export * from '@use-funnel/core';
 
 const QS_KEY = 'funnel.';
 
-const checkHasQSKey = (key: string) => key.startsWith(QS_KEY);
+const STEP_KEY = '.step';
+const CONTEXT_KEY = '.context';
+const HISTORY_KEY = '.histories';
+
+const checkIsHistoryKey = (key: string) => key.startsWith(QS_KEY) && key.endsWith(HISTORY_KEY);
 
 interface NextPageRouteOption {
   shallow?: boolean;
@@ -18,37 +22,52 @@ interface NextPageRouteOption {
 export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialState }) => {
   const router = useRouter();
 
-  const _currentIndex = Number(router.query?.[`${QS_KEY}${id}.index`]);
-  const currentIndex = isNaN(_currentIndex) ? 0 : _currentIndex;
-
-  const _histories = router.query?.[`${QS_KEY}${id}.histories`];
-  const histories = useMemo<(typeof initialState)[]>(() => {
+  const currentContext = useMemo(() => {
     try {
-      return _histories == null ? [initialState] : JSON.parse(_histories as string);
+      const currentStep = router.query?.[`${QS_KEY}${id}${STEP_KEY}`] as string | undefined;
+      const currentContext = router.query?.[`${QS_KEY}${id}${CONTEXT_KEY}`] as string | undefined;
+      return currentStep == null || currentContext == null
+        ? initialState
+        : { step: currentStep, context: JSON.parse(currentContext) };
     } catch {
-      return [initialState];
+      return initialState;
     }
-  }, [_histories]);
+  }, [router.query, initialState]);
+
+  const _beforeHistories = router.query?.[`${QS_KEY}${id}${HISTORY_KEY}`];
+  const beforeHistories = useMemo<(typeof initialState)[]>(() => {
+    try {
+      return _beforeHistories == null ? [] : JSON.parse(_beforeHistories as string);
+    } catch {
+      return [];
+    }
+  }, [_beforeHistories]);
+
+  const currentIndex = history.length;
 
   return useMemo(
     () => ({
-      history: histories,
+      history: [...beforeHistories, currentContext],
       currentIndex,
       async push(state, { scroll, locale, shallow = true } = {}) {
         const { pathname, query } = makePath(router);
+        const queryContext = {
+          [`${QS_KEY}${id}${STEP_KEY}`]: state.step,
+          [`${QS_KEY}${id}${CONTEXT_KEY}`]: JSON.stringify(state.context),
+        };
 
         await router.push(
           {
             pathname,
             query: {
               ...query,
-              [`${QS_KEY}${id}.histories`]: JSON.stringify([...histories, state]),
-              [`${QS_KEY}${id}.index`]: currentIndex + 1,
+              [`${QS_KEY}${id}${HISTORY_KEY}`]: JSON.stringify([...beforeHistories, currentContext]),
+              ...queryContext,
             },
           },
           {
             pathname,
-            query: { ...removeKeys(query, [checkHasQSKey]), [`${QS_KEY}${id}.index`]: currentIndex + 1 },
+            query: { ...removeKeys(query, [checkIsHistoryKey]), ...queryContext },
           },
           {
             shallow,
@@ -59,19 +78,22 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
       },
       async replace(state, { scroll, locale, shallow = true } = {}) {
         const { pathname, query } = makePath(router);
+        const queryContext = {
+          [`${QS_KEY}${id}${STEP_KEY}`]: state.step,
+          [`${QS_KEY}${id}${CONTEXT_KEY}`]: JSON.stringify(state.context),
+        };
 
         await router.replace(
           {
             pathname,
             query: {
               ...query,
-              [`${QS_KEY}${id}.histories`]: JSON.stringify([...(histories ?? []).slice(0, currentIndex), state]),
-              [`${QS_KEY}${id}.index`]: currentIndex,
+              ...queryContext,
             },
           },
           {
             pathname,
-            query: { ...removeKeys(query, [checkHasQSKey]), [`${QS_KEY}${id}.index`]: currentIndex },
+            query: { ...removeKeys(query, [checkIsHistoryKey]), ...queryContext },
           },
           {
             shallow,
@@ -82,6 +104,6 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
       },
       go: (index) => window.history.go(index),
     }),
-    [router, histories],
+    [router, currentIndex, beforeHistories, currentContext],
   );
 });

@@ -1,8 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, test } from 'vitest';
 import mockRouter from 'next-router-mock';
-
+import { describe, expect, test } from 'vitest';
 import { useFunnel } from '../src/index.js';
 
 describe('Test useFunnel next router', () => {
@@ -19,6 +18,8 @@ describe('Test useFunnel next router', () => {
           context: {},
         },
       });
+
+      console.log(funnel);
 
       switch (funnel.step) {
         case 'A': {
@@ -67,19 +68,16 @@ describe('Test useFunnel next router', () => {
     await user.click(screen.getByText('Go B'));
 
     expect(screen.queryByText('vitest')).not.toBeNull();
-    expect(mockRouter.query['funnel.vitest.index']).toBe(1);
-    expect(JSON.parse(mockRouter.query['funnel.vitest.histories'] as string)).toEqual([
-      { step: 'A', context: {} },
-      { step: 'B', context: { id: 'vitest' } },
-    ]);
+    expect(mockRouter.query['funnel.vitest.step']).toBe('B');
+    expect(JSON.parse(mockRouter.query['funnel.vitest.context'] as string)).toEqual({
+      id: 'vitest',
+    });
+    expect(JSON.parse(mockRouter.query['funnel.vitest.histories'] as string)).toEqual([{ step: 'A', context: {} }]);
 
     await user.click(screen.getByText('Go C'));
 
     expect(screen.queryByText('Finished!')).not.toBeNull();
-    expect(mockRouter.query['funnel.vitest.index']).toBe(1);
-    expect(JSON.parse(mockRouter.query['funnel.vitest.histories'] as string)).toEqual([
-      { step: 'A', context: {} },
-      { step: 'C', context: { id: 'vitest', password: 'vitest1234' } },
-    ]);
+    expect(mockRouter.query['funnel.vitest.step']).toBe('C');
+    expect(JSON.parse(mockRouter.query['funnel.vitest.histories'] as string)).toEqual([{ step: 'A', context: {} }]);
   });
 });
