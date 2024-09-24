@@ -71,7 +71,7 @@ export const useFunnel = createUseFunnel<ReactRouterDomRouteOption>(({ id, initi
             state: {
               ...location.state,
               [`${id}.context`]: state.context,
-              [`${id}.histories}`]: [...(history ?? []).slice(0, currentIndex), state],
+              [`${id}.histories`]: [...(history ?? []).slice(0, currentIndex), state],
             },
             preventScrollReset,
             unstable_flushSync,
