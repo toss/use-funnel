@@ -1,5 +1,14 @@
 # @use-funnel/react-router-dom
 
+## 0.0.6
+
+### Patch Changes
+
+- [#65](https://github.com/toss/use-funnel/pull/65) [`8300088`](https://github.com/toss/use-funnel/commit/8300088a64b21fbdaa50b2973619f23b3c9c75c6) Thanks [@minuukang](https://github.com/minuukang)! - fix(core): add state initial fallback when history array is empty
+
+- Updated dependencies [[`8300088`](https://github.com/toss/use-funnel/commit/8300088a64b21fbdaa50b2973619f23b3c9c75c6)]:
+  - @use-funnel/core@0.0.6
+
 ## 0.0.5
 
 ### Patch Changes
