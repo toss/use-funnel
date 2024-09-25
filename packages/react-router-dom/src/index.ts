@@ -15,8 +15,12 @@ export const useFunnel = createUseFunnel<ReactRouterDomRouteOption>(({ id, initi
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const currentStep = searchParams.get(`${id}.step`);
-  const currentContext = location.state?.[`${id}.context`];
+  const stepName = `${id}.step`;
+  const contextName = `${id}.context`;
+  const historiesName = `${id}.histories`;
+
+  const currentStep = searchParams.get(stepName);
+  const currentContext = location.state?.[contextName];
   const currentState = useMemo(() => {
     return currentStep != null && currentContext != null
       ? ({
@@ -27,7 +31,7 @@ export const useFunnel = createUseFunnel<ReactRouterDomRouteOption>(({ id, initi
   }, [currentStep, currentContext, initialState]);
 
   const history: (typeof initialState)[] = useMemo(() => {
-    const histories = location.state?.[`${id}.histories`];
+    const histories = location.state?.[historiesName];
     if (Array.isArray(histories) && histories.length > 0) {
       return histories;
     } else {
@@ -44,15 +48,15 @@ export const useFunnel = createUseFunnel<ReactRouterDomRouteOption>(({ id, initi
       push(state, { preventScrollReset, unstable_flushSync, unstable_viewTransition } = {}) {
         setSearchParams(
           (prev) => {
-            prev.set(`${id}.step`, state.step);
+            prev.set(stepName, state.step);
             return prev;
           },
           {
             replace: false,
             state: {
               ...location.state,
-              [`${id}.context`]: state.context,
-              [`${id}.histories`]: [...(history ?? []), state],
+              [contextName]: state.context,
+              [historiesName]: [...(history ?? []), state],
             },
             preventScrollReset,
             unstable_flushSync,
@@ -63,15 +67,15 @@ export const useFunnel = createUseFunnel<ReactRouterDomRouteOption>(({ id, initi
       replace(state, { preventScrollReset, unstable_flushSync, unstable_viewTransition } = {}) {
         setSearchParams(
           (prev) => {
-            prev.set(`${id}.step`, state.step);
+            prev.set(stepName, state.step);
             return prev;
           },
           {
             replace: true,
             state: {
               ...location.state,
-              [`${id}.context`]: state.context,
-              [`${id}.histories}`]: [...(history ?? []).slice(0, currentIndex), state],
+              [contextName]: state.context,
+              [historiesName]: [...(history ?? []).slice(0, currentIndex), state],
             },
             preventScrollReset,
             unstable_flushSync,
