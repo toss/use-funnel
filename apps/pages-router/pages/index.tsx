@@ -1,4 +1,4 @@
-import { TestPagesRouterFunnel } from '~/src/funnel';
+import { TestPagesRouterFunnel } from '../src/funnel';
 
 export default function Home() {
   return <TestPagesRouterFunnel />;
