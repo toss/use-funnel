@@ -3,10 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3100",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "e2e":"pnpm exec playwright test"
   },
   "dependencies": {
     "@use-funnel/browser": "workspace:^",
@@ -16,6 +17,7 @@
     "react-dom": "^18"
   },
   "devDependencies": {
+    "@playwright/test": "^1.47.2",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
