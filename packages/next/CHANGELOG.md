@@ -1,5 +1,11 @@
 # @use-funnel/next
 
+## 0.0.8
+
+### Patch Changes
+
+- [#73](https://github.com/toss/use-funnel/pull/73) [`0069353`](https://github.com/toss/use-funnel/commit/0069353a9363a7dbb7b8033518c6494e17bbd970) Thanks [@minuukang](https://github.com/minuukang)! - fix(next): wrong using next history.length
+
 ## 0.0.7
 
 ### Patch Changes
