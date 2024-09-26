@@ -12,4 +12,8 @@ test('can move the steps of the funnel using history.push.', async ({ page }) =>
   await page.getByRole('button', { name: 'next' }).click();
 
   await expect(page.getByText('end')).toBeVisible();
+
+  await page.goBack();
+
+  await expect(page.getByText('start')).toBeVisible();
 });
