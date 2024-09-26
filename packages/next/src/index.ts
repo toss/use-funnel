@@ -43,7 +43,7 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
     }
   }, [_beforeHistories]);
 
-  const currentIndex = history.length;
+  const currentIndex = beforeHistories.length;
 
   return useMemo(
     () => ({
