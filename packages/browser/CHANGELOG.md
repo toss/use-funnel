@@ -1,5 +1,14 @@
 # @use-funnel/browser
 
+## 0.0.7
+
+### Patch Changes
+
+- [#69](https://github.com/toss/use-funnel/pull/69) [`093ac8b`](https://github.com/toss/use-funnel/commit/093ac8bcddf6e52cf9c55c1d622d69a1ab1cd4e1) Thanks [@minuukang](https://github.com/minuukang)! - fix(next): Keep current history context at refresh
+  fix(core): Fix useFunnelRouter using initial optionRef
+- Updated dependencies [[`093ac8b`](https://github.com/toss/use-funnel/commit/093ac8bcddf6e52cf9c55c1d622d69a1ab1cd4e1)]:
+  - @use-funnel/core@0.0.7
+
 ## 0.0.6
 
 ### Patch Changes
