@@ -54,86 +54,6 @@ importers:
         specifier: ^5.1.6
         version: 5.4.5
 
-  apps/app-router:
-    dependencies:
-      '@use-funnel/browser':
-        specifier: workspace:^
-        version: link:../../packages/browser
-      '@use-funnel/core':
-        specifier: workspace:^
-        version: link:../../packages/core
-      next:
-        specifier: 14.2.13
-        version: 14.2.13(@playwright/test@1.47.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react:
-        specifier: ^18
-        version: 18.3.1
-      react-dom:
-        specifier: ^18
-        version: 18.3.1(react@18.3.1)
-    devDependencies:
-      '@playwright/test':
-        specifier: ^1.47.2
-        version: 1.47.2
-      '@types/node':
-        specifier: ^20
-        version: 20.14.9
-      '@types/react':
-        specifier: ^18
-        version: 18.3.2
-      '@types/react-dom':
-        specifier: ^18
-        version: 18.3.0
-      postcss:
-        specifier: ^8
-        version: 8.4.38
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.4(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.4.5))
-      typescript:
-        specifier: ^5
-        version: 5.4.5
-
-  apps/pages-router:
-    dependencies:
-      '@use-funnel/core':
-        specifier: workspace:^
-        version: link:../../packages/core
-      '@use-funnel/next':
-        specifier: workspace:^
-        version: link:../../packages/next
-      next:
-        specifier: 14.2.13
-        version: 14.2.13(@playwright/test@1.47.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      react:
-        specifier: ^18
-        version: 18.3.1
-      react-dom:
-        specifier: ^18
-        version: 18.3.1(react@18.3.1)
-    devDependencies:
-      '@playwright/test':
-        specifier: ^1.47.2
-        version: 1.47.2
-      '@types/node':
-        specifier: ^20
-        version: 20.14.9
-      '@types/react':
-        specifier: ^18
-        version: 18.3.2
-      '@types/react-dom':
-        specifier: ^18
-        version: 18.3.0
-      postcss:
-        specifier: ^8
-        version: 8.4.38
-      tailwindcss:
-        specifier: ^3.4.1
-        version: 3.4.4(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.4.5))
-      typescript:
-        specifier: ^5
-        version: 5.4.5
-
   docs:
     dependencies:
       '@codesandbox/sandpack-react':
@@ -176,6 +96,86 @@ importers:
       autoprefixer:
         specifier: ^10.4.19
         version: 10.4.19(postcss@8.4.38)
+      postcss:
+        specifier: ^8
+        version: 8.4.38
+      tailwindcss:
+        specifier: ^3.4.1
+        version: 3.4.4(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.4.5))
+      typescript:
+        specifier: ^5
+        version: 5.4.5
+
+  examples/nextjs-app-router:
+    dependencies:
+      '@use-funnel/browser':
+        specifier: workspace:^
+        version: link:../../packages/browser
+      '@use-funnel/core':
+        specifier: workspace:^
+        version: link:../../packages/core
+      next:
+        specifier: 14.2.13
+        version: 14.2.13(@playwright/test@1.47.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18
+        version: 18.3.1
+      react-dom:
+        specifier: ^18
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@playwright/test':
+        specifier: ^1.47.2
+        version: 1.47.2
+      '@types/node':
+        specifier: ^20
+        version: 20.14.9
+      '@types/react':
+        specifier: ^18
+        version: 18.3.2
+      '@types/react-dom':
+        specifier: ^18
+        version: 18.3.0
+      postcss:
+        specifier: ^8
+        version: 8.4.38
+      tailwindcss:
+        specifier: ^3.4.1
+        version: 3.4.4(ts-node@10.9.2(@types/node@20.14.9)(typescript@5.4.5))
+      typescript:
+        specifier: ^5
+        version: 5.4.5
+
+  examples/nextjs-pages-router:
+    dependencies:
+      '@use-funnel/core':
+        specifier: workspace:^
+        version: link:../../packages/core
+      '@use-funnel/next':
+        specifier: workspace:^
+        version: link:../../packages/next
+      next:
+        specifier: 14.2.13
+        version: 14.2.13(@playwright/test@1.47.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18
+        version: 18.3.1
+      react-dom:
+        specifier: ^18
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@playwright/test':
+        specifier: ^1.47.2
+        version: 1.47.2
+      '@types/node':
+        specifier: ^20
+        version: 20.14.9
+      '@types/react':
+        specifier: ^18
+        version: 18.3.2
+      '@types/react-dom':
+        specifier: ^18
+        version: 18.3.0
       postcss:
         specifier: ^8
         version: 8.4.38
