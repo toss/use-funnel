@@ -3,7 +3,7 @@
   "version": "0.0.8",
   "description": "",
   "type": "module",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
   "publishConfig": {
     "access": "public",
     "main": "./dist/index.js",
