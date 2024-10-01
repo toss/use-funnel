@@ -1,5 +1,20 @@
 # @use-funnel/next
 
+## 0.0.8
+
+### Patch Changes
+
+- [#73](https://github.com/toss/use-funnel/pull/73) [`0069353`](https://github.com/toss/use-funnel/commit/0069353a9363a7dbb7b8033518c6494e17bbd970) Thanks [@minuukang](https://github.com/minuukang)! - fix(next): wrong using next history.length
+
+## 0.0.7
+
+### Patch Changes
+
+- [#69](https://github.com/toss/use-funnel/pull/69) [`093ac8b`](https://github.com/toss/use-funnel/commit/093ac8bcddf6e52cf9c55c1d622d69a1ab1cd4e1) Thanks [@minuukang](https://github.com/minuukang)! - fix(next): Keep current history context at refresh
+  fix(core): Fix useFunnelRouter using initial optionRef
+- Updated dependencies [[`093ac8b`](https://github.com/toss/use-funnel/commit/093ac8bcddf6e52cf9c55c1d622d69a1ab1cd4e1)]:
+  - @use-funnel/core@0.0.7
+
 ## 0.0.6
 
 ### Patch Changes
