@@ -5,7 +5,7 @@ import { useLayoutEffect, useMemo, useState } from 'react';
 
 export const useFunnel = createUseFunnel(({ id, initialState }) => {
   const searchParams = useSearchParams();
-  const [state, setState] = useState<any>({});
+  const [state, setState] = useState<Record<string, any>>({});
   useLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       setState(window.history.state);
