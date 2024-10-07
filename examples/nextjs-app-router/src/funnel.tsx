@@ -1,19 +1,23 @@
 'use client';
-import { useFunnel } from '@use-funnel/browser';
+import { useFunnel } from '@use-funnel/next-app-router';
+import { useRouter } from 'next/navigation';
 
-export const TestAppRouterFunnel = () => {
+export const EasyCaseFunnel = () => {
   const funnel = useFunnel<FunnelState>({ id: FUNNEL_ID, initial: { step: 'start', context: {} } });
+  const router = useRouter();
   return (
-    <funnel.Render
-      start={({ history }) => (
-        <div>
-          <p>start</p>
-
-          <button onClick={() => history.push('end')}>next</button>
-        </div>
-      )}
-      end={() => <div>end</div>}
-    />
+    <>
+      <funnel.Render
+        start={({ history }) => (
+          <div>
+            <p>start</p>
+            <button onClick={() => history.push('end')}>next</button>
+          </div>
+        )}
+        end={() => <div>end</div>}
+      />
+      <button onClick={() => router.push('/overlay')}>navigate to overlay funnel</button>
+    </>
   );
 };
 
