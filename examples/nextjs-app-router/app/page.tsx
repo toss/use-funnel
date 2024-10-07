@@ -1,5 +1,5 @@
-import { EasyCaseFunnel } from '../src/funnel';
+import { TestAppRouterFunnel } from '~/src/funnel';
 
 export default function Home() {
-  return <EasyCaseFunnel />;
+  return <TestAppRouterFunnel />;
 }

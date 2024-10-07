@@ -2,7 +2,7 @@
 import { useFunnel } from '@use-funnel/next-app-router';
 import { useRouter } from 'next/navigation';
 
-export const EasyCaseFunnel = () => {
+export const TestAppRouterFunnel = () => {
   const funnel = useFunnel<FunnelState>({ id: FUNNEL_ID, initial: { step: 'start', context: {} } });
   const router = useRouter();
   return (
