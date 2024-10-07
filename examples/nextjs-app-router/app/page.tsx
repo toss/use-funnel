@@ -1,5 +1,10 @@
+import { Suspense } from 'react';
 import { TestAppRouterFunnel } from '~/src/funnel';
 
 export default function Home() {
-  return <TestAppRouterFunnel />;
+  return (
+    <Suspense>
+      <TestAppRouterFunnel />
+    </Suspense>
+  );
 }

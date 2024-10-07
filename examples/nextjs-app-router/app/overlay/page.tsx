@@ -1,5 +1,10 @@
+import { Suspense } from 'react';
 import { OverlayFunnel } from '../../src/overlay/OverlayCaseFunnel';
 
 export default function Page() {
-  return <OverlayFunnel />;
+  return (
+    <Suspense>
+      <OverlayFunnel />;
+    </Suspense>
+  );
 }
