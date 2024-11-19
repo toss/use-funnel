@@ -152,7 +152,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
                 context: prevHistory.context,
                 index: params.index - 1,
                 histories: (params.histories ?? []).slice(0, params.index),
-                isOverlay: false, // FIXME: overlay -> overlay 일 경우를 처리할 수 없음
+                isOverlay: overlayStepMapRef.current[prevHistory.step],
               };
               navigation.setParams({
                 ...route.params,
