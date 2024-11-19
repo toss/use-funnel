@@ -1,3 +1,4 @@
+'use client';
 import { createUseFunnel } from '@use-funnel/core';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -5,10 +6,10 @@ export * from '@use-funnel/core';
 
 export const useFunnel = createUseFunnel(({ id, initialState }) => {
   const [location, setLocation] = useState(() => ({
-    search: window.location.search,
+    search: typeof window !== 'undefined' ? window.location.search : '',
   }));
   const [state, setState] = useState(() => ({
-    ...window.history.state,
+    ...(typeof window !== 'undefined' ? window.history.state : {}),
   }));
 
   useEffect(() => {
