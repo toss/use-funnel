@@ -145,7 +145,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
           } else {
             // FIXME: 미완성 코드. 관련 에러: https://github.com/toss/use-funnel/issues/77
             // 이렇게 해도 네이티브 뒤로가기 시의 문제는 여전히 해결할 수 없음
-            if (params && navigation.getState().index === 0 && params.isOverlay) {
+            if (params && params.index > 0 && navigation.getState().index === 0 && params.isOverlay) {
               const prevHistory = (params.histories ?? [])[params.index - 1];
               const newState: NativeFunnelState = {
                 step: prevHistory.step,
