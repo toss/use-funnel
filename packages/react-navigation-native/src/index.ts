@@ -142,6 +142,26 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
         if (delta === -1) {
           if (navigation.canGoBack()) {
             navigation.goBack();
+          } else {
+            // FIXME: 미완성 코드. 관련 에러: https://github.com/toss/use-funnel/issues/77
+            // 이렇게 해도 네이티브 뒤로가기 시의 문제는 여전히 해결할 수 없음
+            if (params && navigation.getState().index === 0 && params.isOverlay) {
+              const prevHistory = (params.histories ?? [])[params.index - 1];
+              const newState: NativeFunnelState = {
+                step: prevHistory.step,
+                context: prevHistory.context,
+                index: params.index - 1,
+                histories: (params.histories ?? []).slice(0, params.index),
+                isOverlay: false, // FIXME: overlay -> overlay 일 경우를 처리할 수 없음
+              };
+              navigation.setParams({
+                ...route.params,
+                [navigationParamName]: {
+                  ...useFunnelState,
+                  [id]: newState,
+                },
+              });
+            }
           }
         } else {
           // find delta index
