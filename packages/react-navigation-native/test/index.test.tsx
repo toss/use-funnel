@@ -140,4 +140,66 @@ describe('Test useFunnel react-navigation-native router', () => {
     expect(screen.queryByText('B title : replace-test')).toBeNull();
     expect(screen.queryByText('A : Go B')).not.toBeNull();
   });
+
+  test('The overlay should work even if there is no history', async () => {
+    function NoHistoryOverlayTest() {
+      const funnel = useFunnel<{
+        A: { id?: string };
+        Overlay: {};
+      }>({
+        id: 'first-history-overlay-test',
+        initial: {
+          step: 'A',
+          context: {},
+        },
+      });
+      return (
+        <funnel.Render
+          A={({ history }) => (
+            <View>
+              <Button title="A : Go Overlay" onPress={() => history.push('Overlay')} />
+            </View>
+          )}
+          Overlay={funnel.Render.overlay({
+            render({ close }) {
+              return (
+                <View>
+                  <Text>Overlay : title</Text>
+                  <Button title="Overlay : Close Overlay" onPress={() => close()} />
+                </View>
+              );
+            },
+          })}
+        />
+      );
+    }
+
+    const navigationRef = createNavigationContainerRef();
+
+    render(
+      <NavigationContainer ref={navigationRef}>
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={NoHistoryOverlayTest} />
+        </Stack.Navigator>
+      </NavigationContainer>,
+    );
+
+    const user = userEvent.setup();
+
+    // The first screen is "A"
+    expect(screen.queryByText('A : Go Overlay')).not.toBeNull();
+
+    // When the user presses the "A : Go Overlay" button
+    await user.press(screen.getByText('A : Go Overlay'));
+
+    // The screen should be "Overlay"
+    expect(screen.queryByText('Overlay : title')).not.toBeNull();
+
+    // When the user presses the "Overlay : Close Overlay" button
+    await user.press(screen.getByText('Overlay : Close Overlay'));
+
+    // The screen should be "A", overlay is closed
+    expect(screen.queryByText('Overlay : title')).toBeNull();
+    expect(screen.queryByText('A : Go Overlay')).not.toBeNull();
+  });
 });
