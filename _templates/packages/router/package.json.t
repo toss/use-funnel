@@ -25,7 +25,7 @@ to: packages/<%= name %>/package.json
     "package.json"
   ],
   "scripts": {
-    "test": "vitest run",
+    "test": "pnpm --filter \"@use-funnel/core\" build && vitest run",
     "test:unit": "vitest --root test/",
     "build": "rimraf dist && concurrently \"pnpm:build:*\"",
     "build:dist": "tsup",

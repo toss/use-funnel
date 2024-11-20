@@ -22,7 +22,7 @@
     "package.json"
   ],
   "scripts": {
-    "test": "jest .",
+    "test": "pnpm --filter \"@use-funnel/core\" build && jest .",
     "build": "rimraf dist && concurrently \"pnpm:build:*\"",
     "build:dist": "tsup",
     "build:types": "tsc -p tsconfig.build.json --emitDeclarationOnly",
