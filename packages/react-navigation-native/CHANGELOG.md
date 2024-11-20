@@ -1,5 +1,11 @@
 # @use-funnel/react-navigation-native
 
+## 0.0.8
+
+### Patch Changes
+
+- [#80](https://github.com/toss/use-funnel/pull/80) [`5a7cbbf`](https://github.com/toss/use-funnel/commit/5a7cbbff6c06eb66bf26e7a6ccbe2acc664f4f37) Thanks [@minuukang](https://github.com/minuukang)! - Fix browser at ssr, react-navigation-native overlay at first step
+
 ## 0.0.7
 
 ### Patch Changes
