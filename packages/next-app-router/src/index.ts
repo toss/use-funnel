@@ -70,6 +70,6 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
         window.history.go(index);
       },
     }),
-    [history, currentIndex, currentState, searchParams, id, state],
+    [history, currentIndex, currentState, searchParams, id],
   );
 });
