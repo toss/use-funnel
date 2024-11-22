@@ -45,15 +45,13 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
       currentState,
       push(newState) {
         const newSearchParams = new URLSearchParams(searchParams);
-        const newHistoryState = {
-          ...state,
-          [`${id}.context`]: newState.context,
-          [`${id}.histories`]: [...(history ?? []), newState],
-        };
-
         newSearchParams.set(`${id}.step`, newState.step);
         window.history.pushState(newHistoryState, '', `?${newSearchParams.toString()}`);
-        setState(newHistoryState);
+        setState(prevHistoryState => ({
+          ...prevHistoryState,
+          [`${id}.context`]: newState.context,
+          [`${id}.histories`]: [...(history ?? []), newState],
+        }));
       },
       replace(newState) {
         const newSearchParams = new URLSearchParams(searchParams);
