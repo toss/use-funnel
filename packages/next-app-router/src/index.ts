@@ -46,32 +46,28 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
       push(newState) {
         const newSearchParams = new URLSearchParams(searchParams);
         newSearchParams.set(`${id}.step`, newState.step);
-        const newHistoryState = {
-          ...state,
-          [`${id}.context`]: newState.context,
-          [`${id}.histories`]: [...(history ?? []), newState],
-        };
-        window.history.pushState(newHistoryState, '', `?${newSearchParams.toString()}`);
-        setState((prevHistoryState) => ({
-          ...prevHistoryState,
-          [`${id}.context`]: newState.context,
-          [`${id}.histories`]: [...(history ?? []), newState],
-        }));
+        setState((prevHistoryState) => {
+          const newHistoryState = {
+            ...prevHistoryState,
+            [`${id}.context`]: newState.context,
+            [`${id}.histories`]: [...(history ?? []), newState],
+          };
+          window.history.pushState(newHistoryState, '', `?${newSearchParams.toString()}`);
+          return newHistoryState;
+        });
       },
       replace(newState) {
         const newSearchParams = new URLSearchParams(searchParams);
         newSearchParams.set(`${id}.step`, newState.step);
-        const newHistoryState = {
-          ...state,
-          [`${id}.context`]: newState.context,
-          [`${id}.histories`]: [...(history ?? []), newState],
-        };
-        window.history.replaceState(newHistoryState, '', `?${newSearchParams.toString()}`);
-        setState((prevHistoryState) => ({
-          ...prevHistoryState,
-          [`${id}.context`]: newState.context,
-          [`${id}.histories`]: [...(history ?? []), newState],
-        }));
+        setState((prevHistoryState) => {
+          const newHistoryState = {
+            ...prevHistoryState,
+            [`${id}.context`]: newState.context,
+            [`${id}.histories`]: [...(history ?? []), newState],
+          };
+          window.history.replaceState(newHistoryState, '', `?${newSearchParams.toString()}`);
+          return newHistoryState;
+        });
       },
       go(index) {
         window.history.go(index);
