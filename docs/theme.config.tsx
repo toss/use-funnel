@@ -24,6 +24,18 @@ const config: DocsThemeConfig = {
         <meta name="google-site-verification" content="r1VBovAYczFN4z_Mi_wIkBOfQuWV8H05OEPtHmBjolU" />
         <link rel="alternate" hrefLang="ko" href="https://use-funnel.slash.page/ko" />
         <link rel="alternate" hrefLang="en" href="https://use-funnel.slash.page/en" />
+        <meta
+          property="keywords"
+          content="@use-funnel, funnel, 퍼널 상태관리, state management, react, navigation, react-native, rn"
+        />
+        <meta
+          property="description"
+          content={
+            locale === 'ko'
+              ? '모바일 네비게이션에 최적화된 단계별 상태 관리 라이브러리'
+              : 'Step-by-step state management library optimized for mobile navigation'
+          }
+        />
         <meta property="og:title" content={title || '@use-funnel'} />
         <meta property="og:url" content={url} />
         <meta
@@ -31,8 +43,8 @@ const config: DocsThemeConfig = {
           content={
             frontMatter.description ||
             (locale === 'ko'
-              ? '강력하고 안전한 단계별 상태 관리 라이브러리'
-              : 'Powerful and safe step-by-step state management library')
+              ? '모바일 네비게이션에 최적화된 단계별 상태 관리 라이브러리'
+              : 'Step-by-step state management library optimized for mobile navigation')
           }
         />
         <meta property="og:image" content="/logo.png" />
