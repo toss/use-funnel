@@ -1,5 +1,14 @@
 # @use-funnel/next
 
+## 0.0.9
+
+### Patch Changes
+
+- [#88](https://github.com/toss/use-funnel/pull/88) [`d327a69`](https://github.com/toss/use-funnel/commit/d327a6959687309591859a80b05524a8ca714a80) Thanks [@minuukang](https://github.com/minuukang)! - Fix overlay step render before step when is event step
+
+- Updated dependencies [[`d327a69`](https://github.com/toss/use-funnel/commit/d327a6959687309591859a80b05524a8ca714a80)]:
+  - @use-funnel/core@0.0.8
+
 ## 0.0.8
 
 ### Patch Changes
