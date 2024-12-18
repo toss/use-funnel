@@ -13,15 +13,13 @@ export const HomePage = ({
   items: { title: string; desc: string }[];
 }) => {
   return (
-    <div className="flex h-[calc(100vh-162px)] pt-12">
-      <div className="flex flex-col h-full mr-8">
-        <div className="flex flex-col flex-1">
-          <Image src="/logo.png" alt="@use-funnel logo" width={160} height={160} />
+    <div className="flex md:h-[calc(100vh-162px)] pt-12">
+      <div className="flex flex-col md:h-full md:mr-8">
+        <div className="flex flex-col flex-1 md:mb-0 mb-12">
+          <Image src="/logo.png" alt="@use-funnel logo" width={140} height={140} />
           <div className="flex flex-col gap-4 mb-12">
-            <div className="relative text-6xl font-bold">
-              <span>{title}</span>
-            </div>
-            <p className="text-3xl leading-normal whitespace-pre">{description}</p>
+            <h1 className="relative text-6xl font-bold">{title}</h1>
+            <h2 className="text-2xl leading-normal break-words">{description}</h2>
           </div>
           <div>
             <Link href="/docs/overview">
@@ -32,21 +30,21 @@ export const HomePage = ({
           </div>
         </div>
 
-        <div className="flex flex-col justify-between gap-8 md:flex-row items-stretch">
+        <div className="flex md:flex-row flex-col justify-between gap-8 items-stretch">
           {items.map(({ title, desc }) => (
             <div
-              className="flex flex-1 flex-col items-start gap-3 bg-opacity-10 bg-slate-500 rounded-xl p-4"
+              className="flex flex-1 flex-col items-start gap-3 bg-opacity-10 bg-slate-500 rounded-lg py-4 px-6"
               key={title}
             >
-              <div className="text-xl font-bold">{title}</div>
-              <p className="text-base whitespace-break-spaces">{desc}</p>
+              <div className="text-xl font-bold opacity-80">{title}</div>
+              <p className="text-base whitespace-break-spaces opacity-60">{desc}</p>
             </div>
           ))}
         </div>
       </div>
 
       <video
-        className="float-right max-w-[40%] invert-video hidden md:block"
+        className="float-right max-w-[40%] invert-video hidden md:block rounded-lg "
         src="/example.mp4"
         poster="/overlay.png"
         height="100%"
