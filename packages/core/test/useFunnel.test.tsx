@@ -122,17 +122,19 @@ describe('Test useFunnel()', () => {
     test('should work funnel.Render.overlay', async () => {
       function FunnelRenderTest() {
         const funnel = useFunnel<{
+          _: { id?: string };
           A: { id?: string };
           B: { id: string };
         }>({
           id: 'vitest',
           initial: {
-            step: 'A',
+            step: '_',
             context: {},
           },
         });
         return (
           <funnel.Render
+            _={({ history }) => <button onClick={() => history.push('A')}>Go A</button>}
             A={funnel.Render.with({
               events: {
                 GoB: ({ id }: { id: string }, { history }) => {
@@ -159,17 +161,24 @@ describe('Test useFunnel()', () => {
 
       render(<FunnelRenderTest />);
 
-      expect(screen.queryByText('Go B')).not.toBeNull();
+      expect(screen.queryByText('Go A')).not.toBeNull();
 
       const user = userEvent.setup();
+      await user.click(screen.getByText('Go A'));
+
+      expect(screen.queryByText('Go B')).not.toBeNull();
+      expect(screen.queryByText('Go A')).toBeNull();
+
       await user.click(screen.getByText('Go B'));
 
+      expect(screen.queryByText('Go A')).toBeNull();
       expect(screen.queryByText('Go B')).not.toBeNull();
       expect(screen.queryByText('overlay: vitest')).not.toBeNull();
 
       // close overlay
       await user.click(screen.getByText('Close Overlay'));
 
+      expect(screen.queryByText('Go A')).toBeNull();
       expect(screen.queryByText('Go B')).not.toBeNull();
       expect(screen.queryByText('overlay: vitest')).toBeNull();
     });

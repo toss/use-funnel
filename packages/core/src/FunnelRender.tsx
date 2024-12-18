@@ -113,6 +113,9 @@ export function FunnelRender<TStepContextMap extends AnyStepContextMap, TRouteOp
             close: neverUseHistory,
           }),
         ]);
+        if (stepRender.type === 'render') {
+          break;
+        }
       }
     }
     renderEntires = renderEntires.slice().reverse();
