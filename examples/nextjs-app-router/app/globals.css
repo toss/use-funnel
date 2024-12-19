@@ -2,3 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+button {
+  padding: 4px 8px;
+  background-color: steelblue;
+  color: white;
+  border-radius: 4px;
+}
+button:active {
+  transform: scale(0.96);
+}
