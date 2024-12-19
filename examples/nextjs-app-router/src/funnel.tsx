@@ -1,5 +1,6 @@
 'use client';
 import { useFunnel } from '@use-funnel/browser';
+import { SubFunnel } from './sub-funnel';
 
 export const TestAppRouterFunnel = () => {
   const funnel = useFunnel<FunnelState>({ id: FUNNEL_ID, initial: { step: 'start', context: {} } });
@@ -7,12 +8,16 @@ export const TestAppRouterFunnel = () => {
     <funnel.Render
       start={({ history }) => (
         <div>
-          <p>start</p>
-
-          <button onClick={() => history.push('end')}>next</button>
+          <p>MAIN - START</p>
+          <SubFunnel mainNext={() => history.push('end')} />
         </div>
       )}
-      end={() => <div>end</div>}
+      end={({ history }) => (
+        <div>
+          <p>MAIN - END</p>
+          <SubFunnel mainNext={() => history.push('start')} />
+        </div>
+      )}
     />
   );
 };
