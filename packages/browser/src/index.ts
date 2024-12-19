@@ -1,6 +1,6 @@
 'use client';
-import { createUseFunnel } from '@use-funnel/core';
-import { useEffect, useMemo, useState } from 'react';
+import { AnyFunnelState, createUseFunnel } from '@use-funnel/core';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export * from '@use-funnel/core';
 
@@ -25,13 +25,15 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
 
   const currentStep = new URLSearchParams(location.search).get(`${id}.step`);
   const currentContext = state?.[`${id}.context`];
-  const currentState = useMemo(() => {
-    return currentStep != null && currentContext != null
-      ? ({
-          step: currentStep,
-          context: currentContext,
-        } as typeof initialState)
-      : initialState;
+  const currentState: typeof initialState = useMemo(() => {
+    if (currentStep != null && currentContext != null) {
+      return {
+        step: currentStep,
+        context: currentContext,
+      };
+    }
+
+    return initialState;
   }, [currentStep, currentContext, initialState]);
 
   const history: (typeof initialState)[] = useMemo(
@@ -40,38 +42,36 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
   );
   const currentIndex = history.length - 1;
 
+  const changeState = useCallback(
+    (method: 'pushState' | 'replaceState', newState: AnyFunnelState) => {
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.set(`${id}.step`, newState.step);
+      const newHistoryState = {
+        ...state,
+        [`${id}.context`]: newState.context,
+        [`${id}.histories`]: [...(history ?? []), newState],
+      };
+
+      window.history[method](newHistoryState, '', `?${searchParams.toString()}`);
+
+      setLocation({
+        search: window.location.search,
+      });
+      setState(newHistoryState);
+    },
+    [location, state, history, currentState],
+  );
+
   return useMemo(
     () => ({
       history,
       currentIndex,
       currentState,
       push(newState) {
-        const searchParams = new URLSearchParams(location.search);
-        searchParams.set(`${id}.step`, newState.step);
-        const newHistoryState = {
-          ...state,
-          [`${id}.context`]: newState.context,
-          [`${id}.histories`]: [...(history ?? []), newState],
-        };
-        window.history.pushState(newHistoryState, '', `?${searchParams.toString()}`);
-        setLocation({
-          search: window.location.search,
-        });
-        setState(newHistoryState);
+        changeState('pushState', newState);
       },
       replace(newState) {
-        const searchParams = new URLSearchParams(location.search);
-        searchParams.set(`${id}.step`, newState.step);
-        const newHistoryState = {
-          ...state,
-          [`${id}.context`]: newState.context,
-          [`${id}.histories`]: [...(history ?? []), newState],
-        };
-        window.history.replaceState(newHistoryState, '', `?${searchParams.toString()}`);
-        setLocation({
-          search: window.location.search,
-        });
-        setState(newHistoryState);
+        changeState('replaceState', newState);
       },
       go: (index) => {
         window.history.go(index);
