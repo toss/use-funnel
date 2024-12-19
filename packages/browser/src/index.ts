@@ -46,8 +46,9 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
     (method: 'pushState' | 'replaceState', newState: AnyFunnelState) => {
       const searchParams = new URLSearchParams(location.search);
       searchParams.set(`${id}.step`, newState.step);
+
       const newHistoryState = {
-        ...state,
+        ...window.history.state,
         [`${id}.context`]: newState.context,
         [`${id}.histories`]: [...(history ?? []), newState],
       };
@@ -59,7 +60,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
       });
       setState(newHistoryState);
     },
-    [location, state, history, currentState],
+    [location, history],
   );
 
   return useMemo(
@@ -77,6 +78,6 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
         window.history.go(index);
       },
     }),
-    [history, currentIndex, currentState],
+    [history, currentIndex, currentState, changeState],
   );
 });
