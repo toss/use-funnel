@@ -1,9 +1,11 @@
-'use client';
-import dynamic from 'next/dynamic';
-const TestAppRouterFunnel = dynamic(() =>
-  import('../src/funnel').then(({ TestAppRouterFunnel }) => TestAppRouterFunnel),
-);
+import Link from 'next/link';
+
 export default function Home() {
-  //A pre-render error occurs in @use-funnel/browser 0.0.5 version.
-  return <TestAppRouterFunnel />;
+  return (
+    <div>
+      <Link href="/funnel">
+        <button>Go to Funnel</button>
+      </Link>
+    </div>
+  );
 }
