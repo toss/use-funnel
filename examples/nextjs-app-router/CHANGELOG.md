@@ -1,5 +1,12 @@
 # nextjs-app-router
 
+## 0.1.3
+
+### Patch Changes
+
+- Updated dependencies [[`b9d4abc`](https://github.com/toss/use-funnel/commit/b9d4abc59a3cabdf29e1004c09780e284beafc2b)]:
+  - @use-funnel/browser@0.0.10
+
 ## 0.1.2
 
 ### Patch Changes
