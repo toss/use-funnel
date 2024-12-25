@@ -8,9 +8,18 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
   const [location, setLocation] = useState(() => ({
     search: typeof window !== 'undefined' ? window.location.search : '',
   }));
-  const [state, setState] = useState(() => ({
-    ...(typeof window !== 'undefined' ? window.history.state : {}),
-  }));
+  const [state, setState] = useState(() => {
+    if (typeof window === 'undefined') {
+      return {};
+    }
+
+    const isSubFunnelIdDuplicated = window.history.state[`${id}.histories`];
+    if (isSubFunnelIdDuplicated) {
+      console.error(`Duplicate sub funnel ids detected in main funnel. This may cause unexpected step rendering.`);
+    }
+
+    return window.history.state;
+  });
 
   useEffect(() => {
     function handlePopState(event: PopStateEvent) {
