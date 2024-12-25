@@ -4,6 +4,17 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export * from '@use-funnel/core';
 
+function unmountFunnel(id: string) {
+  const newHistoryState = {
+    ...window.history.state,
+  };
+
+  delete newHistoryState[`${id}.context`];
+  delete newHistoryState[`${id}.histories`];
+
+  window.history.replaceState(newHistoryState, '');
+}
+
 export const useFunnel = createUseFunnel(({ id, initialState }) => {
   const [location, setLocation] = useState(() => ({
     search: typeof window !== 'undefined' ? window.location.search : '',
@@ -28,6 +39,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
     }
     window.addEventListener('popstate', handlePopState);
     return () => {
+      unmountFunnel(id);
       window.removeEventListener('popstate', handlePopState);
     };
   }, []);
