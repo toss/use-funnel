@@ -1,6 +1,6 @@
 {
   "name": "@use-funnel/core",
-  "version": "0.0.9",
+  "version": "0.0.8",
   "description": "",
   "type": "module",
   "main": "./dist/index.js",
