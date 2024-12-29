@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { afterEach, describe, expect, test } from 'vitest';
 import { useFunnel } from '../src/index.js';
@@ -109,6 +109,8 @@ describe('Test useFunnel browser router', () => {
 
     // close overlay
     await user.click(screen.getByText('Close Overlay'));
+
+    await waitForElementToBeRemoved(() => screen.queryAllByText('overlay: vitest'));
 
     expect(screen.queryByText('Go A')).toBeNull();
     expect(screen.queryByText('Go B')).not.toBeNull();
