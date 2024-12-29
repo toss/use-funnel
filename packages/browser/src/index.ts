@@ -50,7 +50,8 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
       const newHistoryState = {
         ...window.history.state,
         [`${id}.context`]: newState.context,
-        [`${id}.histories`]: [...(history ?? []), newState],
+        [`${id}.histories`]:
+          method === 'pushState' ? [...(history ?? []), newState] : [...history.slice(0, currentIndex), newState],
       };
 
       window.history[method](newHistoryState, '', `?${searchParams.toString()}`);
@@ -74,10 +75,23 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
       replace(newState) {
         changeState('replaceState', newState);
       },
-      go: (index) => {
+      go(index) {
         window.history.go(index);
       },
+      cleanup() {
+        const newHistoryState = {
+          ...window.history.state,
+        };
+
+        delete newHistoryState[`${id}.context`];
+        delete newHistoryState[`${id}.histories`];
+
+        const searchParams = new URLSearchParams(location.search);
+        searchParams.delete(`${id}.step`);
+
+        window.history.replaceState(newHistoryState, '', `?${searchParams.toString()}`);
+      },
     }),
-    [history, currentIndex, currentState, changeState],
+    [id, history, currentIndex, currentState, changeState],
   );
 });

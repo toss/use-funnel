@@ -202,4 +202,98 @@ describe('Test useFunnel react-navigation-native router', () => {
     expect(screen.queryByText('Overlay : title')).toBeNull();
     expect(screen.queryByText('A : Go Overlay')).not.toBeNull();
   });
+
+  test('should work with sub funnel when is multiple used', async () => {
+    function SubFunnel(props: { onNext(id: string): void }) {
+      const funnel = useFunnel<{
+        sub1: { id?: string };
+        sub2: { id: string };
+      }>({
+        id: 'sub',
+        initial: {
+          step: 'sub1',
+          context: {},
+        },
+      });
+      return <funnel.Render
+        sub1={({ history }) => <Button onPress={() => history.push('sub2', { id: 'SubId' })} title="Go to sub2" />}
+        sub2={({ context }) => {
+          return (
+            <View>
+              <Text>Your id is {context.id}?</Text>
+              <Button title="OK" onPress={() => props.onNext(context.id)} />
+            </View>
+          );
+        }}
+      />
+    }
+
+    function MainFunnel() {
+      const funnel = useFunnel<{
+        main1: { id1?: string };
+        main2: { id1: string; id2?: string };
+        main3: { id1: string; id2?: string }
+      }>({
+        id: 'main',
+        initial: {
+          step: 'main1',
+          context: {},
+        },
+      });
+
+      return <funnel.Render
+        main1={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id1: id })} />}
+        main2={({ context, history }) => (
+          <View>
+            <Text>id1 is {context.id1}!</Text>
+            {context.id2 == null ? (
+              <Button title="set id2" onPress={() => history.push('main3')} />
+            ) : (
+              <Text>id2 is {context.id2}</Text>
+            )}
+          </View>
+        )}
+        main3={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id2: id })} />}
+      />
+    }
+
+    const navigationRef = createNavigationContainerRef();
+
+    render(
+      <NavigationContainer ref={navigationRef}>
+        <Stack.Navigator>
+          <Stack.Screen name="Home" component={MainFunnel} />
+        </Stack.Navigator>
+      </NavigationContainer>,
+    );
+
+    // Main1/Sub1
+    expect(screen.queryByText('Go to sub2')).not.toBeNull();
+
+    const user = userEvent.setup();
+    await user.press(screen.getByText('Go to sub2'));
+
+    // Main1/Sub2
+    expect(screen.queryByText('Your id is SubId?')).not.toBeNull();
+    await user.press(screen.getByText('OK'));
+
+    // Main2
+    // expect(navigationRef.getCurrentRoute()?.params).not.toHaveProperty(['__useFunnelState', 'sub']);
+    expect(screen.queryByText('id1 is SubId!')).not.toBeNull();
+    expect(screen.queryByText('set id2')).not.toBeNull();
+    await user.press(screen.getByText('set id2'));
+
+    // Main3/Sub1
+    expect(screen.queryByText('Go to sub2')).not.toBeNull();
+
+    await user.press(screen.getByText('Go to sub2'));
+
+    // Main3/Sub2
+    expect(screen.queryByText('Your id is SubId?')).not.toBeNull();
+    await user.press(screen.getByText('OK'));
+
+    // Main2
+    expect(screen.queryByText('id1 is SubId!')).not.toBeNull();
+    expect(screen.queryByText('id2 is SubId')).not.toBeNull();
+  })
 });

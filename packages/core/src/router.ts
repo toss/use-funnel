@@ -17,6 +17,7 @@ export interface FunnelRouterResult<TRouteOption extends RouteOption> {
   push: (state: AnyFunnelState, option?: FunnelRouterTransitionOption & TRouteOption) => void | Promise<void>;
   replace: (state: AnyFunnelState, option?: FunnelRouterTransitionOption & TRouteOption) => void | Promise<void>;
   go: (index: number) => void | Promise<void>;
+  cleanup: () => void;
 }
 
 export interface FunnelRouter<TRouteOption extends RouteOption> {
