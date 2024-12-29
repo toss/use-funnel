@@ -1,5 +1,14 @@
 # @use-funnel/react-router-dom
 
+## 0.0.9
+
+### Patch Changes
+
+- [#99](https://github.com/toss/use-funnel/pull/99) [`6cb845b`](https://github.com/toss/use-funnel/commit/6cb845b654362ac62efb8204ce02eb5e34259885) Thanks [@minuukang](https://github.com/minuukang)! - fix(\*): Cleanup funnel state when unmounted
+
+- Updated dependencies [[`6cb845b`](https://github.com/toss/use-funnel/commit/6cb845b654362ac62efb8204ce02eb5e34259885)]:
+  - @use-funnel/core@0.0.9
+
 ## 0.0.8
 
 ### Patch Changes
