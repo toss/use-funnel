@@ -1,5 +1,11 @@
 # @use-funnel/core
 
+## 0.0.9
+
+### Patch Changes
+
+- [#97](https://github.com/toss/use-funnel/pull/97) [`256c611`](https://github.com/toss/use-funnel/commit/256c611e612a750d33e04fad8feb2d4dbae039e1) Thanks [@minuukang](https://github.com/minuukang)! - fix(\*): Cleanup funnel state when unmounted
+
 ## 0.0.8
 
 ### Patch Changes
