@@ -9,7 +9,7 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import { createUseFunnel } from '@use-funnel/core';
-import { useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 export * from '@use-funnel/core';
 
@@ -21,6 +21,7 @@ type NativeFunnelState = {
   index: number;
   histories?: any[];
   isOverlay?: boolean;
+  routeKey?: string;
 };
 
 type NativeFunnelParam = {
@@ -36,8 +37,41 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
   const route = useRoute<RouteProp<NativeFunnelParamList>>();
   const routes = useNavigationState<NativeFunnelParamList, Route<string, NativeFunnelParam>[]>((state) => state.routes);
 
+  const currentkey = route.key;
+
   const useFunnelState = route.params?.[navigationParamName];
   const params = useFunnelState?.[id];
+
+  useEffect(() => {
+    if (params?.routeKey !== currentkey) {
+      navigation.setParams({
+        ...route.params,
+        [navigationParamName]: {
+          ...useFunnelState,
+          [id]: {
+            ...params!,
+            routeKey: currentkey,
+          },
+        },
+      });
+    }
+  }, [params, currentkey]);
+
+  const createTransitionParam = useCallback(
+    (newState: NativeFunnelState) => {
+      const newUseFunnelState = { ...useFunnelState };
+      for (const key in newUseFunnelState) {
+        if (newUseFunnelState[key].routeKey !== currentkey) {
+          delete newUseFunnelState[key];
+        }
+      }
+      return {
+        ...newUseFunnelState,
+        [id]: newState,
+      } as Record<string, NativeFunnelState>;
+    },
+    [currentkey, useFunnelState],
+  );
 
   const currentStep = params?.step;
   const currentContext = params?.context;
@@ -73,6 +107,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
             [navigationParamName]: {
               ...useFunnelState,
               [id]: {
+                ...beforeState,
                 step: beforeState.step,
                 context: beforeState.context,
                 index: currentIndex - 1,
@@ -105,10 +140,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
         if (funnelState.isOverlay) {
           navigation.setParams({
             ...route.params,
-            [navigationParamName]: {
-              ...useFunnelState,
-              [id]: funnelState,
-            },
+            [navigationParamName]: createTransitionParam(funnelState),
           });
         } else {
           navigation.navigate({
@@ -116,10 +148,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
             key: `${navigationParamName}::${id}::${currentIndex + 1}`,
             params: {
               ...route.params,
-              [navigationParamName]: {
-                ...useFunnelState,
-                [id]: funnelState,
-              },
+              [navigationParamName]: createTransitionParam(funnelState),
             },
           });
         }
@@ -127,15 +156,12 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
       replace(state) {
         navigation.setParams({
           ...route.params,
-          [navigationParamName]: {
-            ...useFunnelState,
-            [id]: {
-              step: state.step,
-              context: state.context,
-              index: currentIndex,
-              histories: [...(history ?? []).slice(0, currentIndex), state],
-            },
-          },
+          [navigationParamName]: createTransitionParam({
+            step: state.step,
+            context: state.context,
+            index: currentIndex,
+            histories: [...(history ?? []).slice(0, currentIndex), state],
+          }),
         });
       },
       go(delta) {
@@ -180,7 +206,15 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
           }
         }
       },
+      cleanup() {
+        const newUseFunnelState = { ...useFunnelState };
+        delete newUseFunnelState[id];
+        navigation.setParams({
+          ...route.params,
+          [navigationParamName]: newUseFunnelState,
+        });
+      },
     }),
-    [currentState, history, currentIndex, navigation, route, params, useFunnelState, routes],
+    [id, currentState, history, currentIndex, navigation, route, params, useFunnelState, routes, createTransitionParam],
   );
 });

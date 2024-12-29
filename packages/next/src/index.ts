@@ -103,7 +103,31 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
         );
       },
       go: (index) => window.history.go(index),
+      async cleanup() {
+        const { pathname, query } = makePath(router);
+        const queryContext = {
+          [`${QS_KEY}${id}${STEP_KEY}`]: undefined,
+          [`${QS_KEY}${id}${CONTEXT_KEY}`]: undefined,
+        };
+
+        await router.replace(
+          {
+            pathname,
+            query: {
+              ...query,
+              ...queryContext,
+            },
+          },
+          {
+            pathname,
+            query: { ...removeKeys(query, [checkIsHistoryKey]), ...queryContext },
+          },
+          {
+            shallow: true,
+          },
+        );
+      },
     }),
-    [router, currentIndex, beforeHistories, currentContext],
+    [id, router, currentIndex, beforeHistories, currentContext],
   );
 });

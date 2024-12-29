@@ -83,10 +83,25 @@ export const useFunnel = createUseFunnel<ReactRouterDomRouteOption>(({ id, initi
           },
         );
       },
-      go: (index) => {
+      go(index) {
         navigate(index);
       },
+      cleanup() {
+        const newLocationState = { ...location.state };
+        delete newLocationState[contextName];
+        delete newLocationState[historiesName];
+        setSearchParams(
+          (prev) => {
+            prev.delete(stepName);
+            return prev;
+          },
+          {
+            replace: true,
+            state: newLocationState,
+          },
+        );
+      },
     }),
-    [currentState, history, currentIndex, setSearchParams, navigate, location.state],
+    [id, stepName, currentState, history, currentIndex, setSearchParams, navigate, location.state],
   );
 });
