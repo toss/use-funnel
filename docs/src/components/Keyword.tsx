@@ -2,11 +2,11 @@ import { useRouter } from 'next/router';
 
 export const keywords = {
   step: {
-    ko: '사용자가 하나의 목표를 위해 여러 화면에 걸쳐서 필요한 값을 입력할 때, 각 화면이 step이에요.',
+    ko: '하나의 목표를 위해 사용자에게 여러 화면에 걸쳐서 필요한 값을 입력받을 때, 각 화면이 step이에요.',
     en: 'When a user performs an input value for one action across multiple screens, each screen is called a "step".',
   },
   context: {
-    ko: '각 step에서 입력한 값의 상태에요.',
+    ko: '각 step에서 입력한 값을 저장한 상태에요.',
     en: 'It is a state that stores the input values required for each step.',
   },
   history: {
