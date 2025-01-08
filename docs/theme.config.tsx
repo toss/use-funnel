@@ -16,7 +16,12 @@ const config: DocsThemeConfig = {
   head: function Head() {
     const { title, frontMatter } = useConfig();
     const { asPath, defaultLocale, locale } = useRouter();
+
     const url = 'https://use-funnel.slash.page' + (defaultLocale === locale ? asPath : `/${locale}${asPath}`);
+    const contentDescription =
+      locale === 'ko'
+        ? '모바일 네비게이션에 최적화된 단계별 상태 관리 라이브러리'
+        : 'Step-by-step state management library optimized for mobile navigation';
 
     return (
       <>
@@ -24,17 +29,14 @@ const config: DocsThemeConfig = {
         <meta name="google-site-verification" content="r1VBovAYczFN4z_Mi_wIkBOfQuWV8H05OEPtHmBjolU" />
         <link rel="alternate" hrefLang="ko" href="https://use-funnel.slash.page/ko" />
         <link rel="alternate" hrefLang="en" href="https://use-funnel.slash.page/en" />
-        <meta property="og:title" content={title || '@use-funnel'} />
-        <meta property="og:url" content={url} />
         <meta
-          property="og:description"
-          content={
-            frontMatter.description ||
-            (locale === 'ko'
-              ? '강력하고 안전한 단계별 상태 관리 라이브러리'
-              : 'Powerful and safe step-by-step state management library')
-          }
+          property="keywords"
+          content="@use-funnel, funnel, 퍼널 상태관리, 모바일 상태관리, 단계별 상태관리, mobile state, state management, react, navigation, react-native, rn"
         />
+        <meta name="description" content={contentDescription} />
+        <meta property="og:title" content={title ?? '@use-funnel'} />
+        <meta property="og:url" content={url} />
+        <meta property="og:description" content={frontMatter.description ?? contentDescription} />
         <meta property="og:image" content="/logo.png" />
         <link rel="icon" href="/favicon.ico" type="image/ico" />
       </>
@@ -46,7 +48,7 @@ const config: DocsThemeConfig = {
   docsRepositoryBase: 'https://github.com/toss/use-funnel/tree/main/docs',
   useNextSeoProps() {
     const { asPath } = useRouter();
-    if (asPath !== '/') {
+    if (asPath !== '/' && asPath !== '/ko') {
       return {
         titleTemplate: '%s – @use-funnel',
       };
