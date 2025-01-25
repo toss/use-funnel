@@ -1,5 +1,5 @@
 import { Steps, Callout } from 'nextra/components'
-import { UseFunnelCodeBlock, Keyword } from '@/components'
+import { UseFunnelCodeBlock, Keyword, useFunnelPackages } from '@/components'
 
 # Getting Started
 
@@ -35,7 +35,28 @@ First, specify the object type with the key as the step and the context object a
 
 Here, we set the initial step to "EmailInput" and an empty `context` object to be used in that step. `id` is a unique identifier to distinguish when there are multiple funnels in one component.
 
-<UseFunnelCodeBlock>
+<UseFunnelCodeBlock
+  renderSupplement={({ packageName }) => {
+    if (packageName === useFunnelPackages[0].packageName) {
+      return (
+        <Callout type="warning">
+          <strong>Note:</strong> Since <code>@use-funnel/browser</code> relies on the browser's history
+          state, it cannot be hydrated on the server. This means it must run exclusively on the client. To make sure 
+          it works correctly, you can either render it conditionally after mounting in a parent component or use a{' '}
+          <code>ssr: false</code> configuration with{' '}
+          <a
+            href="https://nextjs.org/docs/app/building-your-application/optimizing/lazy-loading#nextdynamic"
+            target="_blank"
+            rel="noreferrer"
+          >
+            next/dynamic
+          </a>{' '}
+          to create the funnel component.
+        </Callout>
+      );
+    }
+  }}
+>
 ```tsx {5-15}
 import { useFunnel } from "@use-funnel/next";
 import type { EmailInput, PasswordInput, OtherInfoInput } "./context";
