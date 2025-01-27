@@ -114,6 +114,13 @@ interface FunnelHistory<TContextMap, TCurrentStep extends keyof TContextMap> {
 <Tabs items={useFunnelPackages.map((p) => p.packageTitle)} storageKey="favorite-package">
   <Tabs.Tab>
     ```ts
+    interface RouteOption {}
+    ```
+
+    At this package, no options are provided.
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```ts
     interface RouteOption {
       scroll?: boolean;
       locale?: string;

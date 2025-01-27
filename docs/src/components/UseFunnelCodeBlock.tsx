@@ -3,6 +3,10 @@ import { useEffect, useRef } from 'react';
 
 export const useFunnelPackages = [
   {
+    packageName: 'browser',
+    packageTitle: 'Next.js app router',
+  },
+  {
     packageName: 'next',
     packageTitle: 'Next.js page router',
   },
@@ -20,12 +24,20 @@ export const useFunnelPackages = [
   },
 ];
 
-export function UseFunnelCodeBlock({ children }: React.PropsWithChildren<unknown>) {
+interface UseFunnelCodeBlockProps {
+  renderSupplement?: ({ packageTitle }: { packageTitle: string }) => React.ReactNode;
+}
+
+export function UseFunnelCodeBlock({
+  children,
+  renderSupplement: RenderSupplement,
+}: React.PropsWithChildren<UseFunnelCodeBlockProps>) {
   return (
     <Tabs items={useFunnelPackages.map((p) => p.packageTitle)} storageKey="favorite-package">
       {useFunnelPackages.map((item) => (
         <Tabs.Tab key={item.packageTitle}>
           <UseFunnelImportReplace packageName={item.packageName}>{children}</UseFunnelImportReplace>
+          {RenderSupplement && <RenderSupplement packageTitle={item.packageTitle} />}
         </Tabs.Tab>
       ))}
     </Tabs>
