@@ -25,7 +25,7 @@ export const useFunnelPackages = [
 ];
 
 interface UseFunnelCodeBlockProps {
-  renderSupplement?: ({ packageName }: { packageName: string }) => React.ReactNode;
+  renderSupplement?: ({ packageTitle }: { packageTitle: string }) => React.ReactNode;
 }
 
 export function UseFunnelCodeBlock({
@@ -37,7 +37,7 @@ export function UseFunnelCodeBlock({
       {useFunnelPackages.map((item) => (
         <Tabs.Tab key={item.packageTitle}>
           <UseFunnelImportReplace packageName={item.packageName}>{children}</UseFunnelImportReplace>
-          {RenderSupplement && <RenderSupplement packageName={item.packageName} />}
+          {RenderSupplement && <RenderSupplement packageTitle={item.packageTitle} />}
         </Tabs.Tab>
       ))}
     </Tabs>

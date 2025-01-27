@@ -36,8 +36,8 @@ type 그외정보입력 = { email: string; password: string; other?: unknown }
 여기서는 초기 단계인 "이메일입력"과 해당 단계에서 사용할 빈 `context` 객체를 설정했어요. `id`는 [한 컴포넌트에 여러 퍼널](/docs/sub-funnel)이 있을 때 구분하기 위한 고유 식별자에요.
 
 <UseFunnelCodeBlock
-  renderSupplement={({ packageName }) => {
-    if (packageName === useFunnelPackages[0].packageName) {
+  renderSupplement={({ packageTitle }) => {
+    if (packageTitle === useFunnelPackages[0].packageTitle) {
       return (
         <Callout type="warning">
             <strong>주의할 점:</strong> <code>@use-funnel/browser</code>의 경우 브라우저의 히스토리 상태를 기반으로

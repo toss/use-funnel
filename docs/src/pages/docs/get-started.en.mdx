@@ -36,8 +36,8 @@ First, specify the object type with the key as the step and the context object a
 Here, we set the initial step to "EmailInput" and an empty `context` object to be used in that step. `id` is a unique identifier to distinguish when there are multiple funnels in one component.
 
 <UseFunnelCodeBlock
-  renderSupplement={({ packageName }) => {
-    if (packageName === useFunnelPackages[0].packageName) {
+  renderSupplement={({ packageTitle }) => {
+    if (packageTitle === useFunnelPackages[0].packageTitle) {
       return (
         <Callout type="warning">
           <strong>Note:</strong> Since <code>@use-funnel/browser</code> relies on the browser's history
