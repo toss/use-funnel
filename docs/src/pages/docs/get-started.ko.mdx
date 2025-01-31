@@ -1,5 +1,5 @@
 import { Steps, Callout } from 'nextra/components'
-import { UseFunnelCodeBlock, Keyword } from '@/components'
+import { UseFunnelCodeBlock, Keyword, useFunnelPackages } from '@/components'
 
 # 시작하기
 
@@ -35,7 +35,27 @@ type 그외정보입력 = { email: string; password: string; other?: unknown }
 
 여기서는 초기 단계인 "이메일입력"과 해당 단계에서 사용할 빈 `context` 객체를 설정했어요. `id`는 [한 컴포넌트에 여러 퍼널](/docs/sub-funnel)이 있을 때 구분하기 위한 고유 식별자에요.
 
-<UseFunnelCodeBlock>
+<UseFunnelCodeBlock
+  renderSupplement={({ packageTitle }) => {
+    if (packageTitle === useFunnelPackages[0].packageTitle) {
+      return (
+        <Callout type="warning">
+            <strong>주의할 점:</strong> <code>@use-funnel/browser</code>의 경우 브라우저의 히스토리 상태를 기반으로
+            동작하기 때문에 서버에서 <code>Hydration</code>을 기대하기 어려워요. 그래서 오로지 클라이언트에서만 실행될 수 있도록 상위
+            컴포넌트에서 <code>mount</code>후에 렌더링 하게하거나,{' '}
+            <a
+              href="https://nextjs.org/docs/app/building-your-application/optimizing/lazy-loading#nextdynamic"
+              target="_blank"
+              rel="noreferrer"
+            >
+              next/dynamic
+            </a>
+            의 컴포넌트를 통해 <code>ssr: false</code> 형태로 퍼널 컴포넌트를 만들어야해요.
+        </Callout>
+      );
+    }
+  }}
+>
 ```tsx {5-15}
 import { useFunnel } from "@use-funnel/next";
 import type { 이메일입력, 비밀번호입력, 그외정보입력 } "./context";
