@@ -1,4 +1,4 @@
-# @use-funnel/react-router-dom
+# @use-funnel/react-navigation-native
 
 <div align="center">
   <a href="https://use-funnel.slash.page" title="@use-funnel - A powerful and safe step-by-step state management library">
@@ -31,7 +31,7 @@ https://github.com/user-attachments/assets/8300d4ed-ab02-436e-a5a6-99c8d732e32f
 
 
 ```tsx
-import { useFunnel } from '@use-funnel/react-router-dom';
+import { useFunnel } from '@use-funnel/react-navigation-native';
 
 export function App() {
   const funnel = useFunnel<{
@@ -47,7 +47,7 @@ export function App() {
       context: {},
     },
   });
-  
+
   return (
     <funnel.Render
       SelectJob={funnel.Render.with({
