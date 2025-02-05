@@ -3,7 +3,7 @@
 <div align="center">
   <a href="https://use-funnel.slash.page" title="@use-funnel - A powerful and safe step-by-step state management library">
     <img src="./docs/public/logo.png" width="200" />
-    <h1 align="center">@use-funnel</h1>
+    <h2 align="center">@use-funnel</h2>
   </a>
   <p style="font-size:18px;">A powerful and safe step-by-step state management library</p>
 </div>
