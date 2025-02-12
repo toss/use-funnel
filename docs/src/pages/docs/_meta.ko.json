@@ -11,6 +11,7 @@
   },
   "install": "설치하기",
   "get-started": "시작하기",
+  "migration": "@toss/use-funnel 마이그레이션",
   "--- Reference": {
     "type": "separator",
     "title": "레퍼런스"

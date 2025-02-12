@@ -1,3 +1,4 @@
+export * from './CodeCompare';
 export * from './HomePage';
 export * from './Keyword';
 export * from './Sandpack';

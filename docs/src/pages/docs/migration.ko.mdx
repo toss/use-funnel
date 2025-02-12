@@ -1,0 +1,214 @@
+import { CodeCompare } from '@/components';
+
+# @toss/use-funnel 마이그레이션
+
+이 문서는 [@toss/use-funnel](https://www.slash.page/ko/libraries/react/use-funnel/README.i18n) 에서 사용하던 코드를 새로운 `@use-funnel` 로 마이그레이션하는 방법을 설명합니다. `@toss/use-funnel` 은 Next.js Page Router 로 작성되어서 이 문서는 `@use-funnel/next` 로 마이그레이션 하는 방법을 설명합니다.
+
+## 새로운 혜택
+
+- 상태가 히스토리를 따라가지 않는 이슈를 수정했어요([관련 문서](https://use-funnel.slash.page/ko/docs/features#%EC%89%AC%EC%9A%B4-%ED%9E%88%EC%8A%A4%ED%86%A0%EB%A6%AC-%EC%83%81%ED%83%9C-%EA%B4%80%EB%A6%AC))
+- 단계별로 상태를 만들 수 있게 되었어요.
+- Next.js 외에 `react-router-dom`, `@react-navigation/native` 를 지원해요.
+
+## 설치하기
+
+[설치하기](https://use-funnel.slash.page/ko/docs/install)에서 더 자세한 내용을 확인해보세요.
+
+```shell npm2yarn
+npm install @use-funnel/next --save
+```
+
+## Breaking Change
+
+### steps 마이그레이션
+
+새로운 `@use-funnel` 에서는 단순히 단계만 정의할 수 있는게 아니라 단계별로 상태를 정의할 수 있습니다. `@toss/use-funnel` 으로 작성된 퍼널에서 이러한 타입이 필요없거나, 상태가 있더라도 단계별로 다른게 필요없다면 `@use-funnel` 에서 제공하는 `createStepBuilder()` 를 활용할 수 있습니다.
+
+<CodeCompare>
+```tsx showLineNumbers {3}
+import { useFunnel } from '@toss/use-funnel';
+
+const FUNNEL_STEPS = ['A', 'B', 'C'] as const;
+const [Funnel, setFunnel] = useFunnel(FUNNEL_STEPS);
+```
+```tsx showLineNumbers {3-5,8}
+import { createFunnelSteps } from '@use-funnel/next';
+
+const steps = createFunnelSteps()
+  .extends(['A', 'B', 'C'])
+  .build();
+  
+const funnel = useFunnel({
+  steps,
+  initial: {
+    step: 'A',
+    context: {}
+  }
+});
+```
+</CodeCompare>
+
+### `<Funnel />`, `<Funnel.Step />` 컴포넌트 마이그레이션
+
+새로운 `@use-funnel` 에서는 단계별로 상태 타입을 추론하기 위해 별도의 컴포넌트를 사용하지 않고 `useFunnel()` 에서 반환되는 `funnel.step`, `funnel.context` 를 통해 현재 단계와 상태를 확인할 수 있습니다. `funnel.step` 을 switch-case 문으로 구별하여 렌더링할 수 있습니다.
+
+<CodeCompare>
+```tsx
+import { useFunnel } from '@toss/use-funnel';
+
+const [Funnel, setFunnel] = useFunnel([
+  'A', 'B'
+] as const);
+
+return (
+  <Funnel>
+    <Funnel.Step name="A">
+      <div>A</div>
+    </Funnel.Step>
+    <Funnel.Step name="B">
+      <div>B</div>
+    </Funnel.Step>
+  </Funnel>
+)
+```
+```tsx
+import { useFunnel } from '@use-funnel/next';
+
+const steps = createFunnelSteps().extends(['A', 'B']).build();
+const funnel = useFunnel({
+  steps,
+  initial: {
+    step: 'A',
+    context: {}
+  }
+});
+
+switch (funnel.step) {
+  case 'A':
+    return <div>A</div>;
+  case 'B':
+    return <div>B</div>;
+}
+```
+</CodeCompare>
+
+또는 `<funnel.Render />` 컴포넌트를 통해 더욱 더 선언적으로 구현할 수 있습니다. 자세한 내용은 [funnel.Render 컴포넌트](/docs/funnel-render) 문서를 참고해주세요.
+
+### `withState()` 마이그레이션
+  
+`@toss/use-funnel` 의 `withState()` 를 통해 상태를 구현하고 있었다면 `createFunnelSteps()` 에 제네릭을 넘겨서 이를 구현할 수 있습니다.
+
+<CodeCompare>
+```tsx showLineNumbers {5-11}
+import { useFunnel } from '@toss/use-funnel';
+
+const [Funnel, state, setState] = useFunnel([
+  'A', 'B', 'C'
+] as const).withState<{
+  foo?: string;
+  bar?: number;
+}>({
+  foo: 'Hello',
+  bar: 5
+});
+```
+```tsx showLineNumbers {3-6,12-15}
+import { useFunnel, createFunnelSteps } from '@use-funnel/next';
+
+const steps = createFunnelSteps<{
+  foo?: string;
+  bar?: number;
+}>().extends(['A', 'B', 'C']).build();
+
+const funnel = useFunnel({
+  steps,
+  initial: {
+    step: 'A',
+    context: {
+      foo: 'Hello',
+      bar: 5
+    }
+  }
+});
+```
+</CodeCompare>
+
+### stepQueryKey 진입 마이그레이션
+
+`@toss/use-funnel` 에서는 `stepQueryKey` 의 기본값으로 “funnel-step” 이라는 값을 사용하고 있습니다. 새로운 `@use-funnel` 에서는 내부적으로 키를 생성하여 관리하기 때문에 이를 진입점으로 사용하고 있었다면 직접 해당 query parameter를 `initial` 에 넘겨주어야 합니다.
+
+<CodeCompare>
+```tsx showLineNumbers {10}
+import { useFunnel } from '@toss/use-funnel';
+
+// 퍼널 페이지로 이동하되, B Step으로 시작
+router.push('/funnel?my-funnel-step=B');
+
+// B Step으로 시작
+const [Funnel, setFunnel] = useFunnel([
+  'A', 'B', 'C'
+] as const, {
+  stepQueryKey: 'my-funnel-step'
+});
+
+```
+```tsx showLineNumbers {8,15}
+import { useRouter } from 'next/router';
+import { useFunnel, createFunnelSteps } from '@use-funnel/next';
+
+// 퍼널 페이지로 이동하되, B Step으로 시작
+router.push('/funnel?my-funnel-step=B');
+
+const router = useRouter();
+const initialStep = router.query['my-funnel-step'];
+const steps = createFunnelSteps().extends(['A', 'B', 'C']).build();
+
+// B Step으로 시작
+const funnel = useFunnel({
+  steps,
+  initial: {
+    step: intialStep as keyof typeof steps,
+    context: {}
+  }
+});
+```
+</CodeCompare>
+
+### onStepChange 마이그레이션
+
+새로운 `@use-funnel` 에서는 현재 단계가 무엇인지 제공하고 있습니다. 이를 활용하여 `useEffect()` 에서 활용할 수 있습니다.
+
+<CodeCompare>
+```tsx showLineNumbers {6-8}
+import { useFunnel } from '@toss/use-funnel';
+
+const [Funnel, setFunnel] = useFunnel([
+  'A', 'B', 'C'
+] as const, {
+  onStepChange(step) {
+    console.log(`CURRENT STEP: ${step}`);
+  }
+});
+```
+
+```tsx showLineNumbers {16-18}
+import { useEffect } from 'react';
+import { useFunnel, createFunnelSteps } from '@use-funnel/next';
+
+const steps = createFunnelSteps()
+  .extends(['A', 'B', 'C'])
+  .build();
+	
+const funnel = useFunnel({
+  steps,
+  initial: {
+    step: 'A',
+    context: {}
+  }
+});
+
+useEffect(() => {
+  console.log(`CURRENT STEP: ${funnel.step}`);
+}, [funnel.step]);
+```
+</CodeCompare>
