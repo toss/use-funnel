@@ -1,0 +1,136 @@
+import { CodeCompare } from '@/components';
+
+# Migrating from @toss/use-funnel
+
+This document explains how to migrate code from [@toss/use-funnel](https://www.slash.page/ko/libraries/react/use-funnel/README.i18n) to the new `@use-funnel`. Since `@toss/use-funnel` was written for Next.js Page Router, this document focuses on migrating to `@use-funnel/next`.
+
+## New Benefits
+
+- Fixed issues where state did not follow history ([related document](https://use-funnel.slash.page/ko/docs/features#%EC%89%AC%EC%9A%B4-%ED%9E%88%EC%8A%A4%ED%86%A0%EB%A6%AC-%EC%83%81%ED%83%9C-%EA%B4%80%EB%A6%AC))
+- Allows defining state for each step
+- Supports not only Next.js but also `react-router-dom` and `@react-navigation/native`
+
+## Installation
+
+See [Installation](https://use-funnel.slash.page/ko/docs/install) for more details.
+
+```shell npm2yarn
+npm install @use-funnel/next --save
+```
+
+## Breaking Changes
+
+### Migrating Steps
+
+The new `@use-funnel` allows defining not just the steps but also the state for each step. If your funnel in `@toss/use-funnel` does not require different states for each step, you can use `createFunnelSteps()` provided by `@use-funnel`.
+
+<CodeCompare>
+```tsx showLineNumbers {3}
+import { useFunnel } from '@toss/use-funnel';
+
+const FUNNEL_STEPS = ['A', 'B', 'C'] as const;
+const [Funnel, setFunnel] = useFunnel(FUNNEL_STEPS);
+```
+```tsx showLineNumbers {3-5,8}
+import { createFunnelSteps } from '@use-funnel/next';
+
+const steps = createFunnelSteps()
+  .extends(['A', 'B', 'C'])
+  .build();
+  
+const funnel = useFunnel({
+  steps,
+  initial: {
+    step: 'A',
+    context: {}
+  }
+});
+```
+</CodeCompare>
+
+### Migrating `<Funnel />`, `<Funnel.Step />` Components
+
+In `@use-funnel`, you no longer need separate components to infer state types for each step. Instead, you can use `funnel.step` and `funnel.context` returned by `useFunnel()` and render based on `switch-case` statements.
+
+<CodeCompare>
+```tsx
+import { useFunnel } from '@toss/use-funnel';
+
+const [Funnel, setFunnel] = useFunnel([
+  'A', 'B'
+] as const);
+
+return (
+  <Funnel>
+    <Funnel.Step name="A">
+      <div>A</div>
+    </Funnel.Step>
+    <Funnel.Step name="B">
+      <div>B</div>
+    </Funnel.Step>
+  </Funnel>
+)
+```
+```tsx
+import { useFunnel } from '@use-funnel/next';
+
+const steps = createFunnelSteps().extends(['A', 'B']).build();
+const funnel = useFunnel({
+  steps,
+  initial: {
+    step: 'A',
+    context: {}
+  }
+});
+
+switch (funnel.step) {
+  case 'A':
+    return <div>A</div>;
+  case 'B':
+    return <div>B</div>;
+}
+```
+</CodeCompare>
+
+Alternatively, you can use `<funnel.Render />` for a more declarative approach. See the [funnel.Render component](/docs/funnel-render) for more details.
+
+### Migrating `withState()`
+
+If you were using `withState()` in `@toss/use-funnel`, you can now achieve the same functionality by passing a generic to `createFunnelSteps()`.
+
+<CodeCompare>
+```tsx showLineNumbers {5-11}
+import { useFunnel } from '@toss/use-funnel';
+
+const [Funnel, state, setState] = useFunnel([
+  'A', 'B', 'C'
+] as const).withState<{
+  foo?: string;
+  bar?: number;
+}>({
+  foo: 'Hello',
+  bar: 5
+});
+```
+```tsx showLineNumbers {3-6,12-15}
+import { useFunnel, createFunnelSteps } from '@use-funnel/next';
+
+const steps = createFunnelSteps<{
+  foo?: string;
+  bar?: number;
+}>().extends(['A', 'B', 'C']).build();
+
+const funnel = useFunnel({
+  steps,
+  initial: {
+    step: 'A',
+    context: {
+      foo: 'Hello',
+      bar: 5
+    }
+  }
+});
+```
+</CodeCompare>
+
+

@@ -11,6 +11,7 @@
   },
   "install": "Installation",
   "get-started": "Getting Started",
+  "migration": "Migrating from @toss/use-funnel",
   "--- Reference": {
     "type": "separator",
     "title": "Reference"
