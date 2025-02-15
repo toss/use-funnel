@@ -17,10 +17,10 @@ export const HomePage = ({
       <div className="flex flex-col md:h-full md:mr-8">
         <div className="flex flex-col flex-1 md:mb-0 mb-12">
           <Image src="/logo.png" alt="@use-funnel logo" width={140} height={140} />
-          <div className="flex flex-col gap-4 mb-12">
-            <h1 className="relative text-6xl font-bold">{title}</h1>
-            <h2 className="text-2xl leading-normal break-words">{description}</h2>
-          </div>
+          <h1 className="flex flex-col gap-4 mb-12">
+            <strong className="relative text-6xl font-bold">{title}</strong>
+            <p className="text-2xl leading-normal break-words">{description}</p>
+          </h1>
           <div>
             <Link href="/docs/overview">
               <span className="inline-block rounded-xl nx-bg-gray-100 dark:nx-bg-neutral-800 px-10 py-3 text-xl font-bold hover:bg-gray-200">

@@ -2,11 +2,21 @@ import { Keyword, KeywordDescription } from '@/components';
 
 # 개요
 
-<video src="/example.mp4" poster='/overlay.png' width={250} height={543} playsInline muted autoPlay loop className="float-right ml-6 my-6 max-w-[40%]" />
+<video
+  src="/example.mp4"
+  poster="/overlay.png"
+  width={250}
+  height={543}
+  playsInline
+  muted
+  autoPlay
+  loop
+  className="float-right ml-6 my-6 max-w-[40%] invert-video rounded-lg"
+/>
 
 `@use-funnel`은 복잡한 UI 흐름을 간편하게 구현할 수 있도록 도와주는 [React Hook](https://ko.react.dev/reference/rules/rules-of-hooks)이에요.
 
-오른쪽 예제 화면을 보면, 사용자가 직업 → 학교 / 회사 → 가입 날짜를 순서대로 입력하는 UI 흐름을 볼 수 있어요. 특히 모바일에서 중요한 뒤로가기 네비게이션시 자연스러운 상태 변경을 지원해서 이전 단계로 쉽게 이동할 수 있죠. 이렇게 복잡한 UI 흐름을 구현하려면 각 단계별 상태와 히스토리를 관리해야 해요. 
+오른쪽 예제 화면을 보면, 사용자가 직업 → 학교 / 회사 → 가입 날짜를 순서대로 입력하는 UI 흐름을 볼 수 있어요. 특히 모바일에서 중요한 뒤로가기 네비게이션시 자연스러운 상태 변경을 지원해서 이전 단계로 쉽게 이동할 수 있죠. 이렇게 복잡한 UI 흐름을 구현하려면 각 단계별 상태와 히스토리를 관리해야 해요.
 
 `@use-funnel`을 사용하면 이런 모바일 친화적인 UI 흐름을 쉽게 구현할 수 있어요.
 
@@ -14,6 +24,9 @@ import { Keyword, KeywordDescription } from '@/components';
 
 `@use-funnel`에서 사용하는 용어를 설명해 드릴게요.
 
-* <Keyword>step</Keyword> : <KeywordDescription keyword="step" /> 오른쪽 예제에서는 직업, 학교 / 회사, 가입 날짜 입력 화면이에요.
-* <Keyword>context</Keyword> : <KeywordDescription keyword="context" /> 오른쪽 예제에서는 각 화면에서 입력한 직업, 학교 / 회사, 날짜 값이에요.
-* <Keyword>history</Keyword> : <KeywordDescription keyword="history" /> 오른쪽 예제에서는 사용자가 이동한 단계별 화면과 각 단계에서 입력한 값의 전체 기록이에요.
+- <Keyword>step</Keyword> : <KeywordDescription keyword="step" /> 오른쪽 예제에서는 직업, 학교 / 회사, 가입 날짜 입력
+  화면이에요.
+- <Keyword>context</Keyword> : <KeywordDescription keyword="context" /> 오른쪽 예제에서는 각 화면에서 입력한 직업, 학교
+  / 회사, 날짜 값이에요.
+- <Keyword>history</Keyword> : <KeywordDescription keyword="history" /> 오른쪽 예제에서는 사용자가 이동한 단계별 화면과
+  각 단계에서 입력한 값의 전체 기록이에요.

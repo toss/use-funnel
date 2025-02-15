@@ -11,6 +11,10 @@ export const useFunnelPackages = [
     packageTitle: 'Next.js page router',
   },
   {
+    packageName: 'react-router',
+    packageTitle: 'react-router',
+  },
+  {
     packageName: 'react-router-dom',
     packageTitle: 'react-router-dom',
   },

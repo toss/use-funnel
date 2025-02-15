@@ -12,6 +12,7 @@ body:
       options:
         - '@use-funnel/core'
         - '@use-funnel/react-router-dom'
+        - '@use-funnel/react-router'
         - '@use-funnel/next'
         - '@use-funnel/react-navigation-native'
         - '@use-funnel/browser'
