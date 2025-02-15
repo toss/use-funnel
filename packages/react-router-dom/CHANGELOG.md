@@ -4,6 +4,12 @@
 
 ### Patch Changes
 
+- [#112](https://github.com/toss/use-funnel/pull/112) [`c2e0764`](https://github.com/toss/use-funnel/commit/c2e0764b8353c43db6604ff61135be9bc4a9b7d3) Thanks [@minuukang](https://github.com/minuukang)! - Add react-router package & bump react-router-dom
+
+## 0.0.10
+
+### Patch Changes
+
 - [#110](https://github.com/toss/use-funnel/pull/110) [`311a228`](https://github.com/toss/use-funnel/commit/311a22825a371caeb0b90d1de23157dd24e2248c) Thanks [@minuukang](https://github.com/minuukang)! - Add React-router package & Update README.md
 
 - Updated dependencies [[`311a228`](https://github.com/toss/use-funnel/commit/311a22825a371caeb0b90d1de23157dd24e2248c)]:
