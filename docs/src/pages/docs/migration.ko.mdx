@@ -8,7 +8,7 @@ import { CodeCompare } from '@/components';
 
 - 상태가 히스토리를 따라가지 않는 이슈를 수정했어요([관련 문서](https://use-funnel.slash.page/ko/docs/features#%EC%89%AC%EC%9A%B4-%ED%9E%88%EC%8A%A4%ED%86%A0%EB%A6%AC-%EC%83%81%ED%83%9C-%EA%B4%80%EB%A6%AC))
 - 단계별로 상태를 만들 수 있게 되었어요.
-- Next.js 외에 `react-router-dom`, `@react-navigation/native` 를 지원해요.
+- Next.js 외에 `react-router`, `@react-navigation/native` 를 지원해요.
 
 ## 설치하기
 
@@ -30,14 +30,16 @@ import { useFunnel } from '@toss/use-funnel';
 
 const FUNNEL_STEPS = ['A', 'B', 'C'] as const;
 const [Funnel, setFunnel] = useFunnel(FUNNEL_STEPS);
+
 ```
+
 ```tsx showLineNumbers {3-5,8}
 import { createFunnelSteps } from '@use-funnel/next';
 
 const steps = createFunnelSteps()
   .extends(['A', 'B', 'C'])
   .build();
-  
+
 const funnel = useFunnel({
   steps,
   initial: {
@@ -46,6 +48,7 @@ const funnel = useFunnel({
   }
 });
 ```
+
 </CodeCompare>
 
 ### `<Funnel />`, `<Funnel.Step />` 컴포넌트 마이그레이션
@@ -71,8 +74,9 @@ return (
   </Funnel>
 )
 ```
+
 ```tsx
-import { useFunnel } from '@use-funnel/next';
+import {useFunnel} from '@use-funnel/next';
 
 const steps = createFunnelSteps().extends(['A', 'B']).build();
 const funnel = useFunnel({
@@ -89,13 +93,14 @@ switch (funnel.step) {
   case 'B':
     return <div>B</div>;
 }
+
 ```
 </CodeCompare>
 
 또는 `<funnel.Render />` 컴포넌트를 통해 더욱 더 선언적으로 구현할 수 있습니다. 자세한 내용은 [funnel.Render 컴포넌트](/docs/funnel-render) 문서를 참고해주세요.
 
 ### `withState()` 마이그레이션
-  
+
 `@toss/use-funnel` 의 `withState()` 를 통해 상태를 구현하고 있었다면 `createFunnelSteps()` 에 제네릭을 넘겨서 이를 구현할 수 있습니다.
 
 <CodeCompare>
@@ -112,13 +117,16 @@ const [Funnel, state, setState] = useFunnel([
   bar: 5
 });
 ```
+
 ```tsx showLineNumbers {3-6,12-15}
 import { useFunnel, createFunnelSteps } from '@use-funnel/next';
 
 const steps = createFunnelSteps<{
   foo?: string;
   bar?: number;
-}>().extends(['A', 'B', 'C']).build();
+}>()
+  .extends(['A', 'B', 'C'])
+  .build();
 
 const funnel = useFunnel({
   steps,
@@ -126,11 +134,12 @@ const funnel = useFunnel({
     step: 'A',
     context: {
       foo: 'Hello',
-      bar: 5
-    }
-  }
+      bar: 5,
+    },
+  },
 });
 ```
+
 </CodeCompare>
 
 ### stepQueryKey 진입 마이그레이션
@@ -152,6 +161,7 @@ const [Funnel, setFunnel] = useFunnel([
 });
 
 ```
+
 ```tsx showLineNumbers {8,15}
 import { useRouter } from 'next/router';
 import { useFunnel, createFunnelSteps } from '@use-funnel/next';
@@ -172,6 +182,7 @@ const funnel = useFunnel({
   }
 });
 ```
+
 </CodeCompare>
 
 ### onStepChange 마이그레이션
@@ -189,6 +200,7 @@ const [Funnel, setFunnel] = useFunnel([
     console.log(`CURRENT STEP: ${step}`);
   }
 });
+
 ```
 
 ```tsx showLineNumbers {16-18}
@@ -198,7 +210,7 @@ import { useFunnel, createFunnelSteps } from '@use-funnel/next';
 const steps = createFunnelSteps()
   .extends(['A', 'B', 'C'])
   .build();
-	
+
 const funnel = useFunnel({
   steps,
   initial: {
@@ -211,4 +223,5 @@ useEffect(() => {
   console.log(`CURRENT STEP: ${funnel.step}`);
 }, [funnel.step]);
 ```
+
 </CodeCompare>

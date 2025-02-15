@@ -8,6 +8,8 @@
   <p style="font-size:18px;">A powerful and safe step-by-step state management library</p>
 </div>
 
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/toss/use-funnel/blob/main/LICENSE) [![Discord Badge](https://discord.com/api/guilds/1281071127052943361/widget.png?style=shield)](https://discord.gg/vGXbVjP2nY)
+
 `@use-funnel` is a [React Hook](https://react.dev/reference/rules/rules-of-hooks) that helps you easily implement complex UI flows.
 
 ## Core Concepts
@@ -22,16 +24,14 @@ Manage states based on history, making it easy to handle backward and forward na
 
 ### Various Router Support
 
-Supports browser history, react-router-dom, next.js, @react-navigation/native, and more.
+Supports browser history, react-router, next.js, @react-navigation/native, and more.
 
 ## Example
 
-
 https://github.com/user-attachments/assets/8300d4ed-ab02-436e-a5a6-99c8d732e32f
 
-
 ```tsx
-import { useFunnel } from '@use-funnel/react-router-dom';
+import { useFunnel } from '@use-funnel/browser';
 
 export function App() {
   const funnel = useFunnel<{
@@ -47,7 +47,7 @@ export function App() {
       context: {},
     },
   });
-  
+
   return (
     <funnel.Render
       SelectJob={funnel.Render.with({
@@ -65,13 +65,13 @@ export function App() {
         },
       })}
       SelectSchool={({ history }) => (
-        <SelectSchool 
-          onNext={(school) => 
-            history.push('EnterJoinDate', (prev) => ({ 
-              ...prev, 
-              school 
+        <SelectSchool
+          onNext={(school) =>
+            history.push('EnterJoinDate', (prev) => ({
+              ...prev,
+              school,
             }))
-          } 
+          }
         />
       )}
       SelectEmployee={({ history }) => (

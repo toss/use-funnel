@@ -31,7 +31,7 @@ const config: DocsThemeConfig = {
         <link rel="alternate" hrefLang="en" href="https://use-funnel.slash.page/en" />
         <meta
           property="keywords"
-          content="@use-funnel, funnel, 퍼널 상태관리, 모바일 상태관리, 단계별 상태관리, mobile state, state management, react, navigation, react-native, rn"
+          content="@use-funnel, useFunnel(), funnel, 퍼널 상태관리, 모바일 상태관리, 단계별 상태관리, mobile state, state management, react, navigation, react-native, rn"
         />
         <meta name="description" content={contentDescription} />
         <meta property="og:title" content={title ?? '@use-funnel'} />
@@ -44,6 +44,9 @@ const config: DocsThemeConfig = {
   },
   project: {
     link: 'https://github.com/toss/use-funnel',
+  },
+  chat: {
+    link: 'https://discord.gg/vGXbVjP2nY'
   },
   docsRepositoryBase: 'https://github.com/toss/use-funnel/tree/main/docs',
   useNextSeoProps() {
