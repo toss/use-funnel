@@ -1,5 +1,11 @@
 # @use-funnel/core
 
+## 0.0.10
+
+### Patch Changes
+
+- [#110](https://github.com/toss/use-funnel/pull/110) [`311a228`](https://github.com/toss/use-funnel/commit/311a22825a371caeb0b90d1de23157dd24e2248c) Thanks [@minuukang](https://github.com/minuukang)! - Add React-router package & Update README.md
+
 ## 0.0.9
 
 ### Patch Changes
