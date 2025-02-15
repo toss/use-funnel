@@ -31,7 +31,8 @@ import { useFunnel } from '@toss/use-funnel';
 const FUNNEL_STEPS = ['A', 'B', 'C'] as const;
 const [Funnel, setFunnel] = useFunnel(FUNNEL_STEPS);
 
-````
+```
+
 ```tsx showLineNumbers {3-5,8}
 import { createFunnelSteps } from '@use-funnel/next';
 
@@ -46,7 +47,7 @@ const funnel = useFunnel({
     context: {}
   }
 });
-````
+```
 
 </CodeCompare>
 
@@ -63,35 +64,38 @@ const [Funnel, setFunnel] = useFunnel([
 ] as const);
 
 return (
+  <Funnel>
+    <Funnel.Step name="A">
+      <div>A</div>
+    </Funnel.Step>
+    <Funnel.Step name="B">
+      <div>B</div>
+    </Funnel.Step>
+  </Funnel>
+)
+```
 
-{' '}
-<Funnel>
-  <Funnel.Step name="A">
-    <div>A</div>
-  </Funnel.Step>
-  <Funnel.Step name="B">
-    <div>B</div>
-  </Funnel.Step>
-</Funnel>
-) ``` ```tsx import {useFunnel} from '@use-funnel/next';
+```tsx
+import {useFunnel} from '@use-funnel/next';
 
 const steps = createFunnelSteps().extends(['A', 'B']).build();
 const funnel = useFunnel({
-steps,
-initial: {
-step: 'A',
-context: {}
-}
+  steps,
+  initial: {
+    step: 'A',
+    context: {}
+  }
 });
 
 switch (funnel.step) {
-case 'A':
-return <div>A</div>;
-case 'B':
-return <div>B</div>;
+  case 'A':
+    return <div>A</div>;
+  case 'B':
+    return <div>B</div>;
 }
 
-````
+```
+
 </CodeCompare>
 
 Alternatively, you can use `<funnel.Render />` for a more declarative approach. See the [funnel.Render component](/docs/funnel-render) for more details.
@@ -113,7 +117,8 @@ const [Funnel, state, setState] = useFunnel([
   foo: 'Hello',
   bar: 5
 });
-````
+
+```
 
 ```tsx showLineNumbers {3-6,12-15}
 import { useFunnel, createFunnelSteps } from '@use-funnel/next';
@@ -138,3 +143,4 @@ const funnel = useFunnel({
 ```
 
 </CodeCompare>
+

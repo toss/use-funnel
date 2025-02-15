@@ -31,7 +31,8 @@ import { useFunnel } from '@toss/use-funnel';
 const FUNNEL_STEPS = ['A', 'B', 'C'] as const;
 const [Funnel, setFunnel] = useFunnel(FUNNEL_STEPS);
 
-````
+```
+
 ```tsx showLineNumbers {3-5,8}
 import { createFunnelSteps } from '@use-funnel/next';
 
@@ -46,7 +47,7 @@ const funnel = useFunnel({
     context: {}
   }
 });
-````
+```
 
 </CodeCompare>
 
@@ -59,39 +60,41 @@ const funnel = useFunnel({
 import { useFunnel } from '@toss/use-funnel';
 
 const [Funnel, setFunnel] = useFunnel([
-'A', 'B'
+  'A', 'B'
 ] as const);
 
 return (
+  <Funnel>
+    <Funnel.Step name="A">
+      <div>A</div>
+    </Funnel.Step>
+    <Funnel.Step name="B">
+      <div>B</div>
+    </Funnel.Step>
+  </Funnel>
+)
+```
 
-{' '}
-<Funnel>
-  <Funnel.Step name="A">
-    <div>A</div>
-  </Funnel.Step>
-  <Funnel.Step name="B">
-    <div>B</div>
-  </Funnel.Step>
-</Funnel>
-) ``` ```tsx import {useFunnel} from '@use-funnel/next';
+```tsx
+import {useFunnel} from '@use-funnel/next';
 
 const steps = createFunnelSteps().extends(['A', 'B']).build();
 const funnel = useFunnel({
-steps,
-initial: {
-step: 'A',
-context: {}
-}
+  steps,
+  initial: {
+    step: 'A',
+    context: {}
+  }
 });
 
 switch (funnel.step) {
-case 'A':
-return <div>A</div>;
-case 'B':
-return <div>B</div>;
+  case 'A':
+    return <div>A</div>;
+  case 'B':
+    return <div>B</div>;
 }
 
-````
+```
 </CodeCompare>
 
 또는 `<funnel.Render />` 컴포넌트를 통해 더욱 더 선언적으로 구현할 수 있습니다. 자세한 내용은 [funnel.Render 컴포넌트](/docs/funnel-render) 문서를 참고해주세요.
@@ -113,7 +116,7 @@ const [Funnel, state, setState] = useFunnel([
   foo: 'Hello',
   bar: 5
 });
-````
+```
 
 ```tsx showLineNumbers {3-6,12-15}
 import { useFunnel, createFunnelSteps } from '@use-funnel/next';
@@ -152,12 +155,13 @@ router.push('/funnel?my-funnel-step=B');
 
 // B Step으로 시작
 const [Funnel, setFunnel] = useFunnel([
-'A', 'B', 'C'
+  'A', 'B', 'C'
 ] as const, {
-stepQueryKey: 'my-funnel-step'
+  stepQueryKey: 'my-funnel-step'
 });
 
-````
+```
+
 ```tsx showLineNumbers {8,15}
 import { useRouter } from 'next/router';
 import { useFunnel, createFunnelSteps } from '@use-funnel/next';
@@ -177,7 +181,7 @@ const funnel = useFunnel({
     context: {}
   }
 });
-````
+```
 
 </CodeCompare>
 
@@ -190,14 +194,14 @@ const funnel = useFunnel({
 import { useFunnel } from '@toss/use-funnel';
 
 const [Funnel, setFunnel] = useFunnel([
-'A', 'B', 'C'
+  'A', 'B', 'C'
 ] as const, {
-onStepChange(step) {
-console.log(`CURRENT STEP: ${step}`);
-}
+  onStepChange(step) {
+    console.log(`CURRENT STEP: ${step}`);
+  }
 });
 
-````
+```
 
 ```tsx showLineNumbers {16-18}
 import { useEffect } from 'react';
@@ -218,6 +222,6 @@ const funnel = useFunnel({
 useEffect(() => {
   console.log(`CURRENT STEP: ${funnel.step}`);
 }, [funnel.step]);
-````
+```
 
 </CodeCompare>
