@@ -51,7 +51,7 @@ describe('Test useFunnel ReactRouter router', () => {
                 )
               }
             >
-              Go B
+              Go B Step
             </button>
           );
         }
@@ -71,10 +71,10 @@ describe('Test useFunnel ReactRouter router', () => {
 
     render(<FunnelTest />, { wrapper: (props) => <BrowserRouter {...props} window={window} /> });
 
-    expect(screen.queryByText('Go B')).not.toBeNull();
+    expect(screen.queryByText('Go B Step')).not.toBeNull();
 
     const user = userEvent.setup();
-    await user.click(screen.getByText('Go B'));
+    await user.click(screen.getByText('Go B Step'));
 
     expect(mockSetUseSearchParams).toHaveBeenLastCalledWith(
       expect.anything(),
@@ -94,8 +94,8 @@ describe('Test useFunnel ReactRouter router', () => {
 
     await user.click(screen.getByText('Go Back'));
 
+    expect(await screen.findByText('Go B Step')).not.toBeNull();
     expect(screen.queryByText('vitest')).toBeNull();
-    expect(screen.queryByText('Go B')).not.toBeNull();
   });
 
   test('should work with sub funnel when is multiple used', async () => {
