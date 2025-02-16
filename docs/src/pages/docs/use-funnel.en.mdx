@@ -138,6 +138,17 @@ interface FunnelHistory<TContextMap, TCurrentStep extends keyof TContextMap> {
     ```ts
     interface RouteOption {
       preventScrollReset?: boolean;
+      flushSync?: boolean;
+      viewTransition?: boolean;
+    }
+    ```
+
+    For more information, see the [documentation](https://reactrouter.com/en/main/hooks/use-navigate) for the package.
+  </Tabs.Tab>
+  <Tabs.Tab>
+    ```ts
+    interface RouteOption {
+      preventScrollReset?: boolean;
       unstable_flushSync?: boolean;
       unstable_viewTransition?: boolean;
     }
