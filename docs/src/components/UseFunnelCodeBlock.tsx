@@ -67,7 +67,12 @@ function UseFunnelImportReplace({
           tokens.forEach((token) => {
             for (const targetPackage of useFunnelPackages) {
               if (token.textContent?.includes(targetPackage.packageName)) {
-                token.textContent = token.textContent.replace(targetPackage.packageName, packageName);
+                const content = token.textContent.replace(/['"]/g, '');
+                const [prefix, packagePath] = content.split('@use-funnel/');
+
+                if (packagePath === targetPackage.packageName) {
+                  token.textContent = `"${prefix}@use-funnel/${packageName}"`;
+                }
               }
             }
           });
