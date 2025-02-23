@@ -45,6 +45,10 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
       go(delta) {
         setCurrentIndex((prev) => prev + delta);
       },
+      // cleanup 함수는 funnel이 언마운트될 때 호출돼요.
+      cleanup() {
+        
+      },
     }),
     [history, currentIndex], // history와 currentIndex가 변경될 때마다 메모이제이션된 값을 반환해요.
   );

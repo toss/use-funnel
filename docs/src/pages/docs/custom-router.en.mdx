@@ -45,6 +45,10 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
       go(delta) {
         setCurrentIndex((prev) => prev + delta);
       },
+      // cleanup function is called when the funnel unmounts.
+      cleanup() {
+        
+      },
     }),
     [history, currentIndex] // Returns memoized values whenever history and currentIndex change.
   );
