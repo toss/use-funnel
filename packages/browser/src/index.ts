@@ -44,7 +44,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
 
   const changeState = useCallback(
     (method: 'pushState' | 'replaceState', newState: AnyFunnelState) => {
-      const searchParams = new URLSearchParams(location.search);
+      const searchParams = new URLSearchParams(window.location.search);
       searchParams.set(`${id}.step`, newState.step);
 
       const newHistoryState = {
@@ -83,12 +83,20 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
           ...window.history.state,
         };
 
+        const searchParams = new URLSearchParams(window.location.search);
+
+        if (
+          newHistoryState[`${id}.context`] == null ||
+          newHistoryState[`${id}.histories`] == null ||
+          searchParams.get(`${id}.step`) == null
+        ) {
+          return;
+        }
+
         delete newHistoryState[`${id}.context`];
         delete newHistoryState[`${id}.histories`];
 
-        const searchParams = new URLSearchParams(location.search);
         searchParams.delete(`${id}.step`);
-
         window.history.replaceState(newHistoryState, '', `?${searchParams.toString()}`);
       },
     }),

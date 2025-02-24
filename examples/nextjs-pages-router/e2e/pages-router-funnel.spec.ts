@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 const PAGES_ROUTER_LOCAL_URL = 'http://localhost:3101/';
 
@@ -16,4 +16,12 @@ test('can move the steps of the funnel using history.push.', async ({ page }) =>
   await page.goBack();
 
   await expect(page.getByText('start')).toBeVisible();
+});
+
+test('can move the steps of the funnel using Link.', async ({ page }) => {
+  await page.goto(PAGES_ROUTER_LOCAL_URL);
+
+  await page.getByRole('link', { name: 'Go Home' }).click();
+
+  await expect(page.getByText('Home')).toBeVisible();
 });
