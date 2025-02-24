@@ -208,6 +208,11 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
       },
       cleanup() {
         const newUseFunnelState = { ...useFunnelState };
+
+        if (newUseFunnelState[id] == null) {
+          return;
+        }
+
         delete newUseFunnelState[id];
         navigation.setParams({
           ...route.params,

@@ -105,6 +105,11 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
       go: (index) => window.history.go(index),
       async cleanup() {
         const { pathname, query } = makePath(router);
+
+        if (query[`${QS_KEY}${id}${HISTORY_KEY}`] == null || query[`${QS_KEY}${id}${CONTEXT_KEY}`] == null) {
+          // return;
+        }
+
         const queryContext = {
           [`${QS_KEY}${id}${STEP_KEY}`]: undefined,
           [`${QS_KEY}${id}${CONTEXT_KEY}`]: undefined,

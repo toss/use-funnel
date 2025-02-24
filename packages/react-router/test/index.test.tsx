@@ -1,7 +1,7 @@
-import { render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router';
-import { describe, expect, test, vi } from 'vitest';
+import { BrowserRouter, Link, MemoryRouter, Route, Routes } from 'react-router';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { useFunnel } from '../src/index.js';
 
 const mockSetUseSearchParams = vi.fn();
@@ -21,6 +21,8 @@ vi.mock('react-router', async (importOriginal) => {
     },
   } as typeof imports;
 });
+
+afterEach(cleanup);
 
 describe('Test useFunnel ReactRouter router', () => {
   test('should work', async () => {
@@ -110,24 +112,26 @@ describe('Test useFunnel ReactRouter router', () => {
           context: {},
         },
       });
-      return <funnel.Render
-        sub1={({ history }) => <button onClick={() => history.push('sub2', { id: 'SubId' })}>Go to sub2</button>}
-        sub2={({ context }) => {
-          return (
-            <div>
-              <h1>Your id is {context.id}?</h1>
-              <button onClick={() => props.onNext(context.id)}>OK</button>
-            </div>
-          );
-        }}
-      />
+      return (
+        <funnel.Render
+          sub1={({ history }) => <button onClick={() => history.push('sub2', { id: 'SubId' })}>Go to sub2</button>}
+          sub2={({ context }) => {
+            return (
+              <div>
+                <h1>Your id is {context.id}?</h1>
+                <button onClick={() => props.onNext(context.id)}>OK</button>
+              </div>
+            );
+          }}
+        />
+      );
     }
 
     function MainFunnel() {
       const funnel = useFunnel<{
         main1: { id1?: string };
         main2: { id1: string; id2?: string };
-        main3: { id1: string; id2?: string }
+        main3: { id1: string; id2?: string };
       }>({
         id: 'main',
         initial: {
@@ -136,20 +140,22 @@ describe('Test useFunnel ReactRouter router', () => {
         },
       });
 
-      return <funnel.Render
-        main1={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id1: id })} />}
-        main2={({ context, history }) => (
-          <div>
-            <h1>id1 is {context.id1}!</h1>
-            {context.id2 == null ? (
-              <button onClick={() => history.push('main3')}>set id2</button>
-            ) : (
-              <h1>id2 is {context.id2}</h1>
-            )}
-          </div>
-        )}
-        main3={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id2: id })} />}
-      />
+      return (
+        <funnel.Render
+          main1={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id1: id })} />}
+          main2={({ context, history }) => (
+            <div>
+              <h1>id1 is {context.id1}!</h1>
+              {context.id2 == null ? (
+                <button onClick={() => history.push('main3')}>set id2</button>
+              ) : (
+                <h1>id2 is {context.id2}</h1>
+              )}
+            </div>
+          )}
+          main3={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id2: id })} />}
+        />
+      );
     }
 
     render(<MainFunnel />, { wrapper: (props) => <BrowserRouter {...props} window={window} /> });
@@ -181,5 +187,39 @@ describe('Test useFunnel ReactRouter router', () => {
     // Main2
     expect(screen.queryByText('id1 is SubId!')).not.toBeNull();
     expect(screen.queryByText('id2 is SubId')).not.toBeNull();
-  })
+  });
+
+  test('should work when navigate out of funnel', async () => {
+    function FunnelTest() {
+      useFunnel<{ A: { id?: string } }>({
+        id: 'vitest',
+        initial: {
+          step: 'A',
+          context: {},
+        },
+      });
+      return (
+        <div>
+          <Link to="/">Go to home</Link>
+          <h1>This is Funnel</h1>
+        </div>
+      );
+    }
+
+    render(
+      <Routes>
+        <Route path="/" element={<h1>Home</h1>} />
+        <Route path="/funnel" element={<FunnelTest />} />
+      </Routes>,
+      { wrapper: (props) => <MemoryRouter initialEntries={['/funnel']} {...props} /> },
+    );
+
+    expect(screen.queryByText('This is Funnel')).not.toBeNull();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByText('Go to home'));
+
+    expect(screen.queryByText('Home')).not.toBeNull();
+    expect(screen.queryByText('This is Funnel')).toBeNull();
+  });
 });

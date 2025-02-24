@@ -91,24 +91,26 @@ describe('Test useFunnel next router', () => {
           context: {},
         },
       });
-      return <funnel.Render
-        sub1={({ history }) => <button onClick={() => history.push('sub2', { id: 'SubId' })}>Go to sub2</button>}
-        sub2={({ context }) => {
-          return (
-            <div>
-              <h1>Your id is {context.id}?</h1>
-              <button onClick={() => props.onNext(context.id)}>OK</button>
-            </div>
-          );
-        }}
-      />
+      return (
+        <funnel.Render
+          sub1={({ history }) => <button onClick={() => history.push('sub2', { id: 'SubId' })}>Go to sub2</button>}
+          sub2={({ context }) => {
+            return (
+              <div>
+                <h1>Your id is {context.id}?</h1>
+                <button onClick={() => props.onNext(context.id)}>OK</button>
+              </div>
+            );
+          }}
+        />
+      );
     }
 
     function MainFunnel() {
       const funnel = useFunnel<{
         main1: { id1?: string };
         main2: { id1: string; id2?: string };
-        main3: { id1: string; id2?: string }
+        main3: { id1: string; id2?: string };
       }>({
         id: 'main',
         initial: {
@@ -117,20 +119,22 @@ describe('Test useFunnel next router', () => {
         },
       });
 
-      return <funnel.Render
-        main1={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id1: id })} />}
-        main2={({ context, history }) => (
-          <div>
-            <h1>id1 is {context.id1}!</h1>
-            {context.id2 == null ? (
-              <button onClick={() => history.push('main3')}>set id2</button>
-            ) : (
-              <h1>id2 is {context.id2}</h1>
-            )}
-          </div>
-        )}
-        main3={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id2: id })} />}
-      />
+      return (
+        <funnel.Render
+          main1={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id1: id })} />}
+          main2={({ context, history }) => (
+            <div>
+              <h1>id1 is {context.id1}!</h1>
+              {context.id2 == null ? (
+                <button onClick={() => history.push('main3')}>set id2</button>
+              ) : (
+                <h1>id2 is {context.id2}</h1>
+              )}
+            </div>
+          )}
+          main3={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id2: id })} />}
+        />
+      );
     }
 
     render(<MainFunnel />);
@@ -162,5 +166,5 @@ describe('Test useFunnel next router', () => {
     // Main2
     expect(screen.queryByText('id1 is SubId!')).not.toBeNull();
     expect(screen.queryByText('id2 is SubId')).not.toBeNull();
-  })
+  });
 });

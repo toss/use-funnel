@@ -88,6 +88,11 @@ export const useFunnel = createUseFunnel<ReactRouterDomRouteOption>(({ id, initi
       },
       cleanup() {
         const newLocationState = { ...location.state };
+
+        if (!(contextName in newLocationState) && !(historiesName in newLocationState)) {
+          return;
+        }
+
         delete newLocationState[contextName];
         delete newLocationState[historiesName];
         setSearchParams(
