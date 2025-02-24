@@ -107,7 +107,7 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
         const { pathname, query } = makePath(router);
 
         if (query[`${QS_KEY}${id}${HISTORY_KEY}`] == null || query[`${QS_KEY}${id}${CONTEXT_KEY}`] == null) {
-          // return;
+          return;
         }
 
         const queryContext = {
