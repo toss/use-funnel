@@ -54,7 +54,6 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
           method === 'pushState' ? [...(history ?? []), newState] : [...history.slice(0, currentIndex), newState],
       };
 
-      console.log('changeState', method, newHistoryState, `?${searchParams.toString()}`);
       window.history[method](newHistoryState, '', `?${searchParams.toString()}`);
 
       setLocation({
@@ -98,8 +97,6 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
         delete newHistoryState[`${id}.histories`];
 
         searchParams.delete(`${id}.step`);
-        debugger;
-        console.log('cleanup', id, newHistoryState, `?${searchParams.toString()}`);
         window.history.replaceState(newHistoryState, '', `?${searchParams.toString()}`);
       },
     }),
