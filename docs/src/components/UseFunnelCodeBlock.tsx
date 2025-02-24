@@ -65,10 +65,15 @@ function UseFunnelImportReplace({
         .forEach((line) => {
           const tokens = Array.from(line.querySelectorAll('[style*="token-string-expression"]'));
           tokens.forEach((token) => {
-            for (const targetPackage of useFunnelPackages) {
-              if (token.textContent?.includes(targetPackage.packageName)) {
-                token.textContent = token.textContent.replace(targetPackage.packageName, packageName);
-              }
+            const matchingPackage = useFunnelPackages.find((pkg) => token.textContent?.includes(pkg.packageName));
+
+            if (!matchingPackage || !token.textContent) return;
+
+            const content = token.textContent.replace(/['"]/g, '');
+            const [prefix, packagePath] = content.split('@use-funnel/');
+
+            if (packagePath === matchingPackage.packageName) {
+              token.textContent = `"${prefix}@use-funnel/${packageName}"`;
             }
           });
         });
