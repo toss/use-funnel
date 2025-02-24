@@ -1,5 +1,11 @@
 # @use-funnel/react-router-dom
 
+## 0.0.11
+
+### Patch Changes
+
+- [#119](https://github.com/toss/use-funnel/pull/119) [`e9d378f`](https://github.com/toss/use-funnel/commit/e9d378f2ab440f818772cd59b7dea909d4791c9c) Thanks [@minuukang](https://github.com/minuukang)! - Fix cleanup effect is prevent normal navigate
+
 ## 0.0.10
 
 ### Patch Changes
