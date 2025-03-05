@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/pnpm-setup-node
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install
       - name: Create Changesets Pull Request or Publish to NPM
         id: changesets
         uses: changesets/action@v1
