@@ -19,28 +19,31 @@ export function MemoryRouterProvider(props: React.PropsWithChildren) {
   const [history, setHistory] = useState<Record<string, any>[]>([{}]);
   const [index, setIndex] = useState(0);
   const currentHistory = history[index];
-  const context: Context = useMemo(() => ({
-    history: currentHistory,
-    all: {
-      history,
-      index,
-    },
-    push: (data) => {
-      setHistory(prev => [...prev.slice(0, index + 1), { ...currentHistory, ...data }])
-      setIndex(prev => prev + 1);
-    },
-    replace: (data) => {
-      setHistory(prev => [...prev.slice(0, index), { ...currentHistory, ...data }])
-    },
-    go: (delta) => setIndex(prev => prev + delta)
-  }), [currentHistory, index])
-  return <MemoryRouterContext.Provider value={context}>{props.children}</MemoryRouterContext.Provider>
+  const context: Context = useMemo(
+    () => ({
+      history: currentHistory,
+      all: {
+        history,
+        index,
+      },
+      push: (data) => {
+        setHistory((prev) => [...prev.slice(0, index + 1), { ...currentHistory, ...data }]);
+        setIndex((prev) => prev + 1);
+      },
+      replace: (data) => {
+        setHistory((prev) => [...prev.slice(0, index), { ...currentHistory, ...data }]);
+      },
+      go: (delta) => setIndex((prev) => prev + delta),
+    }),
+    [currentHistory, index],
+  );
+  return <MemoryRouterContext.Provider value={context}>{props.children}</MemoryRouterContext.Provider>;
 }
 
 export const MemoryRouter: FunnelRouter<MemoryRouterOption> = ({ id, initialState }) => {
   const memoryRouter = useContext(MemoryRouterContext);
   if (memoryRouter == null) {
-    throw new Error('MemoryRouterProvider should be installed')
+    throw new Error('MemoryRouterProvider should be installed');
   }
 
   const historyKey = `${id}.history`;
@@ -51,16 +54,16 @@ export const MemoryRouter: FunnelRouter<MemoryRouterOption> = ({ id, initialStat
       return {
         history: [initialState],
         index: 0,
-      }
+      };
     }
     return {
       history: memoryRouter.history[historyKey],
       index: memoryRouter.history[indexKey],
-    }
+    };
   }, [memoryRouter, id, initialState]) as {
     index: number;
     history: any[];
-  }
+  };
 
   return useMemo(
     () => ({
@@ -70,13 +73,13 @@ export const MemoryRouter: FunnelRouter<MemoryRouterOption> = ({ id, initialStat
       push(state) {
         memoryRouter.push({
           [indexKey]: context.index + 1,
-          [historyKey]: [...context.history.slice(0, context.index + 1), state]
+          [historyKey]: [...context.history.slice(0, context.index + 1), state],
         });
       },
       replace(state) {
         memoryRouter.replace({
           [indexKey]: context.index,
-          [historyKey]: [...context.history.slice(0, context.index), state]
+          [historyKey]: [...context.history.slice(0, context.index), state],
         });
       },
       go: (index) => {
@@ -86,7 +89,7 @@ export const MemoryRouter: FunnelRouter<MemoryRouterOption> = ({ id, initialStat
         memoryRouter.replace({
           [indexKey]: undefined,
           [historyKey]: undefined,
-        })
+        });
       },
     }),
     [context, memoryRouter],

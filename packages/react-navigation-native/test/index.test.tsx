@@ -215,24 +215,26 @@ describe('Test useFunnel react-navigation-native router', () => {
           context: {},
         },
       });
-      return <funnel.Render
-        sub1={({ history }) => <Button onPress={() => history.push('sub2', { id: 'SubId' })} title="Go to sub2" />}
-        sub2={({ context }) => {
-          return (
-            <View>
-              <Text>Your id is {context.id}?</Text>
-              <Button title="OK" onPress={() => props.onNext(context.id)} />
-            </View>
-          );
-        }}
-      />
+      return (
+        <funnel.Render
+          sub1={({ history }) => <Button onPress={() => history.push('sub2', { id: 'SubId' })} title="Go to sub2" />}
+          sub2={({ context }) => {
+            return (
+              <View>
+                <Text>Your id is {context.id}?</Text>
+                <Button title="OK" onPress={() => props.onNext(context.id)} />
+              </View>
+            );
+          }}
+        />
+      );
     }
 
     function MainFunnel() {
       const funnel = useFunnel<{
         main1: { id1?: string };
         main2: { id1: string; id2?: string };
-        main3: { id1: string; id2?: string }
+        main3: { id1: string; id2?: string };
       }>({
         id: 'main',
         initial: {
@@ -241,20 +243,22 @@ describe('Test useFunnel react-navigation-native router', () => {
         },
       });
 
-      return <funnel.Render
-        main1={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id1: id })} />}
-        main2={({ context, history }) => (
-          <View>
-            <Text>id1 is {context.id1}!</Text>
-            {context.id2 == null ? (
-              <Button title="set id2" onPress={() => history.push('main3')} />
-            ) : (
-              <Text>id2 is {context.id2}</Text>
-            )}
-          </View>
-        )}
-        main3={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id2: id })} />}
-      />
+      return (
+        <funnel.Render
+          main1={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id1: id })} />}
+          main2={({ context, history }) => (
+            <View>
+              <Text>id1 is {context.id1}!</Text>
+              {context.id2 == null ? (
+                <Button title="set id2" onPress={() => history.push('main3')} />
+              ) : (
+                <Text>id2 is {context.id2}</Text>
+              )}
+            </View>
+          )}
+          main3={({ history }) => <SubFunnel onNext={(id) => history.push('main2', { id2: id })} />}
+        />
+      );
     }
 
     const navigationRef = createNavigationContainerRef();
@@ -295,5 +299,5 @@ describe('Test useFunnel react-navigation-native router', () => {
     // Main2
     expect(screen.queryByText('id1 is SubId!')).not.toBeNull();
     expect(screen.queryByText('id2 is SubId')).not.toBeNull();
-  })
+  });
 });

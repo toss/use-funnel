@@ -46,7 +46,7 @@ const config: DocsThemeConfig = {
     link: 'https://github.com/toss/use-funnel',
   },
   chat: {
-    link: 'https://discord.gg/vGXbVjP2nY'
+    link: 'https://discord.gg/vGXbVjP2nY',
   },
   docsRepositoryBase: 'https://github.com/toss/use-funnel/tree/main/docs',
   useNextSeoProps() {
