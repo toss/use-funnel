@@ -41,12 +41,10 @@
   },
   "lint-staged": {
     "packages/*/{src,test}/*.{js,jsx,ts,tsx,md}": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ],
     "packages/*/{src,test}/*.{js,ts,tsx}": [
-      "eslint --fix",
-      "git add"
+      "eslint --fix"
     ]
   },
   "packageManager": "pnpm@9.6.0"
