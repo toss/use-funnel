@@ -39,8 +39,8 @@ describe('createContextGuard spec', () => {
     describe('when step is first extended', () => {
       test('the empty option has no guard', () => {
         expect(steps.아이디입력).toBeUndefined();
-      })
-    })
+      });
+    });
 
     test('step option is equal then previous step option', () => {
       const step1 = steps.그_다음_화면;
@@ -57,7 +57,7 @@ describe('createContextGuard spec', () => {
         step1.guard({
           id: 'asdasdasd',
           password: '1234',
-        })
+        }),
       ).toBe(false);
     });
   });
