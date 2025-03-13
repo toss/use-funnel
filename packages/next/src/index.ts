@@ -1,6 +1,6 @@
 import { createUseFunnel } from '@use-funnel/core';
 import { useRouter } from 'next/router.js';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 import { makePath, removeKeys } from './util';
 
 export * from '@use-funnel/core';
@@ -21,6 +21,9 @@ interface NextPageRouteOption {
 
 export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialState }) => {
   const router = useRouter();
+
+  const routerRef = useRef(router);
+  routerRef.current = router;
 
   const currentContext = useMemo(() => {
     try {
@@ -50,7 +53,7 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
       history: [...beforeHistories, currentContext],
       currentIndex,
       async push(state, { scroll, locale, shallow = true } = {}) {
-        const { pathname, query } = makePath(router);
+        const { pathname, query } = makePath(routerRef.current);
         const queryContext = {
           [`${QS_KEY}${id}${STEP_KEY}`]: state.step,
           [`${QS_KEY}${id}${CONTEXT_KEY}`]: JSON.stringify(state.context),
@@ -77,7 +80,7 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
         );
       },
       async replace(state, { scroll, locale, shallow = true } = {}) {
-        const { pathname, query } = makePath(router);
+        const { pathname, query } = makePath(routerRef.current);
         const queryContext = {
           [`${QS_KEY}${id}${STEP_KEY}`]: state.step,
           [`${QS_KEY}${id}${CONTEXT_KEY}`]: JSON.stringify(state.context),
@@ -104,12 +107,12 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
       },
       go: (index) => window.history.go(index),
       async cleanup() {
-        const { pathname, query } = makePath(router);
-
-        if (query[`${QS_KEY}${id}${HISTORY_KEY}`] == null || query[`${QS_KEY}${id}${CONTEXT_KEY}`] == null) {
+        const searchParams = new URLSearchParams(window.location.search);
+        if (!searchParams.has(`${QS_KEY}${id}${HISTORY_KEY}`) || !searchParams.has(`${QS_KEY}${id}${CONTEXT_KEY}`)) {
           return;
         }
 
+        const { pathname, query } = makePath(routerRef.current);
         const queryContext = {
           [`${QS_KEY}${id}${STEP_KEY}`]: undefined,
           [`${QS_KEY}${id}${CONTEXT_KEY}`]: undefined,
