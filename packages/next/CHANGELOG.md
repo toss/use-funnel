@@ -1,5 +1,11 @@
 # @use-funnel/next
 
+## 0.0.13
+
+### Patch Changes
+
+- [#125](https://github.com/toss/use-funnel/pull/125) [`ce1a61e`](https://github.com/toss/use-funnel/commit/ce1a61edffd02b1908041c11d2b7211799accc1c) Thanks [@minuukang](https://github.com/minuukang)! - fix(next): next router cleanup check querystring without router
+
 ## 0.0.12
 
 ### Patch Changes
