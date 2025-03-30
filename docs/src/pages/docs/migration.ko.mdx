@@ -22,7 +22,7 @@ npm install @use-funnel/next --save
 
 ### steps 마이그레이션
 
-새로운 `@use-funnel` 에서는 단순히 단계만 정의할 수 있는게 아니라 단계별로 상태를 정의할 수 있습니다. `@toss/use-funnel` 으로 작성된 퍼널에서 이러한 타입이 필요없거나, 상태가 있더라도 단계별로 다른게 필요없다면 `@use-funnel` 에서 제공하는 `createStepBuilder()` 를 활용할 수 있습니다.
+새로운 `@use-funnel` 에서는 단순히 단계만 정의할 수 있는게 아니라 단계별로 상태를 정의할 수 있습니다. `@toss/use-funnel` 으로 작성된 퍼널에서 이러한 타입이 필요없거나, 상태가 있더라도 단계별로 다른게 필요없다면 `@use-funnel` 에서 제공하는 `createFunnelSteps()` 를 활용할 수 있습니다.
 
 <CodeCompare>
 ```tsx showLineNumbers {3}
