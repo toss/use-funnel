@@ -31,7 +31,7 @@ type 그외정보입력 = { email: string; password: string; other?: unknown }
     
 이제 [`useFunnel(){:tsx}`](./use-funnel.ko.mdx)을 사용해 초기 단계를 설정해 볼게요.
 
-먼저 <Keyword>step</Keyword>을 key로 한 <Keyword>context</Keyword> 객체를 [`useFunnel(){:tsx}`](./use-funnel.ko.mdx)의 제네릭으로 지정해요. 앞 단계에서 각 단계의 상태를 정의한 타입을 [`useFunnel(){:tsx}`](./use-funnel.ko.mdx)에 전달해서 사용하는 거에요. 해당 컴포넌트에 진입했을 때 사용할 <Keyword>step</Keyword>과 <Keyword>context</Keyword> 객체를 `initial` 프로퍼티에 지정해요.
+먼저 <Keyword>step</Keyword>을 key로 한 <Keyword>context</Keyword> 객체를 [`useFunnel(){:tsx}`](./use-funnel.ko.mdx)의 제네릭으로 지정해요. 앞 단계에서 각 단계의 상태를 정의한 타입을 [`useFunnel(){:tsx}`](./use-funnel.ko.mdx)에 전달해서 사용하는 거예요. 해당 컴포넌트에 진입했을 때 사용할 <Keyword>step</Keyword>과 <Keyword>context</Keyword> 객체를 `initial` 프로퍼티에 지정해요.
 
 여기서는 초기 단계인 "이메일입력"과 해당 단계에서 사용할 빈 `context` 객체를 설정했어요. `id`는 [한 컴포넌트에 여러 퍼널](/docs/sub-funnel)이 있을 때 구분하기 위한 고유 식별자에요.
 
