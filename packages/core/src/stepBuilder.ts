@@ -31,7 +31,7 @@ class SimpleFunnelStepBuilder<
   private prevFunnelStepOption: FunnelStepGuardOption<any> | undefined;
 
   extends<TName extends string>(
-    steps: TName | TName[],
+    steps: TName | TName[] | Readonly<TName[]>,
   ): SimpleFunnelStepBuilder<
     TContext,
     TStepMap & {
@@ -41,7 +41,7 @@ class SimpleFunnelStepBuilder<
   >;
 
   extends<TName extends string, TRequiredKeys extends keyof TContext>(
-    steps: TName | TName[],
+    steps: TName | TName[] | Readonly<TName[]>,
     options: { requiredKeys: TRequiredKeys[] | TRequiredKeys },
   ): SimpleFunnelStepBuilder<
     Omit<TContext, TRequiredKeys> & Pick<Required<TContext>, TRequiredKeys>,
@@ -51,7 +51,7 @@ class SimpleFunnelStepBuilder<
     FunnelStepGuardOption<Omit<TContext, TRequiredKeys> & Pick<Required<TContext>, TRequiredKeys>>
   >;
 
-  extends(steps: string | string[], option?: { requiredKeys: string[] | string }) {
+  extends(steps: string | string[], option?: { requiredKeys: string | string[] }) {
     let funnelStep: FunnelStepOption<any> | undefined;
     if (option != null) {
       const requiredKeys = Array.isArray(option.requiredKeys) ? option.requiredKeys : [option.requiredKeys];
