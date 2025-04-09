@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { BrowserRouter, Link, MemoryRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { useFunnel } from '../src/index.js';
 
@@ -191,7 +191,7 @@ describe('Test useFunnel ReactRouter6 router', () => {
 
   test('should work when navigate out of funnel', async () => {
     function FunnelTest() {
-      useFunnel<{ A: { id?: string } }>({
+      const funnel = useFunnel<{ A: { id?: string }; B: { id: string } }>({
         id: 'vitest',
         initial: {
           step: 'A',
@@ -202,21 +202,41 @@ describe('Test useFunnel ReactRouter6 router', () => {
         <div>
           <Link to="/">Go to home</Link>
           <h1>This is Funnel</h1>
+          <funnel.Render
+            A={({ history }) => <button onClick={() => history.push('B', { id: 'vitest' })}>Go B</button>}
+            B={({ context }) => <div>This is B {context.id}</div>}
+          />
         </div>
       );
     }
 
     render(
       <Routes>
-        <Route path="/" element={<h1>Home</h1>} />
+        <Route
+          path="/"
+          element={
+            <>
+              <h1>Home</h1>
+              <Link to="/funnel">Go to funnel</Link>
+            </>
+          }
+        />
         <Route path="/funnel" element={<FunnelTest />} />
       </Routes>,
-      { wrapper: (props) => <MemoryRouter initialEntries={['/funnel']} {...props} /> },
+      { wrapper: (props) => <BrowserRouter {...props} /> },
     );
+
+    expect(screen.queryByText('Home')).not.toBeNull();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByText('Go to funnel'));
 
     expect(screen.queryByText('This is Funnel')).not.toBeNull();
 
-    const user = userEvent.setup();
+    await user.click(screen.getByText('Go B'));
+
+    expect(screen.queryByText('This is B vitest')).not.toBeNull();
+
     await user.click(screen.getByText('Go to home'));
 
     expect(screen.queryByText('Home')).not.toBeNull();
