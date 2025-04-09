@@ -17,6 +17,8 @@ interface NextPageRouteOption {
   shallow?: boolean;
   locale?: string | false;
   scroll?: boolean;
+  query?: Record<string, string>;
+  preserveQuery?: boolean;
 }
 
 export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialState }) => {
@@ -52,7 +54,7 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
     () => ({
       history: [...beforeHistories, currentContext],
       currentIndex,
-      async push(state, { scroll, locale, shallow = true } = {}) {
+      async push(state, { scroll, locale, shallow = true, query: paramsQuery, preserveQuery = true } = {}) {
         const { pathname, query } = makePath(routerRef.current);
         const queryContext = {
           [`${QS_KEY}${id}${STEP_KEY}`]: state.step,
@@ -63,9 +65,10 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
           {
             pathname,
             query: {
-              ...query,
+              ...(preserveQuery ? query : {}),
               [`${QS_KEY}${id}${HISTORY_KEY}`]: JSON.stringify([...beforeHistories, currentContext]),
               ...queryContext,
+              ...paramsQuery,
             },
           },
           {
@@ -79,7 +82,7 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
           },
         );
       },
-      async replace(state, { scroll, locale, shallow = true } = {}) {
+      async replace(state, { scroll, locale, shallow = true, query: paramsQuery, preserveQuery = true } = {}) {
         const { pathname, query } = makePath(routerRef.current);
         const queryContext = {
           [`${QS_KEY}${id}${STEP_KEY}`]: state.step,
@@ -90,8 +93,9 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
           {
             pathname,
             query: {
-              ...query,
+              ...(preserveQuery ? query : {}),
               ...queryContext,
+              ...paramsQuery,
             },
           },
           {
