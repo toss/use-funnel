@@ -47,5 +47,12 @@
       "eslint --fix"
     ]
   },
+  "prettier": {
+    "tabWidth": 2,
+    "printWidth": 120,
+    "singleQuote": true,
+    "semi": true,
+    "trailingComma": "all"
+  },
   "packageManager": "pnpm@9.6.0"
 }
