@@ -1,6 +1,7 @@
+import { createFunnelSteps } from '@use-funnel/core';
 import { useRouter } from 'next/router.js';
 import { Children, isValidElement, PropsWithChildren, useCallback, useEffect, useMemo, useRef } from 'react';
-import { createFunnelSteps, useFunnel as useFunnelBase } from './index.js';
+import { useFunnel as useFunnelBase } from './index.js';
 
 function Step(props: { children: React.ReactNode; name: string; onEnter?: () => void }) {
   const { children, onEnter } = props;
@@ -42,7 +43,7 @@ export function useFunnel<TSteps extends readonly [string, ...string[]], TContex
     Step: React.ComponentType<{ children: React.ReactNode; name: TSteps[number]; onEnter?: () => void }>;
   },
   ...(IsNever<TContext> extends true
-    ? [(step: TSteps[number], options?: SetStepOptions) => Promise<void>]
+    ? [(step: TSteps[number], options?: SetStepOptions) => void]
     : [
         TContext,
         (
@@ -64,7 +65,7 @@ export function useFunnel<TSteps extends readonly [string, ...string[]], TContex
         | Partial<StepWithContext<TSteps, TContext>>
         | ((prev: StepWithContext<TSteps, TContext>) => Partial<StepWithContext<TSteps, TContext>>),
       options?: SetStepOptions,
-    ) => Promise<void>,
+    ) => void,
   ];
 } {
   const router = useRouter();

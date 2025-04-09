@@ -1,6 +1,6 @@
 {
   "name": "@use-funnel/next",
-  "version": "0.0.14-alpha.0",
+  "version": "0.0.14-alpha.4",
   "description": "",
   "type": "module",
   "main": "./dist/index.js",
@@ -14,12 +14,17 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       },
+      "./compat": {
+        "types": "./dist/compat.d.ts",
+        "default": "./dist/compat.js"
+      },
       "./package.json": "./package.json"
     }
   },
   "files": [
     "dist",
-    "index.d.ts"
+    "index.d.ts",
+    "compat.d.ts"
   ],
   "scripts": {
     "test": "pnpm --filter \"@use-funnel/core\" build && vitest run",
