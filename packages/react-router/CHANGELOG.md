@@ -1,5 +1,11 @@
 # @use-funnel/react-router-dom
 
+## 0.0.3
+
+### Patch Changes
+
+- [#141](https://github.com/toss/use-funnel/pull/141) [`a2b9b98`](https://github.com/toss/use-funnel/commit/a2b9b98307ef753971a6e74973b894bf4e0cf480) Thanks [@minuukang](https://github.com/minuukang)! - fix(react-router, react-router-dom): cleanup check step is exists to replace sub funnel
+
 ## 0.0.2
 
 ### Patch Changes
