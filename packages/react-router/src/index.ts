@@ -88,8 +88,13 @@ export const useFunnel = createUseFunnel<ReactRouterRouteOption>(({ id, initialS
       },
       cleanup() {
         const newLocationState = { ...location.state };
+        const currentSearchParams = new URLSearchParams(window.location.search);
 
-        if (!(contextName in newLocationState) && !(historiesName in newLocationState)) {
+        if (
+          !currentSearchParams.has(stepName) ||
+          !(contextName in newLocationState) ||
+          !(historiesName in newLocationState)
+        ) {
           return;
         }
 
