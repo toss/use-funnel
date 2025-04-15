@@ -33,3 +33,30 @@ export const makePath = (router: Pick<NextRouter, 'asPath' | 'pathname' | 'query
 
   return { pathname, query };
 };
+
+export function parseQueryJson(data: string) {
+  return JSON.parse(data, (_, value) => {
+    if (typeof value === 'object' && value !== null && '__type' in value && value.__type === 'Date') {
+      return new Date(value.value);
+    }
+    return value;
+  });
+}
+
+export function stringifyQueryJson(data: unknown) {
+  return JSON.stringify(data, (_, value) => {
+    if (typeof value === 'object' && value != null) {
+      for (const key in value) {
+        if (value.hasOwnProperty(key)) {
+          if (value[key] instanceof Date) {
+            value[key] = {
+              __type: 'Date',
+              value: value[key].toISOString(),
+            };
+          }
+        }
+      }
+    }
+    return value;
+  });
+}
