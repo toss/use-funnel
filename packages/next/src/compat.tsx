@@ -35,7 +35,7 @@ export function useFunnel<TSteps extends readonly [string, ...string[]], TContex
      */
     stepQueryKey?: string | undefined;
     initialStep?: TSteps[number] | undefined;
-    intialContext?: TContext;
+    initialContext?: TContext;
     onStepChange?: ((name: TSteps[number]) => void) | undefined;
   },
 ): [
@@ -74,8 +74,8 @@ export function useFunnel<TSteps extends readonly [string, ...string[]], TContex
   const steps = createFunnelSteps<{}>()
     .extends(stepNames as unknown as string[])
     .build();
-  const initialContextRef = useRef(options?.intialContext ?? INITIAL_CONTEXT);
-  initialContextRef.current = options?.intialContext ?? INITIAL_CONTEXT;
+  const initialContextRef = useRef(options?.initialContext ?? INITIAL_CONTEXT);
+  initialContextRef.current = options?.initialContext ?? INITIAL_CONTEXT;
   const funnel = useFunnelBase({
     steps,
     id: stepQueryKey,
@@ -172,7 +172,7 @@ export function useFunnel<TSteps extends readonly [string, ...string[]], TContex
   };
 
   return Object.assign(
-    options?.intialContext == null
+    options?.initialContext == null
       ? [FunnelComponent, setStep]
       : [
           FunnelComponent,

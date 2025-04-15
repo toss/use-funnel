@@ -128,7 +128,7 @@ describe('useFunnel', () => {
   it('should be work with intialContext', async () => {
     function Test() {
       const [Funnel, state, setState] = useFunnel(['a', 'b', 'c'] as const, {
-        intialContext: {
+        initialContext: {
           foo: 'bar',
           a: false,
           b: false,
