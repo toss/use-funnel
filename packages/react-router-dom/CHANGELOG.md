@@ -1,5 +1,12 @@
 # @use-funnel/react-router-dom
 
+## 0.0.13
+
+### Patch Changes
+
+- Updated dependencies [[`ded93ac`](https://github.com/toss/use-funnel/commit/ded93ac13b7594676e2f959ecc0131d5f366407c)]:
+  - @use-funnel/core@0.0.11
+
 ## 0.0.12
 
 ### Patch Changes
