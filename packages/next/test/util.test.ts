@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { makePath, removeKeys } from '../src/util';
+import { makePath, parseQueryJson, removeKeys, stringifyQueryJson } from '../src/util';
 
 describe('Test removeKeys', () => {
   test('should work', async () => {
@@ -30,5 +30,21 @@ describe('Test makePath', () => {
     };
 
     expect(makePath(router)).toEqual({ pathname: '/path/123', query: { foo: 'bar' } });
+  });
+});
+
+describe('Test stringifyQueryJson', () => {
+  test('should work', async () => {
+    const value = { a: 1, b: new Date('2025-04-15T14:28:09.987Z') };
+
+    expect(stringifyQueryJson(value)).toEqual('{"a":1,"b":{"__type":"Date","value":"2025-04-15T14:28:09.987Z"}}');
+  });
+});
+
+describe('Test parseQueryJson', () => {
+  test('should work', async () => {
+    const value = '{"a":1,"b":{"__type":"Date","value":"2025-04-15T14:28:09.987Z"}}';
+
+    expect(parseQueryJson(value)).toEqual({ a: 1, b: new Date('2025-04-15T14:28:09.987Z') });
   });
 });

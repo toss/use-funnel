@@ -10,7 +10,7 @@ describe('Test useFunnel next router', () => {
       const funnel = useFunnel<{
         A: { id?: string };
         B: { id: string };
-        C: { id: string; password: string };
+        C: { id: string; password: string; date: Date };
       }>({
         id: 'vitest',
         initial: {
@@ -37,7 +37,7 @@ describe('Test useFunnel next router', () => {
               <div>{funnel.context.id}</div>
               <button
                 onClick={() => {
-                  funnel.history.replace('C', { password: 'vitest1234' });
+                  funnel.history.replace('C', { password: 'vitest1234', date: new Date() });
                 }}
               >
                 Go C
@@ -49,6 +49,7 @@ describe('Test useFunnel next router', () => {
           return (
             <div>
               <div>Finished!</div>
+              <p>{funnel.context.date.toISOString()}</p>
             </div>
           );
         }

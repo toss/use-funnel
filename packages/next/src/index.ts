@@ -1,7 +1,7 @@
 import { createUseFunnel } from '@use-funnel/core';
 import { useRouter } from 'next/router.js';
 import { useMemo, useRef } from 'react';
-import { makePath, removeKeys } from './util';
+import { makePath, parseQueryJson, removeKeys, stringifyQueryJson } from './util';
 
 export * from '@use-funnel/core';
 
@@ -17,6 +17,8 @@ interface NextPageRouteOption {
   shallow?: boolean;
   locale?: string | false;
   scroll?: boolean;
+  query?: Record<string, string>;
+  preserveQuery?: boolean;
 }
 
 export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialState }) => {
@@ -31,7 +33,7 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
       const currentContext = router.query?.[`${QS_KEY}${id}${CONTEXT_KEY}`] as string | undefined;
       return currentStep == null || currentContext == null
         ? initialState
-        : { step: currentStep, context: JSON.parse(currentContext) };
+        : { step: currentStep, context: parseQueryJson(currentContext) };
     } catch {
       return initialState;
     }
@@ -40,7 +42,7 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
   const _beforeHistories = router.query?.[`${QS_KEY}${id}${HISTORY_KEY}`];
   const beforeHistories = useMemo<(typeof initialState)[]>(() => {
     try {
-      return _beforeHistories == null ? [] : JSON.parse(_beforeHistories as string);
+      return _beforeHistories == null ? [] : parseQueryJson(_beforeHistories as string);
     } catch {
       return [];
     }
@@ -52,20 +54,21 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
     () => ({
       history: [...beforeHistories, currentContext],
       currentIndex,
-      async push(state, { scroll, locale, shallow = true } = {}) {
+      async push(state, { scroll, locale, shallow = true, query: paramsQuery, preserveQuery = true } = {}) {
         const { pathname, query } = makePath(routerRef.current);
         const queryContext = {
           [`${QS_KEY}${id}${STEP_KEY}`]: state.step,
-          [`${QS_KEY}${id}${CONTEXT_KEY}`]: JSON.stringify(state.context),
+          [`${QS_KEY}${id}${CONTEXT_KEY}`]: stringifyQueryJson(state.context),
         };
 
         await router.push(
           {
             pathname,
             query: {
-              ...query,
-              [`${QS_KEY}${id}${HISTORY_KEY}`]: JSON.stringify([...beforeHistories, currentContext]),
+              ...(preserveQuery ? query : {}),
+              [`${QS_KEY}${id}${HISTORY_KEY}`]: stringifyQueryJson([...beforeHistories, currentContext]),
               ...queryContext,
+              ...paramsQuery,
             },
           },
           {
@@ -79,19 +82,20 @@ export const useFunnel = createUseFunnel<NextPageRouteOption>(({ id, initialStat
           },
         );
       },
-      async replace(state, { scroll, locale, shallow = true } = {}) {
+      async replace(state, { scroll, locale, shallow = true, query: paramsQuery, preserveQuery = true } = {}) {
         const { pathname, query } = makePath(routerRef.current);
         const queryContext = {
           [`${QS_KEY}${id}${STEP_KEY}`]: state.step,
-          [`${QS_KEY}${id}${CONTEXT_KEY}`]: JSON.stringify(state.context),
+          [`${QS_KEY}${id}${CONTEXT_KEY}`]: stringifyQueryJson(state.context),
         };
 
         await router.replace(
           {
             pathname,
             query: {
-              ...query,
+              ...(preserveQuery ? query : {}),
               ...queryContext,
+              ...paramsQuery,
             },
           },
           {

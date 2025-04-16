@@ -14,12 +14,17 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       },
+      "./compat": {
+        "types": "./dist/compat.d.ts",
+        "default": "./dist/compat.js"
+      },
       "./package.json": "./package.json"
     }
   },
   "files": [
     "dist",
-    "index.d.ts"
+    "index.d.ts",
+    "compat.d.ts"
   ],
   "scripts": {
     "test": "pnpm --filter \"@use-funnel/core\" build && vitest run",
@@ -46,6 +51,7 @@
   "devDependencies": {
     "@testing-library/react": "^15.0.7",
     "@testing-library/user-event": "^14.5.2",
+    "@toss/use-funnel": "^1.4.2",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.3.0",
     "concurrently": "^8.2.2",
