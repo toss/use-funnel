@@ -1,5 +1,14 @@
 # @use-funnel/next
 
+## 0.0.14
+
+### Patch Changes
+
+- [#142](https://github.com/toss/use-funnel/pull/142) [`ded93ac`](https://github.com/toss/use-funnel/commit/ded93ac13b7594676e2f959ecc0131d5f366407c) Thanks [@minuukang](https://github.com/minuukang)! - add compat package of @toss/use-funnel
+
+- Updated dependencies [[`ded93ac`](https://github.com/toss/use-funnel/commit/ded93ac13b7594676e2f959ecc0131d5f366407c)]:
+  - @use-funnel/core@0.0.11
+
 ## 0.0.13
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @use-funnel/core
 
+## 0.0.11
+
+### Patch Changes
+
+- [#142](https://github.com/toss/use-funnel/pull/142) [`ded93ac`](https://github.com/toss/use-funnel/commit/ded93ac13b7594676e2f959ecc0131d5f366407c) Thanks [@minuukang](https://github.com/minuukang)! - fix(core): allow createFunnelSteps.extends() to accept readonly string arrays as the first argument
+
 ## 0.0.10
 
 ### Patch Changes
