@@ -26,10 +26,10 @@ type FunnelEventRenderCallback<
     dispatch: (
       ...args: {
         [key in keyof TEvents]: key extends string
-        ? Partial<Parameters<TEvents[key]>[0]> extends Parameters<TEvents[key]>[0]
-        ? [type: key, payload?: Parameters<TEvents[key]>[0]]
-        : [type: key, payload: Parameters<TEvents[key]>[0]]
-        : never;
+          ? Partial<Parameters<TEvents[key]>[0]> extends Parameters<TEvents[key]>[0]
+            ? [type: key, payload?: Parameters<TEvents[key]>[0]]
+            : [type: key, payload: Parameters<TEvents[key]>[0]]
+          : never;
       }[keyof TEvents]
     ) => void;
   } & OverlayRenderArgument<TOverlayEnable>,
@@ -63,17 +63,17 @@ export class StepRenderHelper<
     callback: TEvent extends never
       ? FunnelRenderCallback<TStepContextMap, TStepKey, true, TRouteOption>
       : FunnelEventRenderCallback<
-        TStepContextMap,
-        TStepKey,
-        true,
-        TRouteOption,
-        {
-          [key in TEvent['type']]: (
-            payload: Extract<TEvent, { type: key }>['payload'],
-            state: FunnelStep<TStepContextMap, TStepKey, TRouteOption>,
-          ) => void;
-        }
-      >,
+          TStepContextMap,
+          TStepKey,
+          true,
+          TRouteOption,
+          {
+            [key in TEvent['type']]: (
+              payload: Extract<TEvent, { type: key }>['payload'],
+              state: FunnelStep<TStepContextMap, TStepKey, TRouteOption>,
+            ) => void;
+          }
+        >,
   ): RenderResult<TStepContextMap, TStepKey, TRouteOption> {
     return {
       type: this.overlay ? 'overlay' : 'render',
@@ -129,8 +129,8 @@ export function renderWith<
   overlay?: TOverlayEnable;
   events?: TEvents;
   render: TEvents extends never
-  ? FunnelRenderCallback<TStepContextMap, TStepKey, TOverlayEnable, TRouteOption>
-  : FunnelEventRenderCallback<TStepContextMap, TStepKey, TOverlayEnable, TRouteOption, TEvents>;
+    ? FunnelRenderCallback<TStepContextMap, TStepKey, TOverlayEnable, TRouteOption>
+    : FunnelEventRenderCallback<TStepContextMap, TStepKey, TOverlayEnable, TRouteOption, TEvents>;
 }) {
   const step = new StepRenderHelper<TStepContextMap, TStepKey, TRouteOption>();
   const events = option.events;
@@ -174,8 +174,8 @@ export function overlayRenderWith<
 >(option: {
   events?: any;
   render: TEvents extends never
-  ? FunnelRenderCallback<TStepContextMap, TStepKey, true, TRouteOption>
-  : FunnelEventRenderCallback<TStepContextMap, TStepKey, true, TRouteOption, TEvents>;
+    ? FunnelRenderCallback<TStepContextMap, TStepKey, true, TRouteOption>
+    : FunnelEventRenderCallback<TStepContextMap, TStepKey, true, TRouteOption, TEvents>;
 }) {
   return renderWith({
     ...option,
