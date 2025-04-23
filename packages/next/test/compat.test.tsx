@@ -47,6 +47,29 @@ describe('useFunnel', () => {
     expect(mockRouter.query['funnel-step']).toBe('a');
   });
 
+  it('should be work when initialStep is defined', async () => {
+    function Test() {
+      const [Funnel, setStep] = useFunnel(['a', 'b', 'c'] as const, {
+        initialStep: 'b',
+      });
+      return (
+        <Funnel>
+          <Funnel.Step name="a">
+            <button onClick={() => setStep('b')}>b</button>
+          </Funnel.Step>
+          <Funnel.Step name="b">
+            <button onClick={() => setStep('c')}>c</button>
+          </Funnel.Step>
+          <Funnel.Step name="c">
+            <button onClick={() => setStep('a')}>a</button>
+          </Funnel.Step>
+        </Funnel>
+      );
+    }
+    render(<Test />);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'c' })).not.toBeNull());
+  });
+
   it('should be work with withState', async () => {
     function Test() {
       const [Funnel, state, setState] = useFunnel(['a', 'b', 'c'] as const).withState({
