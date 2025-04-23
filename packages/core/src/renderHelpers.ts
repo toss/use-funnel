@@ -1,5 +1,5 @@
-import { AnyStepContextMap, FunnelStep, RouteOption } from './core';
-import { FunnelRenderOverlayHandler, RenderResult } from './FunnelRender';
+import { AnyStepContextMap, FunnelStep, RouteOption } from './core.js';
+import { FunnelRenderOverlayHandler, RenderResult } from './FunnelRender.js';
 
 type EventObject = { type: string; payload: never };
 type OverlayRenderArgument<TOverlayEnable extends boolean> = TOverlayEnable extends true
