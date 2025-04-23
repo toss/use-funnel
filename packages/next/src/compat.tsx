@@ -69,23 +69,22 @@ export function useFunnel<TSteps extends readonly [string, ...string[]], TContex
   ];
 } {
   const router = useRouter();
-  const stepQueryKey = options?.stepQueryKey ?? 'funnel-step';
-  const initialStep = (router.query[stepQueryKey] as TSteps[number]) ?? stepNames[0];
+  const { stepQueryKey = 'funnel-step', initialStep = stepNames[0], initialContext, onStepChange } = options || {};
   const steps = createFunnelSteps<{}>()
     .extends(stepNames as unknown as string[])
     .build();
-  const initialContextRef = useRef(options?.initialContext ?? INITIAL_CONTEXT);
-  initialContextRef.current = options?.initialContext ?? INITIAL_CONTEXT;
+  const initialContextRef = useRef(initialContext ?? INITIAL_CONTEXT);
+  initialContextRef.current = initialContext ?? INITIAL_CONTEXT;
   const funnel = useFunnelBase({
     steps,
     id: stepQueryKey,
     initial: {
-      step: initialStep,
+      step: (router.query[stepQueryKey] as TSteps[number] | undefined) ?? initialStep,
       context: initialContextRef.current,
     },
   });
-  const onStepChangeRef = useRef(options?.onStepChange);
-  onStepChangeRef.current = options?.onStepChange;
+  const onStepChangeRef = useRef(onStepChange);
+  onStepChangeRef.current = onStepChange;
 
   const FunnelComponent = useMemo(() => {
     return Object.assign(
