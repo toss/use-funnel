@@ -1,5 +1,11 @@
 # @use-funnel/next
 
+## 0.0.15
+
+### Patch Changes
+
+- [#146](https://github.com/toss/use-funnel/pull/146) [`c8e1839`](https://github.com/toss/use-funnel/commit/c8e1839926b8129e15c03995f466fc213362034f) Thanks [@minuukang](https://github.com/minuukang)! - fix(next): compat initialStep prop is ignored
+
 ## 0.0.14
 
 ### Patch Changes
