@@ -1,4 +1,5 @@
 'use client';
+
 import { AnyFunnelState, createUseFunnel } from '@use-funnel/core';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
