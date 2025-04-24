@@ -1,4 +1,5 @@
 'use client';
+
 import { useFunnel } from '@use-funnel/browser';
 import { SubFunnel } from './sub-funnel';
 
