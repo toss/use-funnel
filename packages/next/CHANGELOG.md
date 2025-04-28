@@ -1,5 +1,11 @@
 # @use-funnel/next
 
+## 0.0.16
+
+### Patch Changes
+
+- [#149](https://github.com/toss/use-funnel/pull/149) [`b386255`](https://github.com/toss/use-funnel/commit/b386255d4a4c6cd872d13fae3c3c3d96f03a91e1) Thanks [@minuukang](https://github.com/minuukang)! - fix(next): cannot export core module with compat package
+
 ## 0.0.15
 
 ### Patch Changes
