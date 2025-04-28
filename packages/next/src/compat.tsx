@@ -1,7 +1,7 @@
 import { createFunnelSteps } from '@use-funnel/core';
 import { useRouter } from 'next/router.js';
 import { Children, isValidElement, PropsWithChildren, useCallback, useEffect, useMemo, useRef } from 'react';
-import { useFunnel as useFunnelBase } from './index.js';
+import { useFunnel as useFunnelBase } from './useFunnel.js';
 
 function Step(props: { children: React.ReactNode; name: string; onEnter?: () => void }) {
   const { children, onEnter } = props;
