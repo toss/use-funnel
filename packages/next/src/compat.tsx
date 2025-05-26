@@ -82,6 +82,8 @@ export function useFunnel<TSteps extends readonly [string, ...string[]], TContex
       step: (router.query[stepQueryKey] as TSteps[number] | undefined) ?? initialStep,
       context: initialContextRef.current,
     },
+    stepQueryName: (id) => id,
+    disableCleanup: true,
   });
   const onStepChangeRef = useRef(onStepChange);
   onStepChangeRef.current = onStepChange;

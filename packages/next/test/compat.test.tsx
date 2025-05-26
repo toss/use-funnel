@@ -37,6 +37,7 @@ describe('useFunnel', () => {
     expect(onStepChange).toHaveBeenLastCalledWith('b');
     expect(screen.getByRole('button', { name: 'c' })).not.toBeNull();
     expect(mockRouter.query['funnel-step']).toBe('b');
+    expect(mockRouter.query['funnel.funnel-step.step']).toBeUndefined();
     await user.click(screen.getByRole('button', { name: 'c' }));
     expect(onStepChange).toHaveBeenLastCalledWith('c');
     expect(screen.getByRole('button', { name: 'a' })).not.toBeNull();
