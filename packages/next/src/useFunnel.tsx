@@ -28,6 +28,7 @@ interface NextPageFunnelOption {
 export const useFunnel = createUseFunnel<NextPageRouteOption, NextPageFunnelOption>(({
   id,
   initialState,
+  steps,
   stepQueryName = (id) => `${QS_KEY}${id}${STEP_KEY}`,
   contextQueryName = (id) => `${QS_KEY}${id}${CONTEXT_KEY}`,
   historyQueryName = (id) => `${QS_KEY}${id}${HISTORY_KEY}`,
@@ -48,7 +49,7 @@ export const useFunnel = createUseFunnel<NextPageRouteOption, NextPageFunnelOpti
     try {
       const currentStep = router.query?.[stepQueryNameRef.current(id)] as string | undefined;
       const currentContext = router.query?.[contextQueryNameRef.current(id)] as string | undefined;
-      return currentStep == null || currentContext == null
+      return currentStep == null || currentContext == null || (steps != null && !(currentStep in steps))
         ? initialState
         : { step: currentStep, context: parseQueryJson(currentContext) };
     } catch {
@@ -90,7 +91,7 @@ export const useFunnel = createUseFunnel<NextPageRouteOption, NextPageFunnelOpti
           },
           {
             pathname,
-            query: { ...removeKeys(query, [historyQueryNameRef.current(id)]), ...queryContext },
+            query: { ...removeKeys(query, [historyQueryNameRef.current(id)]), ...queryContext, ...paramsQuery },
           },
           {
             shallow,
