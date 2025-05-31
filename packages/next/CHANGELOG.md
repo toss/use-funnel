@@ -1,5 +1,11 @@
 # @use-funnel/next
 
+## 0.0.17
+
+### Patch Changes
+
+- [`503a2f4`](https://github.com/toss/use-funnel/commit/503a2f40ebc08165d47d0118f652bc7ecb4093f0) Thanks [@minuukang](https://github.com/minuukang)! - fix(next): handle objects without hasOwnProperty in stringifyQueryJson ([#152](https://github.com/toss/use-funnel/issues/152)) ([#153](https://github.com/toss/use-funnel/issues/153))
+
 ## 0.0.16
 
 ### Patch Changes
