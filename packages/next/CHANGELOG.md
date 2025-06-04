@@ -1,5 +1,14 @@
 # @use-funnel/next
 
+## 0.0.18
+
+### Patch Changes
+
+- [#155](https://github.com/toss/use-funnel/pull/155) [`a8a2523`](https://github.com/toss/use-funnel/commit/a8a252344ff74c2dc2149b7e546ff6cdb1797862) Thanks [@minuukang](https://github.com/minuukang)! - core: Add disable cleanup option, next-compt: disable cleanup true & step query key keep old version
+
+- Updated dependencies [[`a8a2523`](https://github.com/toss/use-funnel/commit/a8a252344ff74c2dc2149b7e546ff6cdb1797862)]:
+  - @use-funnel/core@0.0.12
+
 ## 0.0.17
 
 ### Patch Changes

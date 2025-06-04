@@ -1,6 +1,6 @@
 {
   "name": "@use-funnel/next",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "",
   "type": "module",
   "main": "./dist/index.js",
