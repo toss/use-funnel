@@ -25,7 +25,10 @@ describe('useFunnel', () => {
             <button onClick={() => setStep('c')}>c</button>
           </Funnel.Step>
           <Funnel.Step name="c">
-            <button onClick={() => setStep('a')}>a</button>
+            <button onClick={() => setStep('a', {
+              preserveQuery: true,
+              query: { abc: '1234' }
+            })}>a</button>
           </Funnel.Step>
         </Funnel>
       );
@@ -37,6 +40,7 @@ describe('useFunnel', () => {
     expect(onStepChange).toHaveBeenLastCalledWith('b');
     expect(screen.getByRole('button', { name: 'c' })).not.toBeNull();
     expect(mockRouter.query['funnel-step']).toBe('b');
+    expect(mockRouter.query['funnel.funnel-step.step']).toBeUndefined();
     await user.click(screen.getByRole('button', { name: 'c' }));
     expect(onStepChange).toHaveBeenLastCalledWith('c');
     expect(screen.getByRole('button', { name: 'a' })).not.toBeNull();
@@ -45,6 +49,7 @@ describe('useFunnel', () => {
     expect(onStepChange).toHaveBeenLastCalledWith('a');
     expect(screen.getByRole('button', { name: 'b' })).not.toBeNull();
     expect(mockRouter.query['funnel-step']).toBe('a');
+    expect(mockRouter.query['abc']).toBe('1234');
   });
 
   it('should be work when initialStep is defined', async () => {

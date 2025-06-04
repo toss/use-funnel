@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import {
+  AnyFunnelState,
   AnyStepContextMap,
   FunnelHistory,
   FunnelStateByContextMap,
@@ -19,6 +20,7 @@ export interface UseFunnelOptions<TStepContextMap extends AnyStepContextMap> {
   steps?: {
     [TStepName in keyof TStepContextMap]: FunnelStepOption<TStepContextMap[TStepName]>;
   };
+  disableCleanup?: boolean;
 }
 
 export type UseFunnelResults<TStepContextMap extends AnyStepContextMap, TRouteOption extends RouteOption> = {
@@ -28,32 +30,35 @@ export type UseFunnelResults<TStepContextMap extends AnyStepContextMap, TRouteOp
   };
 } & FunnelStepByContextMap<TStepContextMap, TRouteOption>;
 
-export interface UseFunnel<TRouteOption extends RouteOption> {
+export interface UseFunnel<TRouteOption extends RouteOption, TFunnelOption extends RouteOption> {
   <
     _TStepContextMap extends AnyStepContextMap,
+    _TFunnelOption extends TFunnelOption = TFunnelOption,
     TStepKeys extends keyof _TStepContextMap = keyof _TStepContextMap,
     TStepContext extends _TStepContextMap[TStepKeys] = _TStepContextMap[TStepKeys],
     TStepContextMap extends string extends keyof _TStepContextMap
       ? Record<TStepKeys, TStepContext>
       : _TStepContextMap = string extends keyof _TStepContextMap ? Record<TStepKeys, TStepContext> : _TStepContextMap,
   >(
-    options: UseFunnelOptions<TStepContextMap>,
+    options: UseFunnelOptions<TStepContextMap> & TFunnelOption,
   ): UseFunnelResults<TStepContextMap, TRouteOption>;
 }
 
-export function createUseFunnel<TRouteOption extends RouteOption>(
-  useFunnelRouter: FunnelRouter<TRouteOption>,
-): UseFunnel<TRouteOption> {
+export function createUseFunnel<TRouteOption extends RouteOption, TFunnelOption extends RouteOption = {}>(
+  useFunnelRouter: FunnelRouter<TRouteOption, TFunnelOption>,
+): UseFunnel<TRouteOption, TFunnelOption> {
   return function useFunnel<
     _TStepContextMap extends AnyStepContextMap,
+    _TFunnelOption extends TFunnelOption = TFunnelOption,
     TStepKeys extends keyof _TStepContextMap = keyof _TStepContextMap,
     TStepContext extends _TStepContextMap[TStepKeys] = _TStepContextMap[TStepKeys],
     TStepContextMap extends string extends keyof _TStepContextMap
       ? Record<TStepKeys, TStepContext>
       : _TStepContextMap = string extends keyof _TStepContextMap ? Record<TStepKeys, TStepContext> : _TStepContextMap,
-  >(options: UseFunnelOptions<TStepContextMap>): UseFunnelResults<TStepContextMap, TRouteOption> {
+  >(options: UseFunnelOptions<TStepContextMap> & _TFunnelOption): UseFunnelResults<TStepContextMap, TRouteOption> {
     const optionsRef = useUpdatableRef(options);
     const router = useFunnelRouter({
+      ...optionsRef.current,
       id: optionsRef.current.id,
       initialState: optionsRef.current.initial,
     });
@@ -65,9 +70,12 @@ export function createUseFunnel<TRouteOption extends RouteOption>(
 
     useEffect(() => {
       return () => {
+        if (optionsRef.current.disableCleanup) {
+          return;
+        }
         cleanUpRef.current();
       };
-    }, []);
+    }, [optionsRef]);
 
     const parseStepContext = useCallback(
       <TStep extends keyof TStepContextMap>(step: TStep, context: unknown): TStepContextMap[TStep] | null => {
