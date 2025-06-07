@@ -1,6 +1,6 @@
 import { createUseFunnel } from '@use-funnel/core';
-import { useRouter } from 'next/router.js';
 import { useMemo, useRef } from 'react';
+import { useNextRouter } from './useNextRouter';
 import { makePath, parseQueryJson, removeKeys, stringifyQueryJson } from './util';
 
 const QS_KEY = 'funnel.';
@@ -23,6 +23,7 @@ interface NextPageFunnelOption {
   stepQueryName?: (id: string) => string;
   contextQueryName?: (id: string) => string;
   historyQueryName?: (id: string) => string;
+  suspense?: boolean;
 }
 
 export const useFunnel = createUseFunnel<NextPageRouteOption, NextPageFunnelOption>(({
@@ -32,8 +33,9 @@ export const useFunnel = createUseFunnel<NextPageRouteOption, NextPageFunnelOpti
   stepQueryName = (id) => `${QS_KEY}${id}${STEP_KEY}`,
   contextQueryName = (id) => `${QS_KEY}${id}${CONTEXT_KEY}`,
   historyQueryName = (id) => `${QS_KEY}${id}${HISTORY_KEY}`,
+  suspense,
 }) => {
-  const router = useRouter();
+  const router = useNextRouter({ suspense });
 
   const routerRef = useRef(router);
   routerRef.current = router;
