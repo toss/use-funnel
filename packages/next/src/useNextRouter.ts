@@ -5,7 +5,7 @@ interface Options {
   suspense?: boolean;
 }
 
-export function useNextRouter(options: Options = { suspense: true }) {
+export function useNextRouter(options: Options = { suspense: false }) {
   const router = useRouter();
 
   if (options.suspense && !router.isReady) {
