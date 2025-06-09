@@ -1,5 +1,12 @@
 # nextjs-pages-router
 
+## 0.0.2
+
+### Patch Changes
+
+- Updated dependencies [[`02109ff`](https://github.com/toss/use-funnel/commit/02109ff7af2e55e65d10e1502e6df1d7615e5e02)]:
+  - @use-funnel/next@0.0.19
+
 ## 0.0.1
 
 ### Patch Changes

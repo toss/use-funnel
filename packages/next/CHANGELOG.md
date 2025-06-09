@@ -1,5 +1,11 @@
 # @use-funnel/next
 
+## 0.0.19
+
+### Patch Changes
+
+- [#157](https://github.com/toss/use-funnel/pull/157) [`02109ff`](https://github.com/toss/use-funnel/commit/02109ff7af2e55e65d10e1502e6df1d7615e5e02) Thanks [@Junnis0123](https://github.com/Junnis0123)! - next: add suspense option
+
 ## 0.0.18
 
 ### Patch Changes
