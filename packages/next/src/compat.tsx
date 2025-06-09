@@ -76,13 +76,16 @@ export function useFunnel<TSteps extends readonly [string, ...string[]], TContex
     .build();
   const initialContextRef = useRef(initialContext ?? INITIAL_CONTEXT);
   initialContextRef.current = initialContext ?? INITIAL_CONTEXT;
+  const queryStep = (router.query[stepQueryKey] as TSteps[number] | undefined);
   const funnel = useFunnelBase({
     steps,
     id: stepQueryKey,
     initial: {
-      step: (router.query[stepQueryKey] as TSteps[number] | undefined) ?? initialStep,
+      step: queryStep != null && stepNames.includes(queryStep) ? queryStep : initialStep,
       context: initialContextRef.current,
     },
+    stepQueryName: (id) => id,
+    disableCleanup: true,
   });
   const onStepChangeRef = useRef(onStepChange);
   onStepChangeRef.current = onStepChange;
@@ -118,10 +121,7 @@ export function useFunnel<TSteps extends readonly [string, ...string[]], TContex
         onStepChangeRef.current?.(step);
       }
       await funnel.history[stepChangeType === 'replace' ? 'replace' : 'push'](step as any, context, {
-        query: {
-          ...query,
-          [stepQueryKey]: step,
-        },
+        query,
         preserveQuery,
       });
     },

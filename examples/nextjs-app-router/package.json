@@ -1,6 +1,7 @@
 {
 	"name": "nextjs-app-router",
 	"private": true,
+	"version": "0.0.1",
 	"scripts": {
 		"dev": "next dev -p 3100",
 		"build": "next build",

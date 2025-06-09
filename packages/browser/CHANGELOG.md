@@ -1,5 +1,12 @@
 # @use-funnel/browser
 
+## 0.0.15
+
+### Patch Changes
+
+- Updated dependencies [[`a8a2523`](https://github.com/toss/use-funnel/commit/a8a252344ff74c2dc2149b7e546ff6cdb1797862)]:
+  - @use-funnel/core@0.0.12
+
 ## 0.0.14
 
 ### Patch Changes

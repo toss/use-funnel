@@ -47,7 +47,13 @@ export function stringifyQueryJson(data: unknown) {
   return JSON.stringify(data, (_, value) => {
     if (typeof value === 'object' && value != null) {
       for (const key in value) {
-        if (value.hasOwnProperty(key)) {
+        /**
+         * Safe hasOwnProperty check for objects that don't inherit from Object.prototype.
+         * Uses call() to invoke hasOwnProperty from Object.prototype directly,
+         * avoiding TypeError when object doesn't inherit from Object.prototype.
+         * @see https://github.com/toss/use-funnel/issues/152
+         */
+        if (Object.prototype.hasOwnProperty.call(value, key)) {
           if (value[key] instanceof Date) {
             value[key] = {
               __type: 'Date',

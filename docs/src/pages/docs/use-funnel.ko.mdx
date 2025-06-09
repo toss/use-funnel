@@ -38,7 +38,7 @@ interface UseFunnelOptions<T> {
 
 #### FunnelStepOption
 
-`FunnelStepOption`은 각 단계의 추가 옵션을 정의하는 인터페이스입니다.
+`FunnelStepOption`은 각 단계의 추가 옵션을 정의하는 인터페이스에요.
 
 ```tsx
 interface FunnelStepOption<TContext> {
@@ -46,12 +46,12 @@ interface FunnelStepOption<TContext> {
   parse?: (data: unknown) => TContext;
 }
 ```
-- `guard` (`function`, optional): 데이터를 검증해서 해당 단계의 컨텍스트 타입인지 확인하는 함수입니다.
-- `parse` (`function`, optional): 데이터를 받아 해당 단계의 컨텍스트 타입으로 변환하는 함수입니다.
+- `guard` (`function`, optional): 데이터를 검증해서 해당 단계의 컨텍스트 타입인지 확인하는 함수에요.
+- `parse` (`function`, optional): 데이터를 받아 해당 단계의 컨텍스트 타입으로 변환하는 함수에요.
 
 ## UseFunnelResults
 
-퍼널의 상태와 히스토리를 관리하기 위한 속성과 메서드를 포함합니다.
+퍼널의 상태와 히스토리를 관리하기 위한 속성과 메서드를 포함해요.
 
 ```tsx
 type UseFunnelResults<T> = {
@@ -99,8 +99,8 @@ interface FunnelHistory<TContextMap, TCurrentStep extends keyof TContextMap> {
   - `context` (`object` | `function`): 이동할 단계의 상태를 나타내는 객체에요. 혹은 현재 단계 상태를 이용해서 다음 단계 상태를 만드는 함수를 넣을 수 있어요.
   - `routeOption` (`object`): 이동할 단계에다가 설정할 수 있는 라우팅 옵션이에요. 패키지 별로 다른 옵션을 제공이 돼요. 자세한 내용은 하단의 [RouteOption](#routeoption)을 참고하세요.
 - `replace` (`function`): 새로운 단계로 이동해요. 이전 단계의 히스토리를 남기지 않아요.
-  - `step` (`string`): 이동할 단계의 이름입니다.
-  - `context` (`object` | `function`): 이동할 단계의 상태를 나타내는 객체입니다. 혹은 현재 단계 상태를 이용해서 다음 단계 상태를 만드는 함수를 넣을 수 있어요.
+  - `step` (`string`): 이동할 단계의 이름이에요.
+  - `context` (`object` | `function`): 이동할 단계의 상태를 나타내는 객체에요. 혹은 현재 단계 상태를 이용해서 다음 단계 상태를 만드는 함수를 넣을 수 있어요.
   - `routeOption` (`object`): 이동할 단계에다가 설정할 수 있는 라우팅 옵션이에요. 패키지 별로 다른 옵션을 제공이 돼요. 자세한 내용은 하단의 [RouteOption](#routeoption)을 참고하세요.
 - `go` (`function`): 현재 인덱스 기준으로 지정된 단계로 이동해요.
   - `index` (`number`): 이동하려는 단계의 인덱스에요. 현재 단계로부터의 **상대적인 위치**를 나타내요.

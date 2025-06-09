@@ -34,10 +34,20 @@ describe('Test makePath', () => {
 });
 
 describe('Test stringifyQueryJson', () => {
-  test('should work', async () => {
+  test('should work with date', async () => {
     const value = { a: 1, b: new Date('2025-04-15T14:28:09.987Z') };
 
     expect(stringifyQueryJson(value)).toEqual('{"a":1,"b":{"__type":"Date","value":"2025-04-15T14:28:09.987Z"}}');
+  });
+
+  test('should work with objects that do not inherit from Object.prototype', async () => {
+    const objectWithoutPrototype = Object.create(null);
+    objectWithoutPrototype.a = 1;
+    objectWithoutPrototype.b = 2;
+
+    const value = { a: 1, c: objectWithoutPrototype };
+
+    expect(stringifyQueryJson(value)).toEqual('{"a":1,"c":{"a":1,"b":2}}');
   });
 });
 

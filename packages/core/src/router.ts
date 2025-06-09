@@ -3,6 +3,9 @@ import { AnyFunnelState, RouteOption } from './core.js';
 export interface FunnelRouterOption<TState extends AnyFunnelState> {
   id: string;
   initialState: TState;
+  steps?: {
+    [TStepName: string]: unknown;
+  };
 }
 
 export interface FunnelRouterTransitionOption {
@@ -20,6 +23,6 @@ export interface FunnelRouterResult<TRouteOption extends RouteOption> {
   cleanup: () => void;
 }
 
-export interface FunnelRouter<TRouteOption extends RouteOption> {
-  (option: FunnelRouterOption<AnyFunnelState>): FunnelRouterResult<TRouteOption>;
+export interface FunnelRouter<TRouteOption extends RouteOption, TFunnelOption extends RouteOption = RouteOption> {
+  (option: FunnelRouterOption<AnyFunnelState> & TFunnelOption): FunnelRouterResult<TRouteOption>;
 }
