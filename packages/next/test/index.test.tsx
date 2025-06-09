@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import mockRouter from 'next-router-mock';
 import { describe, expect, test } from 'vitest';
 import { useFunnel } from '../src/index.js';
+import { renderWithSuspense } from './utils.js';
 
 describe('Test useFunnel next router', () => {
   test('should work', async () => {
@@ -78,6 +79,71 @@ describe('Test useFunnel next router', () => {
     expect(screen.queryByText('Finished!')).not.toBeNull();
     expect(mockRouter.query['funnel.vitest.step']).toBe('C');
     expect(JSON.parse(mockRouter.query['funnel.vitest.histories'] as string)).toEqual([{ step: 'A', context: {} }]);
+  });
+
+  describe('should work with suspense option', async () => {
+    function FunnelTest() {
+      const funnel = useFunnel<{
+        A: { id?: string };
+        B: { id: string };
+        C: { id: string; password: string; date: Date };
+      }>({
+        id: 'vitest',
+        initial: {
+          step: 'A',
+          context: {},
+        },
+        suspense: true,
+      });
+
+      switch (funnel.step) {
+        case 'A': {
+          return <div>A</div>;
+        }
+        case 'B': {
+          return <div>B</div>;
+        }
+        case 'C': {
+          return <div>C</div>;
+        }
+        default: {
+          throw new Error('Invalid step');
+        }
+      }
+    }
+
+    test('does not have the query parameter value when `isReady: false`', () => {
+      mockRouter.isReady = false;
+
+      const { checkDidSuspend, withSuspense } = renderWithSuspense();
+      render(withSuspense(<FunnelTest />, { fallback: null }));
+      expect(checkDidSuspend()).toBe(true);
+    });
+
+    test('returns the correct query parameter value when `isReady: true`', async () => {
+      mockRouter.isReady = false;
+
+      const { checkDidSuspend, withSuspense } = renderWithSuspense();
+
+      const FunnelWithSuspense = withSuspense(<FunnelTest />, { fallback: <div>fallback</div> });
+      const page = render(FunnelWithSuspense);
+
+      // set isReady true and rerender page
+      const timer = setTimeout(() => {
+        mockRouter.isReady = true;
+        page.rerender(FunnelWithSuspense);
+        clearTimeout(timer);
+      }, 1000);
+
+      expect(screen.queryByText('fallback')).not.toBeNull();
+
+      await waitFor(() => {
+        expect(screen.queryByText('C')).not.toBeNull();
+        expect(mockRouter.query['funnel.vitest.step']).toBe('C');
+      });
+
+      expect(checkDidSuspend()).toBe(true);
+    });
   });
 
   // TODO: Fix this test to sync next-router-mock and window.location.search

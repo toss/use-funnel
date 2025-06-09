@@ -1,4 +1,4 @@
-import { NextRouter } from 'next/router';
+import Router, { NextRouter } from 'next/router';
 
 export const removeKeys = (_value: Record<string, any>, conditions: (string | ((key: string) => boolean))[]) => {
   const value = { ..._value };
@@ -64,5 +64,11 @@ export function stringifyQueryJson(data: unknown) {
       }
     }
     return value;
+  });
+}
+
+export function waitForRouterReady() {
+  return new Promise<void>((resolve) => {
+    Router.ready(resolve);
   });
 }
