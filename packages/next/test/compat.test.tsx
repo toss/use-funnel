@@ -170,11 +170,16 @@ describe('useFunnel', () => {
             <Funnel.Step name="a">
               <button
                 onClick={() =>
-                  setState({
-                    a: true,
-                    step: 'b',
-                    foo: 'from a',
-                  })
+                  setState(
+                    {
+                      a: true,
+                      step: 'b',
+                      foo: 'from a',
+                    },
+                    {
+                      stepChangeType: 'push',
+                    },
+                  )
                 }
               >
                 b
@@ -183,11 +188,16 @@ describe('useFunnel', () => {
             <Funnel.Step name="b">
               <button
                 onClick={() =>
-                  setState({
-                    b: true,
-                    step: 'c',
-                    foo: 'from b',
-                  })
+                  setState(
+                    {
+                      b: true,
+                      step: 'c',
+                      foo: 'from b',
+                    },
+                    {
+                      stepChangeType: 'push',
+                    },
+                  )
                 }
               >
                 c
@@ -196,11 +206,16 @@ describe('useFunnel', () => {
             <Funnel.Step name="c">
               <button
                 onClick={() =>
-                  setState({
-                    c: true,
-                    step: 'a',
-                    foo: 'from c',
-                  })
+                  setState(
+                    {
+                      c: true,
+                      step: 'a',
+                      foo: 'from c',
+                    },
+                    {
+                      stepChangeType: 'push',
+                    },
+                  )
                 }
               >
                 a

@@ -50,6 +50,7 @@ export function useFunnel<TSteps extends readonly [string, ...string[]], TContex
           context:
             | Partial<StepWithContext<TSteps, TContext>>
             | ((prev: StepWithContext<TSteps, TContext>) => Partial<StepWithContext<TSteps, TContext>>),
+          options?: SetStepOptions,
         ) => void,
       ]),
 ] & {

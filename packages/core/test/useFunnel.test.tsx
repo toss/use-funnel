@@ -17,13 +17,15 @@ describe('Test useFunnel()', () => {
     test('should work useFunnel with component render', async () => {
       function FunnelTest() {
         const funnel = useFunnel<{
-          A: { id?: string };
-          B: { id: string };
+          A: { id?: string; o: string };
+          B: { id?: string; o: string };
         }>({
           id: 'vitest',
           initial: {
             step: 'A',
-            context: {},
+            context: {
+              o: '1234',
+            },
           },
         });
 
