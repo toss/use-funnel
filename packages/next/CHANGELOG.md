@@ -1,5 +1,11 @@
 # @use-funnel/next
 
+## 0.0.20
+
+### Patch Changes
+
+- [#160](https://github.com/toss/use-funnel/pull/160) [`b5d0b01`](https://github.com/toss/use-funnel/commit/b5d0b01194ea6fcc920e6b9e1c1e99261d82a8a7) Thanks [@minuukang](https://github.com/minuukang)! - fix(next): sub funnel history key is not removed at asPath
+
 ## 0.0.19
 
 ### Patch Changes
