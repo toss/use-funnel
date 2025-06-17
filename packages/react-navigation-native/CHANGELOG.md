@@ -1,5 +1,11 @@
 # @use-funnel/react-navigation-native
 
+## 0.0.15
+
+### Patch Changes
+
+- [`fbe5aca`](https://github.com/toss/use-funnel/commit/fbe5aca9a565671ec14676d3893947b18508724e) Thanks [@minuukang](https://github.com/minuukang)! - fix(react-navigation-native): prevent navigation warning by skipping setParams on unfocused screens
+
 ## 0.0.14
 
 ### Patch Changes
