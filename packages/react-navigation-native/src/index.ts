@@ -207,6 +207,10 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
         }
       },
       cleanup() {
+        if (!navigation.isFocused()) {
+          return;
+        }
+
         const newUseFunnelState = { ...useFunnelState };
 
         if (newUseFunnelState[id] == null) {
