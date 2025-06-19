@@ -1,4 +1,4 @@
-import Router, { NextRouter } from 'next/router';
+import Router, { NextRouter } from 'next/router.js';
 
 export const removeKeys = (_value: Record<string, any>, conditions: (string | ((key: string) => boolean))[]) => {
   const value = { ..._value };
