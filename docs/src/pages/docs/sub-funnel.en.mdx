@@ -1,46 +1,49 @@
-import { Keyword, Sandpack } from '@/components'
+import { Keyword, Sandpack } from '@/components';
 
 # Creating a Funnel within a Funnel
 
 When developing a funnel, you may need to go through multiple steps to achieve a particular state. Alternatively, you might need to reuse a portion of the funnel steps in another context. In these situations, dividing the funnel into sub-funnels can be an efficient approach. The flowchart would looks like this:
 
-```mermaid
-%%{init: { 'logLevel': 'debug', 'theme': 'base', 'gitGraph': {'showBranches': true, 'showCommitLabel':true,'mainBranchName': 'main-funnel'}} }%%
-gitGraph
-  commit id: "A"
-  commit id: "B"
-  branch "b-funnel"
-  checkout "b-funnel"
-  commit id: "B-1"
-  commit id: "B-2"
-  commit id: "B-3"
-  checkout "main-funnel"
-  merge "b-funnel"
-  commit id: "C"
-```
+<div className="w-full overflow-x-auto">
+  <div className="min-w-0 flex justify-center scale-[0.65] sm:scale-75 md:scale-85 lg:scale-100">
+    ```mermaid
+    %%{init: { 'logLevel': 'debug', 'theme': 'base', 'gitGraph': {'showBranches': true, 'showCommitLabel':true,'mainBranchName': 'main-funnel', 'rotateCommitLabel': false}} }%%
+    gitGraph
+      commit id: "A"
+      commit id: "B"
+      branch "b-funnel"
+      checkout "b-funnel"
+      commit id: "B-1"
+      commit id: "B-2"
+      commit id: "B-3"
+      checkout "main-funnel"
+      merge "b-funnel"
+      commit id: "C"
+    ```
+  </div>
+</div>
 
 `@use-funnel` supports sub-funnels. You simply need to specify a different `id` when using [`useFunnel()`](./use-funnel.mdx) in the components with in a particular <Keyword>step</Keyword>.
-
 
 <div className='h-8' />
 <Sandpack>
 
 ```tsx Example.tsx active
-import { useFunnel } from "@use-funnel/react-router-dom";
+import { useFunnel } from '@use-funnel/react-router-dom';
 
-import { BFunnel } from "./BFunnel";
+import { BFunnel } from './BFunnel';
 
 export function Example() {
   const funnel = useFunnel<{
-    A: { a?: string; b?: string; };
-    B: { a: string; b?: string; };
-    C: { a: string; b: string; };
+    A: { a?: string; b?: string };
+    B: { a: string; b?: string };
+    C: { a: string; b: string };
   }>({
-    id: "main-funnel",
+    id: 'main-funnel',
     initial: {
-      step: "A",
-      context: {}
-    }
+      step: 'A',
+      context: {},
+    },
   });
   return (
     <funnel.Render
@@ -53,7 +56,7 @@ export function Example() {
       B={({ context, history }) => (
         <div>
           <h1>B Step</h1>
-          <BFunnel a={context.a} onNext={b => history.push('C', { b })} />
+          <BFunnel a={context.a} onNext={(b) => history.push('C', { b })} />
         </div>
       )}
       C={({ context }) => (
@@ -64,12 +67,12 @@ export function Example() {
         </div>
       )}
     />
-  )
+  );
 }
 ```
 
 ```tsx BFunnel.tsx
-import { useFunnel } from "@use-funnel/react-router-dom";
+import { useFunnel } from '@use-funnel/react-router-dom';
 
 interface Props {
   a: string;
@@ -78,15 +81,15 @@ interface Props {
 
 export function BFunnel({ a, onNext }: Props) {
   const funnel = useFunnel<{
-    B1: { hello?: string; world?: string;};
-    B2: { hello: string; world?: string; };
-    B3: { hello: string; world: string; };
+    B1: { hello?: string; world?: string };
+    B2: { hello: string; world?: string };
+    B3: { hello: string; world: string };
   }>({
-    id: "b-funnel",
+    id: 'b-funnel',
     initial: {
-      step: "B1",
-      context: {}
-    }
+      step: 'B1',
+      context: {},
+    },
   });
   return (
     <funnel.Render
@@ -115,7 +118,7 @@ export function BFunnel({ a, onNext }: Props) {
         </div>
       )}
     />
-  )
+  );
 }
 ```
 
