@@ -28,27 +28,34 @@ export const useFunnelPackages = [
   },
 ];
 
-interface UseFunnelCodeBlockProps {
-  renderSupplement?: ({ packageTitle }: { packageTitle: string }) => React.ReactNode;
-}
-
-export function UseFunnelCodeBlock({
-  children,
-  renderSupplement: RenderSupplement,
-}: React.PropsWithChildren<UseFunnelCodeBlockProps>) {
+export function UseFunnelCodeBlock({ children }: React.PropsWithChildren<unknown>) {
   return (
     <Tabs items={useFunnelPackages.map((p) => p.packageTitle)} storageKey="favorite-package">
       {useFunnelPackages.map((item) => (
         <Tabs.Tab key={item.packageTitle}>
           <UseFunnelImportReplace packageName={item.packageName}>{children}</UseFunnelImportReplace>
-          {RenderSupplement && <RenderSupplement packageTitle={item.packageTitle} />}
         </Tabs.Tab>
       ))}
     </Tabs>
   );
 }
 
-function UseFunnelImportReplace({
+interface UseFunnelCodeBlockTabsProps {
+  tabItems: typeof useFunnelPackages;
+}
+export function UseFunnelCodeBlockTabs({ tabItems, children }: React.PropsWithChildren<UseFunnelCodeBlockTabsProps>) {
+  return (
+    <>
+      {tabItems.map((item) => (
+        <Tabs.Tab key={item.packageTitle}>
+          <UseFunnelImportReplace packageName={item.packageName}>{children}</UseFunnelImportReplace>
+        </Tabs.Tab>
+      ))}
+    </>
+  );
+}
+
+export function UseFunnelImportReplace({
   children,
   packageName,
 }: React.PropsWithChildren<{
