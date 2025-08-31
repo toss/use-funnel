@@ -1,5 +1,6 @@
-import { Steps, Callout } from 'nextra/components'
-import { UseFunnelCodeBlock, Keyword, useFunnelPackages } from '@/components'
+import { Steps, Callout } from 'nextra/components';
+import { UseFunnelCodeBlock, Keyword, useFunnelPackages, UseFunnelCodeBlockTabs } from '@/components';
+import { Tabs } from 'nextra/components';
 
 # Getting Started
 
@@ -35,12 +36,10 @@ First, specify the object type with the key as the step and the context object a
 
 Here, we set the initial step to "EmailInput" and an empty `context` object to be used in that step. `id` is a unique identifier to distinguish when there are multiple funnels in one component.
 
-<UseFunnelCodeBlock
-  renderSupplement={({ packageTitle }) => {
-    if (packageTitle === useFunnelPackages[0].packageTitle) {
-      return (
-        <Callout type="warning">
-          <strong>Note:</strong> Since <code>@use-funnel/browser</code> relies on the browser's history
+<Tabs items={useFunnelPackages.map((p) => p.packageTitle)} storageKey="favorite-package">
+<Tabs.Tab>
+{<Callout type="warning">
+  <strong>Note:</strong> Since <code>@use-funnel/browser</code> relies on the browser's history
           state, it cannot be hydrated on the server. This means it must run exclusively on the client. To make sure 
           it works correctly, you can either render it conditionally after mounting in a parent component or use a{' '}
           <code>ssr: false</code> configuration with{' '}
@@ -52,14 +51,27 @@ Here, we set the initial step to "EmailInput" and an empty `context` object to b
             next/dynamic
           </a>{' '}
           to create the funnel component.
-        </Callout>
-      );
-    }
-  }}
->
+</Callout>}
+
+```tsx {6-10}
+import { useState, useEffect } from 'react';
+
+export default function Page() {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
+
+  return <MyFunnelApp />;
+}
+```
+
 ```tsx {5-15}
-import { useFunnel } from "@use-funnel/next";
-import type { EmailInput, PasswordInput, OtherInfoInput } "./context";
+import { useFunnel } from '@use-funnel/browser';
+import type { EmailInput, PasswordInput, OtherInfoInput } from './context';
 
 function MyFunnelApp() {
   const funnel = useFunnel<{
@@ -70,13 +82,38 @@ function MyFunnelApp() {
     id: "my-funnel-app",
     initial: {
       step: "EmailInput",
-      context: {}
-    }
+      context: {},
+    },
   });
   // ...
 }
 ```
-</UseFunnelCodeBlock>
+
+</Tabs.Tab>
+<UseFunnelCodeBlockTabs tabItems={useFunnelPackages.filter(item => item.packageTitle !== useFunnelPackages[0].packageTitle)}>
+
+```tsx {5-15}
+import { useFunnel } from '@use-funnel/next';
+import type { EmailInput, PasswordInput, OtherInfoInput } from './context';
+
+function MyFunnelApp() {
+  const funnel = useFunnel<{
+    EmailInput: EmailInput;
+    PasswordInput: PasswordInput;
+    OtherInfoInput: OtherInfoInput;
+  }>({
+    id: 'my-funnel-app',
+    initial: {
+      step: "EmailInput",
+      context: {},
+    },
+  });
+  // ...
+}
+```
+
+</UseFunnelCodeBlockTabs>
+</Tabs>
 
 For other ways to define the state of each step, see the [state definition guide](/docs/context-guide).
 

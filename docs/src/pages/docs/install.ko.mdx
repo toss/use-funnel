@@ -5,7 +5,7 @@
 - [react-router](https://reactrouter.com/home)
   - [react-router-dom](https://reactrouter.com/upgrading/v6)의 경우 `@use-funnel/react-router-dom` 패키지를 사용해주세요.
 - [next.js page router](https://nextjs.org/docs/pages)
-  - [next.js app router](https://nextjs.org/docs/app/building-your-application) 는 `@use-funnel/browser` 패키지를 `ssr: false` 옵션과 함께 사용해주세요.
+- [next.js app router](https://nextjs.org/docs/app/building-your-application)의 경우 `@use-funnel/browser` 패키지를 사용해주세요. 현재 전용 어댑터를 지원하지 않으므로, 자세한 구현은 [공식 가이드](https://use-funnel.slash.page/docs/get-started#configuring-the-initial-step)를 참고해주세요.
 - [@react-navigation/native](https://reactnavigation.org/)
 - [browser history](https://developer.mozilla.org/en-US/docs/Web/API/History)
 
@@ -16,7 +16,7 @@
 
 ## 설치 방법
 
-사용할 라우터를 선택하고, 다음 명령어를 사용해서 패키지를 설치해주세요.
+사용할 라우터에 맞는 패키지를 선택해 설치해주세요.
 
 ```shell npm2yarn
 npm install @use-funnel/react-router --save
