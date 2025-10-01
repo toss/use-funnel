@@ -4,6 +4,7 @@ import {
   NavigationProp,
   Route,
   RouteProp,
+  StackActions,
   useNavigation,
   useNavigationState,
   useRoute,
@@ -140,16 +141,24 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
         if (funnelState.isOverlay) {
           navigation.setParams({
             ...route.params,
-            [navigationParamName]: createTransitionParam(funnelState),
+            [navigationParamName]: createTransitionParam({
+              ...funnelState,
+              routeKey: currentkey,
+            }),
           });
         } else {
-          navigation.navigate({
-            ...route,
-            key: `${navigationParamName}::${id}::${currentIndex + 1}`,
-            params: {
-              ...route.params,
-              [navigationParamName]: createTransitionParam(funnelState),
-            },
+          const nextRouteKey = `${navigationParamName}::${id}::${currentIndex + 1}`;
+          const nextState: NativeFunnelState = {
+            ...funnelState,
+            routeKey: nextRouteKey,
+          };
+          const action = StackActions.push(route.name, {
+            ...route.params,
+            [navigationParamName]: createTransitionParam(nextState),
+          });
+          navigation.dispatch({
+            ...action,
+            target: navigation.getState().key,
           });
         }
       },
@@ -161,6 +170,7 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
             context: state.context,
             index: currentIndex,
             histories: [...(history ?? []).slice(0, currentIndex), state],
+            routeKey: currentkey,
           }),
         });
       },

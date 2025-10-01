@@ -16,7 +16,7 @@ const jestConfig: JestConfigWithTsJest = {
   setupFiles: ['<rootDir>/node_modules/react-native/jest/setup.js'],
   setupFilesAfterEnv: ['@testing-library/react-native/extend-expect'],
   // // Ref: https://github.com/facebook/jest/issues/12984
-  transformIgnorePatterns: [`node_modules/(?!(?:.pnpm/)?(@react-native|react-native))`],
+  transformIgnorePatterns: [`node_modules/(?!(?:.pnpm/)?(@react-native|react-native|@react-navigation))`],
   moduleNameMapper: {
     '\\.(jpg|jpeg|png|gif)$': '<rootDir>/__mocks__/fileMock.js',
     // Ref: https://github.com/kulshekhar/ts-jest/issues/1057
