@@ -1,5 +1,11 @@
 # @use-funnel/react-navigation-native
 
+## 0.0.16
+
+### Patch Changes
+
+- [#172](https://github.com/toss/use-funnel/pull/172) [`8d7d436`](https://github.com/toss/use-funnel/commit/8d7d4368aa1287358386841592629e16b76693cf) Thanks [@hexdrinker](https://github.com/hexdrinker)! - keep funnel stack working on react-navigation 7
+
 ## 0.0.15
 
 ### Patch Changes
