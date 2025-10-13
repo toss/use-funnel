@@ -33,7 +33,7 @@
   "author": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/toss/use-funnel.git",
+    "url": "git+https://github.com/toss/use-funnel.git",
     "directory": "packages/react-router-dom"
   },
   "license": "MIT",

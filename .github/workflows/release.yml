@@ -10,6 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/pnpm-setup-node
+      - run: npm install -g npm@11.5.1
       - run: pnpm install
       - name: Create Changesets Pull Request or Publish to NPM
         id: changesets
@@ -21,4 +22,3 @@ jobs:
           publish: pnpm changeset:publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
