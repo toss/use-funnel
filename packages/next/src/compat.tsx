@@ -76,7 +76,7 @@ export function useFunnel<TSteps extends readonly [string, ...string[]], TContex
     .build();
   const initialContextRef = useRef(initialContext ?? INITIAL_CONTEXT);
   initialContextRef.current = initialContext ?? INITIAL_CONTEXT;
-  const queryStep = (router.query[stepQueryKey] as TSteps[number] | undefined);
+  const queryStep = router.query[stepQueryKey] as TSteps[number] | undefined;
   const funnel = useFunnelBase({
     steps,
     id: stepQueryKey,

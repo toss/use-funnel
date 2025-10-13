@@ -25,10 +25,16 @@ describe('useFunnel', () => {
             <button onClick={() => setStep('c')}>c</button>
           </Funnel.Step>
           <Funnel.Step name="c">
-            <button onClick={() => setStep('a', {
-              preserveQuery: true,
-              query: { abc: '1234' }
-            })}>a</button>
+            <button
+              onClick={() =>
+                setStep('a', {
+                  preserveQuery: true,
+                  query: { abc: '1234' },
+                })
+              }
+            >
+              a
+            </button>
           </Funnel.Step>
         </Funnel>
       );
