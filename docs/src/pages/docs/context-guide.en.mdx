@@ -29,7 +29,6 @@ function MyFunnelApp() {
     id: "how-to-define-step-contexts",
     initial: {
       step: "EmailInput",
-      context: {}
     }
   });
 
@@ -81,7 +80,6 @@ function MyFunnelApp() {
     id: "how-to-define-step-contexts",
     initial: {
       step: "EmailInput",
-      context: {}
     },
     steps: {
       EmailInput: { guard: EmailInput_guard },
@@ -112,7 +110,7 @@ function MyFunnelApp() {
 You can create a <Keyword>step</Keyword> that changes a specific key of the initial <Keyword>context</Keyword> from optional to required when transitioning to the next <Keyword>step</Keyword> simply.
 
 ```tsx
-declare function createFunnelSteps<FormState>(): {
+declare function createFunnelSteps<FormState = {}>(): {
   extends: (name: string | string[], options?: { requiredKeys: string | string[] }) => this;
   build: () => Record<string, FunnelStepOption>;
 }
@@ -147,7 +145,6 @@ function MyFunnelApp() {
     id: "create-funnel-steps",
     initial: {
       step: "EmailInput",
-      context: {}
     },
     steps
   });
@@ -190,7 +187,6 @@ function MyFunnelApp() {
     },
     initial: {
       step: "EmailInput",
-      context: {}
     }
   });
 
@@ -235,7 +231,6 @@ function MyFunnelApp() {
     },
     initial: {
       step: "EmailInput",
-      context: {}
     }
   });
 

@@ -87,6 +87,6 @@ class SimpleFunnelStepBuilder<
   }
 }
 
-export function createFunnelSteps<TContext>() {
+export function createFunnelSteps<TContext = {}>() {
   return new SimpleFunnelStepBuilder<TContext>();
 }
