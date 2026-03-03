@@ -44,6 +44,12 @@ export type FunnelStateByContextMap<TStepContextMap extends AnyStepContextMap> =
   [key in keyof TStepContextMap & string]: FunnelState<key, TStepContextMap[key]>;
 }[keyof TStepContextMap & string];
 
+export type FunnelInitialStateByContextMap<TStepContextMap extends AnyStepContextMap> = {
+  [key in keyof TStepContextMap & string]: Partial<TStepContextMap[key]> extends TStepContextMap[key]
+    ? { step: key; context?: TStepContextMap[key] }
+    : { step: key; context: TStepContextMap[key] };
+}[keyof TStepContextMap & string];
+
 export type FunnelTransition<
   TStepContextMap extends AnyStepContextMap,
   TStepKey extends keyof TStepContextMap & string,

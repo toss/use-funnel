@@ -29,7 +29,6 @@ function MyFunnelApp() {
     id: "how-to-define-step-contexts",
     initial: {
       step: "이메일입력",
-      context: {}
     }
   });
 
@@ -81,7 +80,6 @@ function MyFunnelApp() {
     id: "step-by-step",
     initial: {
       step: "이메일입력",
-      context: {}
     },
     steps: {
       이메일입력: { guard: 이메일입력_guard },
@@ -112,7 +110,7 @@ function MyFunnelApp() {
 간단하게 다음 <Keyword>step</Keyword>으로 넘어갈 때 초기 <Keyword>context</Keyword>의 특정 키를 선택(optional)에서 필수(required)로 변경하는 <Keyword>step</Keyword>을 만들 수 있어요.
 
 ```tsx
-declare function createFunnelSteps<FormState>(): {
+declare function createFunnelSteps<FormState = {}>(): {
   extends: (name: string | string[], options?: { requiredKeys: string | string[] }) => this;
   build: () => Record<string, FunnelStepOption>;
 }
@@ -149,7 +147,6 @@ function MyFunnelApp() {
     steps: steps,
     initial: {
       step: "이메일입력",
-      context: {}
     }
   });
 
@@ -191,7 +188,6 @@ function MyFunnelApp() {
     },
     initial: {
       step: "이메일입력",
-      context: {}
     }
   });
 
@@ -238,7 +234,6 @@ function MyFunnelApp() {
     },
     initial: {
       step: "이메일입력",
-      context: {}
     }
   });
 

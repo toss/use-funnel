@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo } from 'react';
 import {
-  AnyFunnelState,
   AnyStepContextMap,
   FunnelHistory,
+  FunnelInitialStateByContextMap,
   FunnelStateByContextMap,
   FunnelStep,
   FunnelStepByContextMap,
@@ -16,7 +16,7 @@ import { useStateStore, useStateSubscriberStore, useUpdatableRef } from './utils
 
 export interface UseFunnelOptions<TStepContextMap extends AnyStepContextMap> {
   id: string;
-  initial: FunnelStateByContextMap<TStepContextMap>;
+  initial: FunnelInitialStateByContextMap<TStepContextMap>;
   steps?: {
     [TStepName in keyof TStepContextMap]: FunnelStepOption<TStepContextMap[TStepName]>;
   };
@@ -56,14 +56,23 @@ export function createUseFunnel<TRouteOption extends RouteOption, TFunnelOption 
       ? Record<TStepKeys, TStepContext>
       : _TStepContextMap = string extends keyof _TStepContextMap ? Record<TStepKeys, TStepContext> : _TStepContextMap,
   >(options: UseFunnelOptions<TStepContextMap> & _TFunnelOption): UseFunnelResults<TStepContextMap, TRouteOption> {
+    const normalizedInitial = useMemo(
+      () =>
+        ({
+          ...options.initial,
+          context: options.initial.context ?? {},
+        }) as FunnelStateByContextMap<TStepContextMap>,
+      [options.initial],
+    );
     const optionsRef = useUpdatableRef(options);
+    const normalizedInitialRef = useUpdatableRef(normalizedInitial);
     const router = useFunnelRouter({
       ...optionsRef.current,
       id: optionsRef.current.id,
-      initialState: optionsRef.current.initial,
+      initialState: normalizedInitial,
     });
     const currentState = (router.history[router.currentIndex] ??
-      options.initial) as FunnelStateByContextMap<TStepContextMap>;
+      normalizedInitial) as FunnelStateByContextMap<TStepContextMap>;
     const currentStateRef = useUpdatableRef(currentState);
 
     const cleanUpRef = useUpdatableRef(router.cleanup);
@@ -107,7 +116,7 @@ export function createUseFunnel<TRouteOption extends RouteOption, TFunnelOption 
               };
         const context = parseStepContext(step, newContext);
         return context == null
-          ? optionsRef.current.initial
+          ? normalizedInitialRef.current
           : ({
               step,
               context,
@@ -135,7 +144,7 @@ export function createUseFunnel<TRouteOption extends RouteOption, TFunnelOption 
       const validContext = parseStepContext(currentState.step, currentState.context);
       return {
         ...(validContext == null
-          ? optionsRef.current.initial
+          ? normalizedInitialRef.current
           : {
               step: currentState.step,
               context: validContext,
