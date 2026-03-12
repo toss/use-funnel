@@ -1,5 +1,14 @@
 # @use-funnel/core
 
+## 0.1.0
+
+### Minor Changes
+
+- [#181](https://github.com/toss/use-funnel/pull/181) [`8efd2d4`](https://github.com/toss/use-funnel/commit/8efd2d4d2ee67a9e4ecc8bc7d094fa7fac86ca84) Thanks [@Junnis0123](https://github.com/Junnis0123)! - feat(core): make `initial.context` optional when all context properties are optional
+
+  - `createFunnelSteps()` now defaults `TContext` to `{}` when no type argument is provided
+  - `useFunnel({ initial: { step: 'A' } })` is now valid when the context type has only optional properties (e.g. `{ foo?: string }` or `{}`)
+
 ## 0.0.13
 
 ### Patch Changes
