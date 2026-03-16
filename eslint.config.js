@@ -1,9 +1,10 @@
 import { builtinModules } from 'module';
+import { defineConfig } from 'eslint/config';
 import prettierRecommended from 'eslint-plugin-prettier/recommended';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import tseslint from 'typescript-eslint';
 
-export default tseslint.config(
+export default defineConfig(
   {
     ignores: ['**/node_modules/', '**/dist/'],
   },
