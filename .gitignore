@@ -165,3 +165,5 @@ dist
 
 # End of https://www.toptal.com/developers/gitignore/api/node,go
 .DS_Store
+.claude.json
+CLAUDE.md

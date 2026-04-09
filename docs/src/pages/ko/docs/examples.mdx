@@ -1,0 +1,267 @@
+import { Callout } from 'nextra/components'
+
+# 예제
+
+`@use-funnel`을 사용할 때 자주 마주치는 실전 패턴을 정리했습니다.
+
+## 뒤로가기 시 입력값 유지하기
+
+A 단계에서 B 단계로 `history.push()`를 호출하면, B 단계의 새로운 히스토리 엔트리가 생성됩니다. 이때 **A 단계의 히스토리 엔트리는 변경되지 않습니다.** `history.back()`으로 A 단계로 돌아가면, A 단계가 처음 생성됐을 때의 context가 그대로 복원됩니다.
+
+```js
+// EmailInput에서 PasswordInput으로 push한 후:
+history = [
+  { step: 'EmailInput',    context: {} },                        // ← 변경되지 않음
+  { step: 'PasswordInput', context: { email: 'user@email.com' } } // ← 새로 생성됨
+]
+currentIndex = 1
+
+// history.back() 호출 후:
+currentIndex = 0  // → EmailInput이 context: {} 로 렌더링됨 (email 없음!)
+```
+
+따라서 아래와 같이 코드를 작성하면, 뒤로가기 시 이메일 입력값이 **유지되지 않습니다:**
+
+```tsx
+function MyFunnel() {
+  const funnel = useFunnel<{
+    EmailInput: { email?: string };
+    PasswordInput: { email: string; password?: string };
+    Done: { email: string; password: string };
+  }>({
+    id: 'sign-up',
+    initial: { step: 'EmailInput', context: {} },
+  });
+
+  return (
+    <funnel.Render
+      EmailInput={({ history }) => (
+        <EmailForm
+          onNext={(email) => history.push('PasswordInput', { email })}
+        />
+      )}
+      PasswordInput={({ context, history }) => (
+        <PasswordForm
+          email={context.email}
+          onNext={(password) => history.push('Done', { ...context, password })}
+          onBack={() => history.back()}
+        />
+      )}
+      Done={({ context }) => (
+        <p>{context.email}로 가입 완료</p>
+      )}
+    />
+  );
+}
+```
+
+<Callout type="warning">
+`history.push()`로 다음 단계에 전달한 context는 **다음 단계의 엔트리에만** 저장됩니다. 현재 단계의 엔트리는 변경되지 않으므로, `history.back()` 후 현재 단계의 context에는 push 시 전달한 값이 포함되지 않습니다.
+</Callout>
+
+### 입력값을 유지하려면: replace로 현재 단계의 context 업데이트
+
+뒤로가기 시에도 입력값을 유지하려면, **다음 단계로 이동하기 전에** `history.replace()`로 현재 단계의 context를 업데이트해야 합니다. 이렇게 하면 히스토리에 현재까지의 입력 상태가 저장되어, 뒤로가기 시 해당 상태가 복원됩니다.
+
+```tsx
+function MyFunnel() {
+  const funnel = useFunnel<{
+    EmailInput: { email?: string };
+    PasswordInput: { email: string; password?: string };
+    Done: { email: string; password: string };
+  }>({
+    id: 'sign-up',
+    initial: { step: 'EmailInput', context: {} },
+  });
+
+  return (
+    <funnel.Render
+      EmailInput={({ context, history }) => (
+        <EmailForm
+          defaultEmail={context.email}
+          // 입력이 변경될 때마다 현재 단계의 context를 업데이트
+          onBlur={(email) => history.replace('EmailInput', { email })}
+          onNext={(email) => history.push('PasswordInput', { email })}
+        />
+      )}
+      PasswordInput={({ context, history }) => (
+        <PasswordForm
+          email={context.email}
+          onNext={(password) => history.push('Done', { ...context, password })}
+          onBack={() => history.back()}
+        />
+      )}
+      Done={({ context }) => (
+        <p>{context.email}로 가입 완료</p>
+      )}
+    />
+  );
+}
+```
+
+#### 핵심 변경사항
+
+- `context.email`을 `defaultEmail`로 전달하여 폼 초기값을 설정합니다.
+- `onBlur`에서 `history.replace()`를 호출하여 현재 단계의 히스토리 엔트리를 업데이트합니다.
+- 이후 `history.back()`으로 돌아오면, `replace`로 저장된 context가 복원됩니다.
+
+```js
+// onBlur로 replace 호출 후:
+history = [
+  { step: 'EmailInput', context: { email: 'user@email.com' } },  // ← replace로 업데이트됨
+]
+currentIndex = 0
+
+// onNext로 push 호출 후:
+history = [
+  { step: 'EmailInput',    context: { email: 'user@email.com' } },  // ← 업데이트된 상태 유지
+  { step: 'PasswordInput', context: { email: 'user@email.com' } },
+]
+currentIndex = 1
+
+// history.back() 호출 후:
+currentIndex = 0  // → EmailInput이 { email: 'user@email.com' } 과 함께 렌더링됨 ✅
+```
+
+<Callout>
+`replace()`는 **현재 인덱스의 히스토리 엔트리를 덮어씁니다.** 새 엔트리를 추가하는 `push()`와 달리, 히스토리 길이가 변하지 않습니다. 폼 입력을 저장하는 데 적합합니다.
+</Callout>
+
+### push와 replace의 차이
+
+| | `history.push()` | `history.replace()` |
+|---|---|---|
+| 히스토리 엔트리 | 새로 추가 | 현재 엔트리 덮어쓰기 |
+| currentIndex | +1 증가 | 변경 없음 |
+| `back()` 시 | 이전 엔트리로 이동 | (이전에 이미 덮어썼으므로 원래 값은 사라짐) |
+| 사용 시점 | 다음 단계로 이동할 때 | 현재 단계의 상태를 저장할 때 |
+
+```tsx
+// push 사용: A → B → C, 뒤로가기는 C → B → A
+history.push('B', contextB);
+history.push('C', contextC);
+
+// replace 사용: A → B(C로 교체됨), 뒤로가기는 C → A
+history.push('B', contextB);
+history.replace('C', contextC); // B가 덮어씌워짐
+```
+
+뒤로가기 시 특정 단계를 건너뛰고 싶을 때(예: 다시 방문할 필요 없는 로딩 단계) `replace()`를 사용하세요.
+
+---
+
+## 화면을 그리지 않고 step 수행하기
+
+UI를 표시하지 않는 단계가 필요한 경우가 있습니다. 예를 들어 API를 호출하고 그 결과에 따라 바로 다음 단계로 이동하는 경우입니다.
+
+### 패턴 1: useEffect + replace
+
+단계에 진입하자마자 `useEffect`로 작업을 수행하고, `history.replace()`를 사용해 뒤로가기 시 이 단계를 건너뛰도록 합니다.
+
+```tsx
+function MyFunnel() {
+  const funnel = useFunnel<{
+    Form: { name?: string; email?: string };
+    Submit: { name: string; email: string };
+    Success: { name: string; email: string; id: string };
+    Error: { name: string; email: string; error: string };
+  }>({
+    id: 'registration',
+    initial: { step: 'Form', context: {} },
+  });
+
+  return (
+    <funnel.Render
+      Form={({ history }) => (
+        <RegistrationForm
+          onSubmit={(name, email) => history.push('Submit', { name, email })}
+        />
+      )}
+      Submit={({ context, history }) => {
+        useEffect(() => {
+          registerUser(context)
+            .then((res) => history.replace('Success', { ...context, id: res.id }))
+            .catch((err) => history.replace('Error', { ...context, error: err.message }));
+        }, []);
+
+        return <LoadingSpinner />;
+      }}
+      Success={({ context }) => (
+        <p>환영합니다, {context.name}님! ID는 {context.id}입니다.</p>
+      )}
+      Error={({ context, history }) => (
+        <div>
+          <p>오류: {context.error}</p>
+          <button onClick={() => history.back()}>다시 시도</button>
+        </div>
+      )}
+    />
+  );
+}
+```
+
+#### 핵심 포인트
+
+- `Submit` 단계는 API 호출 중 잠깐 로딩 스피너를 보여줍니다.
+- `history.push()` 대신 `history.replace()`를 사용하여 뒤로가기 시 로딩 단계를 건너뜁니다.
+- 에러가 발생하면 "다시 시도"를 눌러 `Form` 단계로 돌아갈 수 있습니다(`Submit` 단계가 아닌).
+
+### 패턴 2: Render.with()와 이벤트
+
+`funnel.Render.with()`를 사용하면 이벤트 기반으로 전환을 정의할 수 있습니다. 이 패턴은 전환 로직을 렌더 함수와 분리합니다.
+
+```tsx
+function MyFunnel() {
+  const funnel = useFunnel<{
+    Form: { name?: string; email?: string };
+    Submit: { name: string; email: string };
+    Success: { name: string; email: string; id: string };
+    Error: { name: string; email: string; error: string };
+  }>({
+    id: 'registration',
+    initial: { step: 'Form', context: {} },
+  });
+
+  return (
+    <funnel.Render
+      Form={({ history }) => (
+        <RegistrationForm
+          onSubmit={(name, email) => history.push('Submit', { name, email })}
+        />
+      )}
+      Submit={funnel.Render.with({
+        events: {
+          submit: async (payload, { history, context }) => {
+            try {
+              const res = await registerUser(context);
+              history.replace('Success', { ...context, id: res.id });
+            } catch (err) {
+              history.replace('Error', { ...context, error: err.message });
+            }
+          },
+        },
+        render({ dispatch }) {
+          useEffect(() => {
+            dispatch('submit');
+          }, []);
+
+          return <LoadingSpinner />;
+        },
+      })}
+      Success={({ context }) => (
+        <p>환영합니다, {context.name}님! ID는 {context.id}입니다.</p>
+      )}
+      Error={({ context, history }) => (
+        <div>
+          <p>오류: {context.error}</p>
+          <button onClick={() => history.back()}>다시 시도</button>
+        </div>
+      )}
+    />
+  );
+}
+```
+
+<Callout>
+`Render.with()` 패턴은 하나의 단계에서 여러 전환이 가능한 경우(예: 성공, 다양한 에러, 재시도)에 특히 유용합니다. 자세한 내용은 [전환 이벤트 정의하기](./transition-event)를 참고하세요.
+</Callout>
