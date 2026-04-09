@@ -26,13 +26,13 @@ type 그외정보입력 = { email: string; password: string; other?: unknown }
 
 - `그외정보입력`: 회원가입의 세 번째 <Keyword>step</Keyword>이에요. 사용자가 이메일과 비밀번호를 모두 입력한 후 추가 정보를 입력하는 <Keyword>step</Keyword>이에요. 이 <Keyword>step</Keyword>에서는 `email`과 `password`가 모두 필수적으로 입력되어 있어야 해요.
 
-이렇게 각 <Keyword>step</Keyword>의 상태를 타입으로 정의하면 코드에서 [타입 안전성](./features.ko.mdx#강력한-타입-안전성으로-관리하는-ui-상태)을 유지할 수 있고, <Keyword>step</Keyword>별로 필요한 정보를 쉽게 추적할 수 있어요.
+이렇게 각 <Keyword>step</Keyword>의 상태를 타입으로 정의하면 코드에서 [타입 안전성](./features#강력한-타입-안전성으로-관리하는-ui-상태)을 유지할 수 있고, <Keyword>step</Keyword>별로 필요한 정보를 쉽게 추적할 수 있어요.
     
 ### 초기 단계 설정하기
     
-이제 [`useFunnel(){:tsx}`](./use-funnel.ko.mdx)을 사용해 초기 단계를 설정해 볼게요.
+이제 [`useFunnel(){:tsx}`](./use-funnel)을 사용해 초기 단계를 설정해 볼게요.
 
-먼저 <Keyword>step</Keyword>을 key로 한 <Keyword>context</Keyword> 객체를 [`useFunnel(){:tsx}`](./use-funnel.ko.mdx)의 제네릭으로 지정해요. 앞 단계에서 각 단계의 상태를 정의한 타입을 [`useFunnel(){:tsx}`](./use-funnel.ko.mdx)에 전달해서 사용하는 거예요. 해당 컴포넌트에 진입했을 때 사용할 <Keyword>step</Keyword>과 <Keyword>context</Keyword> 객체를 `initial` 프로퍼티에 지정해요.
+먼저 <Keyword>step</Keyword>을 key로 한 <Keyword>context</Keyword> 객체를 [`useFunnel(){:tsx}`](./use-funnel)의 제네릭으로 지정해요. 앞 단계에서 각 단계의 상태를 정의한 타입을 [`useFunnel(){:tsx}`](./use-funnel)에 전달해서 사용하는 거예요. 해당 컴포넌트에 진입했을 때 사용할 <Keyword>step</Keyword>과 <Keyword>context</Keyword> 객체를 `initial` 프로퍼티에 지정해요.
 
 여기서는 초기 단계인 "이메일입력"과 해당 단계에서 사용할 빈 `context` 객체를 설정했어요. `id`는 [한 컴포넌트에 여러 퍼널](/docs/sub-funnel)이 있을 때 구분하기 위한 고유 식별자에요.
 
@@ -144,7 +144,7 @@ switch (funnel.step) {
     
 #### 참고: `<funnel.Render />{:jsx}` 컴포넌트를 사용해 쉽게 구현하기
 
-혹은 [`useFunnel(){:tsx}`](./use-funnel.ko.mdx)이 반환하는 [`<funnel.Render />{:jsx}`](./funnel-render.ko.mdx) 컴포넌트를 사용할 수 있어요. 이 컴포넌트를 사용하면 단계별 UI를 더 간편하게 관리할 수 있어요.
+혹은 [`useFunnel(){:tsx}`](./use-funnel)이 반환하는 [`<funnel.Render />{:jsx}`](./funnel-render) 컴포넌트를 사용할 수 있어요. 이 컴포넌트를 사용하면 단계별 UI를 더 간편하게 관리할 수 있어요.
 
 ```tsx
 return (

@@ -1,0 +1,267 @@
+import { Callout } from 'nextra/components'
+
+# Examples
+
+Practical patterns for common scenarios when using `@use-funnel`.
+
+## Preserving values on back navigation
+
+When you call `history.push()` to go from step A to step B, a new history entry is created for step B. **Step A's history entry remains unchanged.** When `history.back()` is called to return to step A, the context from when step A was first created is restored.
+
+```js
+// After pushing from EmailInput to PasswordInput:
+history = [
+  { step: 'EmailInput',    context: {} },                        // ← unchanged
+  { step: 'PasswordInput', context: { email: 'user@email.com' } } // ← newly created
+]
+currentIndex = 1
+
+// After history.back():
+currentIndex = 0  // → EmailInput renders with context: {} (no email!)
+```
+
+So if you write code like below, the email value will **NOT be preserved** on back navigation:
+
+```tsx
+function MyFunnel() {
+  const funnel = useFunnel<{
+    EmailInput: { email?: string };
+    PasswordInput: { email: string; password?: string };
+    Done: { email: string; password: string };
+  }>({
+    id: 'sign-up',
+    initial: { step: 'EmailInput', context: {} },
+  });
+
+  return (
+    <funnel.Render
+      EmailInput={({ history }) => (
+        <EmailForm
+          onNext={(email) => history.push('PasswordInput', { email })}
+        />
+      )}
+      PasswordInput={({ context, history }) => (
+        <PasswordForm
+          email={context.email}
+          onNext={(password) => history.push('Done', { ...context, password })}
+          onBack={() => history.back()}
+        />
+      )}
+      Done={({ context }) => (
+        <p>Signed up as {context.email}</p>
+      )}
+    />
+  );
+}
+```
+
+<Callout type="warning">
+The context passed to `history.push()` is stored **only in the next step's entry**. The current step's entry is not modified, so after `history.back()`, the current step's context will not contain the values passed during push.
+</Callout>
+
+### To preserve values: update current step's context with replace
+
+To preserve input values on back navigation, **update the current step's context using `history.replace()` before navigating forward**. This saves the current input state in the history, so it's restored when navigating back.
+
+```tsx
+function MyFunnel() {
+  const funnel = useFunnel<{
+    EmailInput: { email?: string };
+    PasswordInput: { email: string; password?: string };
+    Done: { email: string; password: string };
+  }>({
+    id: 'sign-up',
+    initial: { step: 'EmailInput', context: {} },
+  });
+
+  return (
+    <funnel.Render
+      EmailInput={({ context, history }) => (
+        <EmailForm
+          defaultEmail={context.email}
+          // Update current step's context when input changes
+          onBlur={(email) => history.replace('EmailInput', { email })}
+          onNext={(email) => history.push('PasswordInput', { email })}
+        />
+      )}
+      PasswordInput={({ context, history }) => (
+        <PasswordForm
+          email={context.email}
+          onNext={(password) => history.push('Done', { ...context, password })}
+          onBack={() => history.back()}
+        />
+      )}
+      Done={({ context }) => (
+        <p>Signed up as {context.email}</p>
+      )}
+    />
+  );
+}
+```
+
+#### Key changes
+
+- Pass `context.email` as `defaultEmail` to initialize the form with the saved value.
+- Call `history.replace()` on `onBlur` to update the current step's history entry.
+- When `history.back()` is called later, the context saved by `replace` is restored.
+
+```js
+// After replace on blur:
+history = [
+  { step: 'EmailInput', context: { email: 'user@email.com' } },  // ← updated by replace
+]
+currentIndex = 0
+
+// After push on next:
+history = [
+  { step: 'EmailInput',    context: { email: 'user@email.com' } },  // ← updated state preserved
+  { step: 'PasswordInput', context: { email: 'user@email.com' } },
+]
+currentIndex = 1
+
+// After history.back():
+currentIndex = 0  // → EmailInput renders with { email: 'user@email.com' } ✅
+```
+
+<Callout>
+`replace()` **overwrites the history entry at the current index.** Unlike `push()` which adds a new entry, `replace()` does not change the history length. This makes it ideal for saving form input.
+</Callout>
+
+### push vs replace
+
+| | `history.push()` | `history.replace()` |
+|---|---|---|
+| History entry | Adds new entry | Overwrites current entry |
+| currentIndex | Incremented by 1 | No change |
+| On `back()` | Moves to previous entry | (Previous value is already overwritten) |
+| Use when | Navigating to the next step | Saving current step's state |
+
+```tsx
+// Using push: A → B → C, back goes C → B → A
+history.push('B', contextB);
+history.push('C', contextC);
+
+// Using replace: A → B(replaced with C), back goes C → A
+history.push('B', contextB);
+history.replace('C', contextC); // B is overwritten
+```
+
+Use `replace()` when you want to skip a step in back navigation (e.g., a loading step that shouldn't be revisited).
+
+---
+
+## Performing an action without rendering a step
+
+Sometimes you need a step that doesn't display any UI — for example, calling an API and then immediately moving to the next step based on the result.
+
+### Pattern 1: useEffect with replace
+
+Use `useEffect` to perform the action immediately when the step is entered, and `history.replace()` to skip this step when the user navigates back.
+
+```tsx
+function MyFunnel() {
+  const funnel = useFunnel<{
+    Form: { name?: string; email?: string };
+    Submit: { name: string; email: string };
+    Success: { name: string; email: string; id: string };
+    Error: { name: string; email: string; error: string };
+  }>({
+    id: 'registration',
+    initial: { step: 'Form', context: {} },
+  });
+
+  return (
+    <funnel.Render
+      Form={({ history }) => (
+        <RegistrationForm
+          onSubmit={(name, email) => history.push('Submit', { name, email })}
+        />
+      )}
+      Submit={({ context, history }) => {
+        useEffect(() => {
+          registerUser(context)
+            .then((res) => history.replace('Success', { ...context, id: res.id }))
+            .catch((err) => history.replace('Error', { ...context, error: err.message }));
+        }, []);
+
+        return <LoadingSpinner />;
+      }}
+      Success={({ context }) => (
+        <p>Welcome, {context.name}! Your ID is {context.id}.</p>
+      )}
+      Error={({ context, history }) => (
+        <div>
+          <p>Error: {context.error}</p>
+          <button onClick={() => history.back()}>Try again</button>
+        </div>
+      )}
+    />
+  );
+}
+```
+
+#### Key points
+
+- The `Submit` step shows a brief loading spinner while the API call is in progress.
+- `history.replace()` is used instead of `history.push()` so the loading step is skipped when navigating back.
+- If an error occurs, the user can press "Try again" to go back to the `Form` step (not the `Submit` step).
+
+### Pattern 2: Render.with() and events
+
+You can use `funnel.Render.with()` to define event-driven transitions. This pattern separates the transition logic from the render function.
+
+```tsx
+function MyFunnel() {
+  const funnel = useFunnel<{
+    Form: { name?: string; email?: string };
+    Submit: { name: string; email: string };
+    Success: { name: string; email: string; id: string };
+    Error: { name: string; email: string; error: string };
+  }>({
+    id: 'registration',
+    initial: { step: 'Form', context: {} },
+  });
+
+  return (
+    <funnel.Render
+      Form={({ history }) => (
+        <RegistrationForm
+          onSubmit={(name, email) => history.push('Submit', { name, email })}
+        />
+      )}
+      Submit={funnel.Render.with({
+        events: {
+          submit: async (payload, { history, context }) => {
+            try {
+              const res = await registerUser(context);
+              history.replace('Success', { ...context, id: res.id });
+            } catch (err) {
+              history.replace('Error', { ...context, error: err.message });
+            }
+          },
+        },
+        render({ dispatch }) {
+          useEffect(() => {
+            dispatch('submit');
+          }, []);
+
+          return <LoadingSpinner />;
+        },
+      })}
+      Success={({ context }) => (
+        <p>Welcome, {context.name}! Your ID is {context.id}.</p>
+      )}
+      Error={({ context, history }) => (
+        <div>
+          <p>Error: {context.error}</p>
+          <button onClick={() => history.back()}>Try again</button>
+        </div>
+      )}
+    />
+  );
+}
+```
+
+<Callout>
+The `Render.with()` pattern is especially useful when a single step has multiple possible transitions (e.g., success, different types of errors, retry). See [Transition Events](./transition-event) for more details.
+</Callout>

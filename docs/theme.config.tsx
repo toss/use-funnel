@@ -1,23 +1,33 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router.js';
-import { type DocsThemeConfig, useConfig } from 'nextra-theme-docs';
+import type { DocsThemeConfig } from 'nextra-theme-docs';
+import { useConfig } from 'nextra-theme-docs';
+
+function useLocale() {
+  const { asPath } = useRouter();
+  return asPath.startsWith('/ko') ? 'ko' : 'en';
+}
 
 const config: DocsThemeConfig = {
+  logoLink: false,
   logo: function Logo() {
+    const locale = useLocale();
     return (
-      <div className="flex items-center gap-2">
+      <Link href={`/${locale}`} className="flex items-center gap-2">
         <Image src="/logo.png" width={25} height={25} alt="@use-funnel logo" />
         <div className="relative">
           <strong>@use-funnel</strong>
         </div>
-      </div>
+      </Link>
     );
   },
   head: function Head() {
     const { title, frontMatter } = useConfig();
-    const { asPath, defaultLocale, locale } = useRouter();
+    const { asPath } = useRouter();
+    const locale = useLocale();
 
-    const url = 'https://use-funnel.slash.page' + (defaultLocale === locale ? asPath : `/${locale}${asPath}`);
+    const url = 'https://use-funnel.slash.page' + asPath;
     const contentDescription =
       locale === 'ko'
         ? '모바일 네비게이션에 최적화된 단계별 상태 관리 라이브러리'
@@ -49,20 +59,12 @@ const config: DocsThemeConfig = {
     link: 'https://discord.gg/vGXbVjP2nY',
   },
   docsRepositoryBase: 'https://github.com/toss/use-funnel/tree/main/docs',
-  useNextSeoProps() {
-    const { asPath } = useRouter();
-    if (asPath !== '/' && asPath !== '/ko') {
-      return {
-        titleTemplate: '%s – @use-funnel',
-      };
-    }
-  },
   feedback: { content: '' },
   editLink: {
-    text: function Text() {
-      const router = useRouter();
+    content: function EditLink() {
+      const locale = useLocale();
 
-      if (router.pathname.includes('.ko')) {
+      if (locale === 'ko') {
         return <>이 페이지를 수정하기 →</>;
       }
 
@@ -70,21 +72,14 @@ const config: DocsThemeConfig = {
     },
   },
   sidebar: {
-    titleComponent({ title }) {
-      return <>{title}</>;
-    },
     defaultMenuCollapseLevel: 4,
     toggleButton: true,
   },
-  i18n: [
-    { locale: 'en', text: 'English' },
-    { locale: 'ko', text: '한국어' },
-  ],
   search: {
     placeholder: function Placeholder() {
-      const router = useRouter();
+      const locale = useLocale();
 
-      if (router.pathname.includes('.ko')) {
+      if (locale === 'ko') {
         return '검색어를 입력하세요...';
       }
 
@@ -92,7 +87,7 @@ const config: DocsThemeConfig = {
     },
   },
   footer: {
-    text: 'MIT 2024 © Viva Republica, Inc.',
+    content: 'MIT 2024 © Viva Republica, Inc.',
   },
 };
 
