@@ -1,5 +1,6 @@
 import Image from 'next/image';
-import { Link } from 'nextra-theme-docs';
+import Link from 'next/link';
+import { useRouter } from 'next/router.js';
 
 export const HomePage = ({
   title,
@@ -12,6 +13,9 @@ export const HomePage = ({
   buttonText: string;
   items: { title: string; desc: string }[];
 }) => {
+  const { asPath } = useRouter();
+  const locale = asPath.startsWith('/ko') ? 'ko' : 'en';
+
   return (
     <div className="flex md:h-[calc(100vh-162px)] pt-12">
       <div className="flex flex-col md:h-full md:mr-8 flex-1">
@@ -22,8 +26,8 @@ export const HomePage = ({
             <p className="text-2xl max-lg:text-xl leading-normal break-words">{description}</p>
           </h1>
           <div>
-            <Link href="/docs/overview">
-              <span className="inline-block rounded-xl nx-bg-gray-100 dark:nx-bg-neutral-800 px-10 py-3 text-xl font-bold hover:bg-gray-200">
+            <Link href={`/${locale}/docs/overview`}>
+              <span className="inline-block rounded-xl bg-neutral-800 dark:bg-gray-100 text-white dark:text-black px-10 py-3 text-xl font-bold hover:bg-neutral-700 dark:hover:bg-gray-200">
                 {buttonText}
               </span>
             </Link>
