@@ -1,7 +1,44 @@
 import { cleanup, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { StrictMode, useEffect } from 'react';
 import { afterEach, describe, expect, test } from 'vitest';
 import { useFunnel } from '../src/index.js';
+
+function setPersistedHistory(id: string) {
+  const context = { id: 'persisted' };
+  const histories = [
+    { step: 'A', context: {} },
+    { step: 'B', context },
+  ];
+
+  window.history.replaceState(
+    {
+      ...window.history.state,
+      unrelated: 'preserved',
+      [`${id}.context`]: context,
+      [`${id}.histories`]: histories,
+    },
+    '',
+    `?${id}.step=B&unrelated=preserved#summary`,
+  );
+
+  return { context, histories };
+}
+
+function PersistedFunnel({ id }: { id: string }) {
+  const funnel = useFunnel<{
+    A: { id?: string };
+    B: { id: string };
+  }>({
+    id,
+    initial: {
+      step: 'A',
+      context: {},
+    },
+  });
+
+  return <div>{funnel.step}</div>;
+}
 
 describe('Test useFunnel browser router', () => {
   afterEach(cleanup);
@@ -49,6 +86,81 @@ describe('Test useFunnel browser router', () => {
 
     expect(screen.queryByText('vitest')).toBeNull();
     expect(screen.queryByText('Go B')).not.toBeNull();
+  });
+
+  test('should preserve history during StrictMode effect replay and clean it up on unmount', () => {
+    const id = 'strict-mode';
+    const { context, histories } = setPersistedHistory(id);
+    const originalHref = window.location.href;
+
+    const { unmount } = render(
+      <StrictMode>
+        <PersistedFunnel id={id} />
+      </StrictMode>,
+    );
+
+    expect(screen.queryByText('B')).not.toBeNull();
+    expect(window.location.href).toBe(originalHref);
+    expect(new URLSearchParams(window.location.search).get(`${id}.step`)).toBe('B');
+    expect(new URLSearchParams(window.location.search).get('unrelated')).toBe('preserved');
+    expect(window.location.hash).toBe('#summary');
+    expect(window.history.state[`${id}.context`]).toEqual(context);
+    expect(window.history.state[`${id}.histories`]).toEqual(histories);
+    expect(window.history.state.unrelated).toBe('preserved');
+
+    unmount();
+
+    expect(new URLSearchParams(window.location.search).get(`${id}.step`)).toBeNull();
+    expect(window.history.state[`${id}.context`]).toBeUndefined();
+    expect(window.history.state[`${id}.histories`]).toBeUndefined();
+    expect(new URLSearchParams(window.location.search).get('unrelated')).toBe('preserved');
+    expect(window.location.hash).toBe('#summary');
+    expect(window.history.state.unrelated).toBe('preserved');
+  });
+
+  test('should not restore history over a same-path navigation', () => {
+    const id = 'navigation';
+    setPersistedHistory(id);
+
+    function NavigateDuringReplay() {
+      useEffect(() => {
+        return () => {
+          window.history.replaceState({ replacement: 'new' }, '', '?view=other#details');
+        };
+      }, []);
+
+      return null;
+    }
+
+    render(
+      <StrictMode>
+        <PersistedFunnel id={id} />
+        <NavigateDuringReplay />
+      </StrictMode>,
+    );
+
+    expect(new URLSearchParams(window.location.search).get(`${id}.step`)).toBeNull();
+    expect(window.history.state[`${id}.context`]).toBeUndefined();
+    expect(window.history.state[`${id}.histories`]).toBeUndefined();
+    expect(new URLSearchParams(window.location.search).get('view')).toBe('other');
+    expect(window.location.hash).toBe('#details');
+    expect(window.history.state.replacement).toBe('new');
+  });
+
+  test('should clean up history before the same funnel id remounts', () => {
+    const id = 'remount';
+    setPersistedHistory(id);
+
+    const firstRender = render(<PersistedFunnel id={id} />);
+    firstRender.unmount();
+
+    expect(new URLSearchParams(window.location.search).get(`${id}.step`)).toBeNull();
+    expect(window.history.state[`${id}.context`]).toBeUndefined();
+    expect(window.history.state[`${id}.histories`]).toBeUndefined();
+
+    render(<PersistedFunnel id={id} />);
+
+    expect(screen.queryByText('A')).not.toBeNull();
   });
 
   test('should work funnel.Render.overlay', async () => {

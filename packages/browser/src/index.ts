@@ -1,11 +1,12 @@
 'use client';
 
 import { AnyFunnelState, createUseFunnel } from '@use-funnel/core';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export * from '@use-funnel/core';
 
 export const useFunnel = createUseFunnel(({ id, initialState }) => {
+  const restoreCleanupRef = useRef<(() => void) | undefined>(undefined);
   const [location, setLocation] = useState(() => ({
     search: typeof window !== 'undefined' ? window.location.search : '',
   }));
@@ -14,6 +15,11 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
   }));
 
   useEffect(() => {
+    // Restore a cleanup from React Strict Mode's setup-cleanup-setup replay.
+    const restoreCleanup = restoreCleanupRef.current;
+    restoreCleanupRef.current = undefined;
+    restoreCleanup?.();
+
     function handlePopState(event: PopStateEvent) {
       setLocation(window.location);
       setState(event.state);
@@ -80,25 +86,57 @@ export const useFunnel = createUseFunnel(({ id, initialState }) => {
         window.history.go(index);
       },
       cleanup() {
+        restoreCleanupRef.current = undefined;
+
         const newHistoryState = {
           ...window.history.state,
         };
 
-        const searchParams = new URLSearchParams(window.location.search);
+        const originalHref = window.location.href;
+        const cleanupUrl = new URL(originalHref);
+        const contextName = `${id}.context`;
+        const historiesName = `${id}.histories`;
+        const stepName = `${id}.step`;
+        const currentContext = newHistoryState[contextName];
+        const currentHistories = newHistoryState[historiesName];
+        const currentStep = cleanupUrl.searchParams.get(stepName);
 
-        if (
-          newHistoryState[`${id}.context`] == null ||
-          newHistoryState[`${id}.histories`] == null ||
-          searchParams.get(`${id}.step`) == null
-        ) {
+        if (currentContext == null || currentHistories == null || currentStep == null) {
           return;
         }
 
-        delete newHistoryState[`${id}.context`];
-        delete newHistoryState[`${id}.histories`];
+        delete newHistoryState[contextName];
+        delete newHistoryState[historiesName];
 
-        searchParams.delete(`${id}.step`);
-        window.history.replaceState(newHistoryState, '', `?${searchParams.toString()}`);
+        cleanupUrl.searchParams.delete(stepName);
+        window.history.replaceState(newHistoryState, '', cleanupUrl);
+
+        const cleanedHref = window.location.href;
+        const cleanedHistoryState = window.history.state;
+
+        restoreCleanupRef.current = () => {
+          // Do not restore stale funnel state over another navigation.
+          if (window.location.href !== cleanedHref || window.history.state !== cleanedHistoryState) {
+            return;
+          }
+
+          const currentHistoryState = {
+            ...window.history.state,
+          };
+          const currentSearchParams = new URLSearchParams(window.location.search);
+
+          if (
+            contextName in currentHistoryState ||
+            historiesName in currentHistoryState ||
+            currentSearchParams.has(stepName)
+          ) {
+            return;
+          }
+
+          currentHistoryState[contextName] = currentContext;
+          currentHistoryState[historiesName] = currentHistories;
+          window.history.replaceState(currentHistoryState, '', originalHref);
+        };
       },
     }),
     [id, history, currentIndex, currentState, changeState],
