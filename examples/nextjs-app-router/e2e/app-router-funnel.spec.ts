@@ -25,6 +25,24 @@ test('can move the steps of the funnel using history.push.', async ({ page }) =>
   await expect(page.getByText('Sub End')).toBeVisible();
 });
 
+test('preserves the current step across reloads in StrictMode.', async ({ page }) => {
+  await page.goto(`${APP_ROUTER_LOCAL_URL}funnel`);
+
+  await page.getByRole('button', { name: 'next', exact: true }).click();
+  await page.getByRole('button', { name: 'next', exact: true }).click();
+
+  await expect(page.getByText('MAIN - END')).toBeVisible();
+
+  await page.reload();
+
+  await expect(page.getByText('MAIN - END')).toBeVisible();
+  await expect(page).toHaveURL(/test-app-router-funnel\.step=end/);
+
+  await page.reload();
+
+  await expect(page.getByText('MAIN - END')).toBeVisible();
+});
+
 test('can move the steps of the funnel using Link.', async ({ page }) => {
   await page.goto(APP_ROUTER_LOCAL_URL);
 
